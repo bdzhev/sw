@@ -1,0 +1,1 @@
+export { QuizCardHeaderTitle } from './QuizCardHeaderTitle';

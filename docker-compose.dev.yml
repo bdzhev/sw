@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: oven/bun:1-alpine
+    working_dir: /app
+    command: sh -c "bun install && bun run dev"
+    volumes:
+      - ./backend:/app
+      - backend_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
+
+  frontend:
+    build:
+      context: ./frontend
+    image: oven/bun:1-alpine
+    working_dir: /app
+    command: sh -c "bun install && bun run dev"
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+
+volumes:
+  backend_modules:
+  frontend_modules:

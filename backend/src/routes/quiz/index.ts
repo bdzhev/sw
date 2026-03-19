@@ -1,0 +1,1 @@
+export { quizRoutes } from './quizRoute';

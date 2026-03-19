@@ -1,0 +1,1 @@
+export { useDeleteCharacter } from './useDeleteCharacter';

@@ -1,0 +1,1 @@
+export { useCharacter } from './useCharacter';

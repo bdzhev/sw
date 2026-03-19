@@ -1,0 +1,157 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-alegreya: 'Alegreya', sans-serif;
+
+  --color-bg-primary: var(--color-slate-950);
+  --color-bg-secondary: var(--color-slate-800);
+  --color-fg: var(--color-slate-500);
+
+  --color-border: var(--color-slate-600);
+
+  --color-primary: var(--color-slate-50);
+  --color-secondary: var(--color-slate-300);
+
+  --color-accent-primary: var(--color-teal-300);
+  --color-accent-secondary: var(--color-teal-700);
+
+  --color-branding: var(--color-pink-400);
+
+  --color-danger: var(--color-red-500);
+  --color-warn: var(--color-yellow-500);
+  --color-success: var(--color-green-300);
+  --color-info: var(--color-cyan-200);
+
+  /* remove the colors below in next iterations */
+  --color-primary-bg: var(--color-slate-950);
+  --color-primary-fg: var(--color-slate-800);
+
+  --color-secondary-bg: var(--color-slate-900);
+  --color-secondary-fg: var(--color-slate-700);
+
+  --color-primary-button: var(--color-slate-800);
+  --color-primary-button-bg: var(--color-teal-300);
+  --color-primary-button-hover-bg: var(--color-teal-500);
+
+  --color-secondary-button: var(--color-slate-600);
+  --color-secondary-button-hover: var(--color-slate-500);
+
+  --color-button-disabled: var(--color-slate-700);
+
+  --color-accent: var(--color-pink-400);
+  --color-accent-muted: var(--color-pink-500);
+
+  --color-error: var(--color-red-500);
+}
+
+@utility loading-animation {
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--color-primary-muted),
+        transparent);
+    animation: loading-shimmer 1.25s infinite;
+  }
+}
+
+@keyframes loading-shimmer {
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+
+@utility shimmer {
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -200%;
+    height: 100%;
+    width: 200%;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--color-secondary-bg),
+        transparent);
+    transform: translateX(0);
+  }
+}
+
+@utility shimmer-animate {
+  &::after {
+    animation: shimmer 2s infinite;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+@utility bg-radial {
+  background-image: radial-gradient(circle at center,
+      var(--accent) 0%,
+      var(--secondary) 40%,
+      var(--primary-bg) 100%);
+  background-size: 300% 300%;
+  background-position: center;
+
+}
+
+html,
+body {
+  margin: 0;
+
+  font-family: 'TikTok Sans', sans-serif;
+  font-size: medium;
+  font-style: normal;
+  color: var(--color-primary);
+
+  background-color: var(--color-primary-bg);
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+#app {
+  background-color: var(--color-primary-bg);
+  height: 100%;
+}
+
+/* A little hack for prettier dots i guess. */
+input[type="password"] {
+  font-family: 'Verdana', sans-serif;
+  letter-spacing: 0.125rem;
+}
+
+body {
+  min-height: 100vh;
+}
+
+h1 {
+  @apply text-4xl font-extrabold;
+}
+
+h2 {
+  @apply text-3xl font-bold;
+}
+
+h3 {
+  @apply text-2xl font-extrabold;
+}
+
+h4 {
+  @apply text-xl font-bold;
+}

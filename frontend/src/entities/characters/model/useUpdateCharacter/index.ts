@@ -1,0 +1,1 @@
+export { useUpdateCharacter } from './useUpdateCharacter';
