@@ -20,17 +20,14 @@ New to D&D? Not sure what your stats should be? Stat Wizard walks you through a 
 
 ## Self-hosting
 
-### Prerequisites
+Only [Docker](https://www.docker.com) required — no need to clone the repo or install anything else. Images are published automatically to GitHub Container Registry on every push to `main`.
 
-- [Docker](https://www.docker.com)
-
-### Setup
-
-1. Clone the repo and generate your `.env`:
+1. Download the compose file and generate your `.env`:
    ```sh
-   git clone https://github.com/bdzhev/sw
-   cd sw
-   ./init.sh
+   curl -O https://raw.githubusercontent.com/bdzhev/sw/main/docker-compose.yml
+   curl -O https://raw.githubusercontent.com/bdzhev/sw/main/.env.example
+   curl -O https://raw.githubusercontent.com/bdzhev/sw/main/init.sh
+   chmod +x init.sh && ./init.sh
    ```
    Open `.env` and set `POSTGRES_USER` and `POSTGRES_PASSWORD`.
 
