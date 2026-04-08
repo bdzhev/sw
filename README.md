@@ -32,7 +32,7 @@ New to D&D? Not sure what your stats should be? Stat Wizard walks you through a 
    cd sw
    ./init.sh
    ```
-   Open `.env` and set `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `DATABASE_URL` to match.
+   Open `.env` and set `POSTGRES_USER` and `POSTGRES_PASSWORD`.
 
 2. Start the app:
    ```sh
