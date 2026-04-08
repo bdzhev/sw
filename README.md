@@ -46,22 +46,15 @@ New to D&D? Not sure what your stats should be? Stat Wizard walks you through a 
 
 ## Local dev
 
-Requires [Bun](https://bun.sh).
-
 ```sh
-docker compose up postgres -d
-cd backend && bun run db:migrate
-```
-
-Then in separate terminals:
-
-```sh
-# backend
-cd backend && bun install && bun run dev
-
-# frontend
-cd frontend && bun install && bun run dev
+make dev
 ```
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
+
+On first run, also migrate the database:
+
+```sh
+cd backend && bun run db:migrate
+```
