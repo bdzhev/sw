@@ -7,7 +7,7 @@ COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
-RUN bun run build
+RUN bun run build-only
 
 # Stage 2: serve
 FROM nginx:alpine
