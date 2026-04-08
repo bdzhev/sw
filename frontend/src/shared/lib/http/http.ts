@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_API_URL as string;
+export const BASE_URL =
+  (window as Window & { __API_URL__?: string }).__API_URL__ ??
+  'http://localhost:3000';
 
 async function tryRefresh(): Promise<boolean> {
   const res = await fetch(`${BASE_URL}/auth/refresh`, {

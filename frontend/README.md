@@ -38,17 +38,9 @@ bun run lint
 
 ## Environment
 
-Create a `.env` file in this directory:
+No `.env` file needed. The API URL defaults to `http://localhost:3000` for local dev.
 
-```env
-VITE_API_URL=http://localhost:3000
-```
-
-## Auth
-
-Authentication is handled via Google OAuth through the backend. Clicking "Sign in with Google" redirects to `GET /auth/google`. After the OAuth flow, the backend redirects back to `/auth/callback?token=<jwt>`, where the frontend stores the access token in memory and fetches the current user.
-
-Token refresh is automatic — the HTTP client retries failed 401 requests using a `POST /auth/refresh` call backed by an httpOnly refresh cookie.
+In Docker, `API_URL` is injected at container startup via the root `.env` — see the project root README.
 
 ## Docker
 
