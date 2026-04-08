@@ -1,5 +1,6 @@
 {
   "name": "api_sw",
+  "author": "bdzhev",
   "type": "module",
   "scripts": {
     "dev":"bun run --env-file ../.env --watch src/index.ts",

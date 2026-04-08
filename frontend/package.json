@@ -1,6 +1,7 @@
 {
   "name": "stat_wizard",
   "version": "0.0.0",
+  "author": "bdzhev",
   "private": true,
   "type": "module",
   "scripts": {
