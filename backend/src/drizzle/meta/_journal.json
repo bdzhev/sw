@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1770998757314,
-      "tag": "0000_wealthy_the_fallen",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1772791224639,
-      "tag": "0001_brave_kingpin",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1773242792385,
-      "tag": "0002_yellow_grandmaster",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1773243293762,
-      "tag": "0003_low_talon",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1773653104899,
-      "tag": "0004_equal_albert_cleary",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1774021601057,
-      "tag": "0005_yummy_luminals",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
       "when": 1775000000000,
-      "tag": "0006_username_password_auth",
+      "tag": "0000_init",
       "breakpoints": true
     }
   ]

@@ -1,8 +1,0 @@
-# env
-.env
-
-# deps
-node_modules/
-
-# artifacts
-docker/

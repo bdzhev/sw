@@ -1,1 +1,0 @@
-ALTER TYPE "public"."character_status" ADD VALUE 'pending';
