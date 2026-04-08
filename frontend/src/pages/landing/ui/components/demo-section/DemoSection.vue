@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { onUnmounted } from 'vue';
 
+import { Text } from '@shared/ui/text';
+
 import { useDemoStatsStore } from '../../../model/useDemoStatsStore';
 
 import { DemoFormCard, DemoResultCard } from './components';
@@ -31,13 +33,13 @@ onUnmounted(() => {
     </div>
 
     <div class="col-span-6 row-span-1 w-[80%] text-lg text-primary">
-      <p>
+      <Text>
         The principle is quite simple: you answer a bunch of questions that
         represent the various game scenarious your future character would
         experience and voila – your stats are ready!
-      </p>
+      </Text>
 
-      <p>Below is a somewhat of a demonstration</p>
+      <Text>Below is a somewhat of a demonstration</Text>
     </div>
 
     <DemoFormCard class="col-span-3 row-span-2"/>

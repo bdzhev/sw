@@ -1,4 +1,4 @@
-import type { BaseButtonVariants, BaseButtonSizes } from './BaseButton.types';
+import type { BaseButtonVariants, BaseButtonSizes } from "./BaseButton.types";
 
 export interface ButtonProps {
   variant?: BaseButtonVariants;
@@ -7,4 +7,5 @@ export interface ButtonProps {
   isDisabled?: boolean;
   isRound?: boolean;
   equalPadding?: boolean;
+  type?: "submit" | "button" | "reset";
 }

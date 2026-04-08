@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { signInWithGoogle } from '@shared/api/auth';
+import { Card, CardHeader, HeaderTitle } from '@shared/ui/card';
+
+import { SignUpForm } from './sign-up-form';
 </script>
 
 <template>
-  <div>
-    <button @click="signInWithGoogle">Sign in with Google</button>
-  </div>
+  <Card size="lg" class="w-full max-w-sm p-8">
+    <CardHeader class="mb-6">
+      <HeaderTitle>Sign up</HeaderTitle>
+    </CardHeader>
+
+    <SignUpForm />
+  </Card>
 </template>

@@ -1,16 +1,17 @@
-export { quizQueries } from './queries';
+export { quizQueries } from "./queries";
 
 export {
   getQuizItems,
   getQuizResults,
   sendQuizResults,
   generateStats,
-} from './quiz';
+} from "./quiz";
 
 export type {
-  QuizProgress,
   QuizResults,
   QuizData,
   QuizItem,
   QuizCharacterStats,
-} from './types';
+} from "./types";
+
+export { QUIZ_STATS } from "./types";

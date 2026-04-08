@@ -2,6 +2,6 @@ import { CharacterClass, CharacterRace } from '@shared/api/characters';
 
 export const initialValues = {
   name: '',
-  class: CharacterClass.BARBARIAN,
+  characterClass: CharacterClass.BARBARIAN,
   race: CharacterRace.HUMAN,
 };

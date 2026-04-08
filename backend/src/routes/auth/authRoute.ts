@@ -1,24 +1,25 @@
-import { generateCodeVerifier, generateState, Google } from 'arctic';
 import { and, eq, gt } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { SignJWT } from 'jose';
+
 import { db, sessions, users } from '../../db';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 const ACCESS_TOKEN_TTL = '7d';
 const REFRESH_TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-const google = new Google(
-  process.env.GOOGLE_CLIENT_ID!,
-  process.env.GOOGLE_CLIENT_SECRET!,
-  process.env.GOOGLE_REDIRECT_URI!,
-);
-
-
 async function hashToken(token: string): Promise<string> {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  const buf = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(token)
+  );
+
+  return Array.from(new Uint8Array(buf))
+    .map((b) => {
+      return b.toString(16).padStart(2, '0');
+    })
+    .join('');
 }
 
 async function signAccessToken(userId: number): Promise<string> {
@@ -33,6 +34,7 @@ async function createSession(userId: number): Promise<string> {
   const hash = await hashToken(rawToken);
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
   await db.insert(sessions).values({ userId, refreshTokenHash: hash, expiresAt });
+
   return rawToken;
 }
 
@@ -46,77 +48,78 @@ function setRefreshCookie(c: any, token: string) {
   });
 }
 
-async function findOrCreateUser(
-  provider: string,
-  providerId: string,
-  name: string,
-  email: string,
-) {
-  const existing = await db
-    .select()
-    .from(users)
-    .where(and(eq(users.provider, provider), eq(users.providerId, providerId)));
-
-  if (existing.length > 0) return existing[0];
-
-  const created = await db
-    .insert(users)
-    .values({ provider, providerId, name, email })
-    .returning();
-  return created[0];
+function setAccessCookie(c: any, token: string) {
+  setCookie(c, 'access_token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'Lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 7,
+  });
 }
 
 export const authRoutes = new Hono();
 
-// ─── Google ───────────────────────────────────────────────────────────────────
+// ─── Register ─────────────────────────────────────────────────────────────────
 
-authRoutes.get('/google', async (c) => {
-  const state = generateState();
-  const codeVerifier = generateCodeVerifier();
-  const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'email', 'profile']);
-  setCookie(c, 'oauth_state', state, { httpOnly: true, sameSite: 'Lax', maxAge: 600 });
-  setCookie(c, 'code_verifier', codeVerifier, { httpOnly: true, sameSite: 'Lax', maxAge: 600 });
-  return c.redirect(url.toString());
-});
+authRoutes.post('/register', async (c) => {
+  const { username, password } = await c.req.json<{ username: string; password: string }>();
 
-authRoutes.get('/google/callback', async (c) => {
-  const { code, state } = c.req.query();
-  const storedState = getCookie(c, 'oauth_state');
-  const codeVerifier = getCookie(c, 'code_verifier');
-  deleteCookie(c, 'oauth_state');
-  deleteCookie(c, 'code_verifier');
-
-  if (!state || state !== storedState || !codeVerifier) {
-    return c.json({ error: 'Invalid state' }, 400);
+  if (!username || !password) {
+    return c.json({ error: 'Username and password are required' }, 400);
   }
 
-  let tokens;
-  try {
-    tokens = await google.validateAuthorizationCode(code, codeVerifier);
-  } catch {
-    return c.json({ error: 'Failed to exchange code' }, 400);
+  const existing = await db.select().from(users).where(eq(users.username, username));
+
+  if (existing.length > 0) {
+    return c.json({ error: 'Username already taken' }, 409);
   }
 
-  const profileRes = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
-    headers: { Authorization: `Bearer ${tokens.accessToken()}` },
-  });
-  const profile = await profileRes.json() as { sub: string; name: string; email: string };
-
-  const user = await findOrCreateUser('google', profile.sub, profile.name, profile.email);
+  const created = await db.insert(users).values({ username, password }).returning();
+  const user = created[0];
 
   const refreshToken = await createSession(user.id);
   const accessToken = await signAccessToken(user.id);
 
   setRefreshCookie(c, refreshToken);
-  const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:8080';
-  return c.redirect(`${frontendUrl}/auth/callback?token=${accessToken}`);
+  setAccessCookie(c, accessToken);
+
+  return c.json({ id: user.id, username: user.username }, 201);
+});
+
+// ─── Login ────────────────────────────────────────────────────────────────────
+
+authRoutes.post('/login', async (c) => {
+  const { username, password } = await c.req.json<{ username: string; password: string }>();
+
+  if (!username || !password) {
+    return c.json({ error: 'Username and password are required' }, 400);
+  }
+
+  const result = await db.select().from(users).where(eq(users.username, username));
+
+  if (result.length === 0 || result[0].password !== password) {
+    return c.json({ error: 'Invalid username or password' }, 401);
+  }
+
+  const user = result[0];
+  const refreshToken = await createSession(user.id);
+  const accessToken = await signAccessToken(user.id);
+
+  setRefreshCookie(c, refreshToken);
+  setAccessCookie(c, accessToken);
+
+  return c.json({ id: user.id, username: user.username });
 });
 
 // ─── Refresh ──────────────────────────────────────────────────────────────────
 
 authRoutes.post('/refresh', async (c) => {
   const rawToken = getCookie(c, 'refresh_token');
-  if (!rawToken) return c.json({ error: 'Unauthorized' }, 401);
+
+  if (!rawToken) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
 
   const hash = await hashToken(rawToken);
   const now = new Date();
@@ -131,17 +134,23 @@ authRoutes.post('/refresh', async (c) => {
   }
 
   const accessToken = await signAccessToken(result[0].userId);
-  return c.json({ accessToken });
+  setAccessCookie(c, accessToken);
+
+  return c.json({ success: true });
 });
 
 // ─── Logout ───────────────────────────────────────────────────────────────────
 
 authRoutes.get('/logout', async (c) => {
   const rawToken = getCookie(c, 'refresh_token');
+
   if (rawToken) {
     const hash = await hashToken(rawToken);
     await db.delete(sessions).where(eq(sessions.refreshTokenHash, hash));
   }
+
   deleteCookie(c, 'refresh_token', { path: '/' });
+  deleteCookie(c, 'access_token', { path: '/' });
+
   return c.json({ success: true });
 });

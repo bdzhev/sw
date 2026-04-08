@@ -62,7 +62,7 @@ const { meta } = form;
           placeholder="Character's name"
         />
 
-        <CfClassSelect name="class" />
+        <CfClassSelect name="characterClass" />
 
         <CfRaceSelect name="race" />
       </CfBody>

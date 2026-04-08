@@ -2,6 +2,7 @@
 import { User } from 'lucide-vue-next';
 import { RouterLink } from 'vue-router';
 
+import { RouteName } from '@shared/lib/router';
 import { Button } from '@shared/ui/button';
 import {
   TooltipRoot,
@@ -18,12 +19,7 @@ const { signOut } = useSignOut();
 <template>
   <TooltipRoot placement="right-end" portal-to="body">
     <TooltipTrigger>
-      <Button
-        size="sm"
-        variant="transparent"
-        class="relative w-full"
-        equal-padding
-      >
+      <Button size="sm" variant="transparent" class="relative w-full" equal-padding>
         <User :size="20" />
       </Button>
     </TooltipTrigger>
@@ -31,16 +27,11 @@ const { signOut } = useSignOut();
     <TooltipPortal>
       <TooltipContent>
         <div class="flex flex-col gap-2">
-          <Button
-            variant="transparent"
-            size="sm"
-            @click="signOut"
-            class="w-full"
-          >
+          <Button variant="transparent" size="sm" @click="signOut" class="w-full">
             Sign out
           </Button>
 
-          <RouterLink to="/app/settings">
+          <RouterLink :to="{ name: RouteName.APP_SETTINGS }">
             <Button variant="transparent" size="sm" class="w-full">
               Edit profile
             </Button>

@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-import { toTypedSchema } from '@vee-validate/zod';
 import { useElementBounding } from '@vueuse/core';
 import { useField } from 'vee-validate';
 import { ref, computed } from 'vue';
-import z4 from 'zod/v4';
 
 import type { BaseSliderProps } from './BaseSlider.props';
 
@@ -14,10 +12,9 @@ const props = withDefaults(defineProps<BaseSliderProps>(), {
   shouldShowTicks: false,
 });
 
-const { value, handleBlur, handleChange } = useField(
-  () => props.name,
-  toTypedSchema(z4.number()),
-);
+const { value, handleBlur, handleChange } = useField<number>(() => {
+  return props.name;
+});
 
 const slider = ref<HTMLElement | null>(null);
 const thumb = ref<HTMLElement | null>(null);
@@ -97,60 +94,35 @@ const onPointerUp = (e: PointerEvent) => {
 };
 </script>
 
-<!-- prettier-ignore -->
 <template>
-  <div
-    ref="slider"
-    class="
-      relative flex h-6 w-full cursor-pointer items-center justify-center
-      select-none
-    "
-    @pointerdown="onPointerDown"
-    @pointermove="onPointerMove"
-    @pointerup="onPointerUp"
-    @pointercancel="onPointerUp"
-    role="slider"
-    :aria-valuemin="props.min"
-    :aria-valuemax="props.max"
-    :aria-valuenow="value"
-    tabindex="0"
-  >
+  <div ref="slider" class="
+    relative flex h-6 w-full cursor-pointer items-center justify-center
+    select-none
+  " @pointerdown="onPointerDown" @pointermove="onPointerMove" @pointerup="onPointerUp" @pointercancel="onPointerUp"
+    role="slider" :aria-valuemin="props.min" :aria-valuemax="props.max" :aria-valuenow="value.value" tabindex="0">
     <div class="absolute right-0 left-0 h-1.5 rounded-md bg-fg/30" />
 
-    <div
-      class="absolute right-0 left-0 h-1.5 rounded-md bg-fg transition-all"
-      :style="{ width: `${thumbPercent}%` }"
-    />
+    <div class="absolute right-0 left-0 h-1.5 rounded-md bg-fg transition-all" :style="{ width: `${thumbPercent}%` }" />
 
     <div v-if="props.shouldShowTicks" class="absolute top-1 h-2 w-full">
-      <div
-        v-for="n in props.max"
-        :key="n"
-        class="absolute h-4 w-0.5 rounded-sm bg-secondary"
-        :class="{ hidden: n === props.min || n === props.max }"
-        :style="{
-          left: `${((n - props.min) / (props.max - props.min)) * 100}%`,
-          transform: 'translateX(-50%)',
-        }"
-      />
+      <div v-for="n in props.max" :key="n" class="
+        absolute h-4 w-0.5 rounded-sm bg-secondary
+      " :class="{ hidden: n === props.min || n === props.max }" :style="{
+        left: `${((n - props.min) / (props.max - props.min)) * 100}%`,
+        transform: 'translateX(-50%)',
+      }" />
     </div>
 
-    <div
-      ref="thumb"
-      class="
-        absolute flex h-4 w-4 translate-x-[-50%] items-center justify-center
-        rounded-full border-2 border-accent-primary bg-accent-primary
-        text-center text-sm font-bold text-transparent transition-all
-        duration-150
-        hover:h-7 hover:w-7 hover:bg-bg-secondary hover:text-primary
-        active:h-7 active:w-7 active:bg-bg-secondary active:text-primary
-      "
-      :style="{
-        left: `min(max(${thumbPercent}%, 2%), 98%)`,
-        touchAction: 'none',
-      }"
-      aria-hidden="true"
-    >
+    <div ref="thumb" class="
+      absolute flex h-4 w-4 translate-x-[-50%] items-center justify-center
+      rounded-full border-2 border-accent-primary bg-accent-primary text-center
+      text-sm font-bold text-transparent transition-all duration-150
+      hover:h-7 hover:w-7 hover:bg-bg-secondary hover:text-primary
+      active:h-7 active:w-7 active:bg-bg-secondary active:text-primary
+    " :style="{
+      left: `min(max(${thumbPercent}%, 2%), 98%)`,
+      touchAction: 'none',
+    }" aria-hidden="true">
       {{ value }}
     </div>
   </div>

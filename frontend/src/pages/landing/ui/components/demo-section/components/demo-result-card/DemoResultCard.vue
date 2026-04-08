@@ -8,6 +8,6 @@ const store = useDemoStatsStore();
 
 <template>
   <Card>
-    <p>{{ store.state.characterName }}</p>
+    <Text>{{ store.state.characterName }}</Text>
   </Card>
 </template>

@@ -55,8 +55,9 @@ const racialBonusMap: Record<CharacterRace, Partial<CharacterStats>> = {
   'half-elf':  { [Stat.CON]: 2 },
 };
 
-const sanitize = (value: number): number =>
-  RESTRICTED_VALUES.includes(value) ? value - 1 : value;
+const sanitize = (value: number): number =>{
+  return RESTRICTED_VALUES.includes(value) ? value - 1 : value;
+}
 
 export const calculateStats = (
   results: Partial<QuizResults>,
@@ -119,6 +120,7 @@ export const calculateStats = (
 
   return ALL_STATS.reduce((acc, stat) => {
     acc[stat] = (pointsToAbilityScores[allocated[stat]] ?? 8) + (racialBonus[stat] ?? 0);
+
     return acc;
   }, {} as CharacterStats);
 };

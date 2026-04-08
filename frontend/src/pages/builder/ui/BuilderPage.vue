@@ -1,12 +1,14 @@
 <script setup lang="ts">
-
 import { useRouteParam } from '../lib/useRouteParam';
+import { BuilderProvider } from '../model/BuilderProvider';
 
-import { QuizSteps } from './QuizSteps';
+import { BuilderQuiz } from './BuilderQuiz';
 
 const { characterId } = useRouteParam();
 </script>
 
 <template>
-  <QuizSteps :character-id="characterId" />
+  <BuilderProvider :character-id="characterId">
+    <BuilderQuiz />
+  </BuilderProvider>
 </template>

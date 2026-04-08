@@ -2,12 +2,16 @@
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
+import { RouteName } from '@shared/lib/router';
+
 import { useUser } from '@entities/user';
 
 const { isLoggedIn } = useUser();
 
 const redirectLink = computed(() => {
-  return isLoggedIn.value ? '/app' : '/';
+  return isLoggedIn.value
+    ? { name: RouteName.APP_HOME }
+    : { name: RouteName.HOME };
 });
 </script>
 

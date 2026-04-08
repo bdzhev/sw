@@ -1,0 +1,1 @@
+export { characterRoute } from './characterRoute';

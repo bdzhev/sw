@@ -1,15 +1,17 @@
-import { LanguageCodes } from '@shared/config/locale';
+import { LanguageCodes } from "@shared/config/locale";
 
 enum Stats {
-  STR = 'str',
-  DEX = 'dex',
-  WIS = 'wis',
-  INT = 'int',
-  CHA = 'cha',
-  CON = 'con',
+  STR = "str",
+  DEX = "dex",
+  WIS = "wis",
+  INT = "int",
+  CHA = "cha",
+  CON = "con",
 }
 
-export type QuizCharacterStats = Exclude<Stats, Stats.CON>;
+export const QUIZ_STATS = ["str", "dex", "wis", "int", "cha"] as const;
+
+export type QuizCharacterStats = (typeof QUIZ_STATS)[number];
 
 export type CharacterStats = Record<Stats, number>;
 
@@ -47,19 +49,9 @@ export interface QuizData {
 
 export type QuizResults = Record<string, QuizCharacterStats>;
 
-export interface QuizProgress {
-  /**
-   * Id of a form step that was properly filled to track
-   * the progress of the user in filling the quiz form.
-   * This value is increment-only.
-   */
-  progress: number;
-  results: QuizResults;
-}
-
 export interface SendQuizResultsOptions {
   characterId: string;
-  quizResults: QuizProgress;
+  results: QuizResults;
 }
 
 export interface GenerateStatsPayload {

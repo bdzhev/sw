@@ -10,6 +10,7 @@ import {
 } from './BaseButton.themes';
 
 const props = withDefaults(defineProps<ButtonProps>(), {
+  type: 'button',
   variant: 'primary',
   size: 'sm',
   isDisabled: false,
@@ -38,15 +39,19 @@ const buttonClasses = computed(() => {
 </script>
 
 <template>
-  <button :disabled="props.isDisabled || props.isLoading" :class="[
-    `
-      flex w-fit cursor-pointer flex-row items-center justify-center
-      transition-all duration-200
-      disabled:cursor-not-allowed disabled:bg-fg disabled:text-bg-secondary
-      disabled:inset-ring-0
-    `,
-    buttonClasses,
-  ]">
+  <button
+    :type="props.type"
+    :disabled="props.isDisabled || props.isLoading"
+    :class="[
+      `
+        flex w-fit cursor-pointer flex-row items-center justify-center
+        transition-all duration-200
+        disabled:cursor-not-allowed disabled:bg-fg disabled:text-bg-secondary
+        disabled:inset-ring-0
+      `,
+      buttonClasses,
+    ]"
+  >
     <slot />
   </button>
 </template>

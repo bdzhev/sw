@@ -8,7 +8,9 @@ import type { RadioContext } from './types';
 
 const props = defineProps<RadioFieldProps>();
 
-const { value, setValue } = useField<string | number>(() => props.name);
+const { value, setValue } = useField<string | number>(() => {
+  return props.name;
+});
 
 const handleChange = (newValue: string | number) => {
   setValue(newValue);

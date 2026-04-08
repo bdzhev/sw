@@ -20,29 +20,18 @@ const { characters, isCharInfoLoading, isCharInfoRefetching } =
 </script>
 
 <template>
-  <div v-if="isCharInfoLoading" class="row-auto grid grid-cols-2 gap-8 px-10">
-    <CharacterCardSkeleton
-      class="h-50"
-      v-for="n in SKELETON_CARD_COUNT"
-      :key="n"
-    />
+  <div v-if="isCharInfoLoading" class="row-auto grid grid-cols-3 gap-8 px-10">
+    <CharacterCardSkeleton class="h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
   </div>
 
-  <div
-    v-else
-    class="row-auto grid grid-cols-2 gap-8 px-10"
-    id="characterInfoList"
-  >
+  <div v-else class="row-auto grid grid-cols-3 gap-8 px-10" id="characterInfoList">
     <div v-if="isCharInfoRefetching">
       <CharacterCardSkeleton class="h-50" />
     </div>
 
-    <CharCardRoot
-      v-for="char in characters"
-      :key="char.id"
-      v-bind="char"
-      class="col-span-1 row-span-1 h-50"
-    >
+    <CharCardRoot v-for="char in characters" :key="char.id" v-bind="char" class="
+      col-span-1 row-span-1 h-50
+    ">
       <CharCardHeader>
         <CoreInfoLine label="Class" field="characterClass" />
 

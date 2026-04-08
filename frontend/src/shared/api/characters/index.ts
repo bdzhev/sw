@@ -14,6 +14,7 @@ export {
   CharacterStatus,
   CharacterStat,
   CharacterRace,
+  type BaseCharacterData,
   type CharacterData,
   type AddCharacterPayload,
   type UpdateCharacterPayload,

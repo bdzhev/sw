@@ -2,20 +2,27 @@ import { http } from '@shared/lib/http';
 
 import type {
   QuizData,
-  QuizProgress,
+  QuizResults,
   SendQuizResultsOptions,
   GenerateStatsPayload,
   CharacterStats,
 } from './types';
 
-export const getQuizItems = (): Promise<QuizData> =>
-  http.get<QuizData>('/quiz/questions');
+export const getQuizItems = () => {
+  return http.get<QuizData>('/quiz/questions');
+};
 
-export const getQuizResults = (characterId: string): Promise<QuizProgress | null> =>
-  http.get<QuizProgress | null>(`/quiz/${characterId}`);
+export const getQuizResults = (characterId: string) => {
+  return http.get<QuizResults | null>(`/quiz/${characterId}`);
+};
 
-export const sendQuizResults = ({ characterId, quizResults }: SendQuizResultsOptions): Promise<QuizProgress> =>
-  http.put<QuizProgress>(`/quiz/${characterId}`, quizResults);
+export const sendQuizResults = ({
+  characterId,
+  results,
+}: SendQuizResultsOptions) => {
+  return http.put<QuizResults>(`/quiz/${characterId}`, results);
+};
 
-export const generateStats = ({ characterId }: GenerateStatsPayload): Promise<{ stats: CharacterStats }> =>
-  http.post<{ stats: CharacterStats }>(`/quiz/${characterId}/generate`);
+export const generateStats = ({ characterId }: GenerateStatsPayload) => {
+  return http.post<{ stats: CharacterStats }>(`/quiz/${characterId}/generate`);
+};

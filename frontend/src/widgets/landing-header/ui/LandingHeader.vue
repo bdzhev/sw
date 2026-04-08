@@ -2,8 +2,11 @@
 import { onUnmounted } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
 
+import { ImageFolder } from '@shared/lib/assets';
+import { RouteName } from '@shared/lib/router';
 import { useHasScrolled } from '@shared/lib/ui';
 import { Button } from '@shared/ui/button';
+import { Image } from '@shared/ui/image';
 
 import { useUser } from '@entities/user';
 
@@ -50,15 +53,30 @@ onUnmounted(() => {
           : `w-full px-20`,
       ]"
     >
-      <NavLink link="/">Home</NavLink>
+      <NavLink :link="{ name: RouteName.HOME }">
+        <Image
+          :folder="ImageFolder.Base"
+          name="goblin-fairy"
+          alt="Flying goblin fairy"
+          class="h-12 w-12"
+        />
+      </NavLink>
 
       <div class="flex flex-row items-center gap-8">
-        <NavLink v-if="!isLoggedIn" link="/login" v-on:click="handleLinkClick">
+        <NavLink
+          v-if="!isLoggedIn"
+          :link="{ name: RouteName.LOGIN }"
+          v-on:click="handleLinkClick"
+        >
           Sign in
         </NavLink>
 
         <RouterLink
-          :to="isLoggedIn ? '/app' : '/signup'"
+          :to="
+            isLoggedIn
+              ? { name: RouteName.APP_HOME }
+              : { name: RouteName.SIGNUP }
+          "
           @click="handleLinkClick"
         >
           <Button :is-round="true" size="md">

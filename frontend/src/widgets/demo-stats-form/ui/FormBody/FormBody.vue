@@ -7,11 +7,11 @@ import { demoStatInputDemoItems } from '../../config/stats/stats';
 
 <template>
   <div class="px-8 py-6">
-    <p>Character's name</p>
-    <Input name="characterName" placeholder="Jimbo" class="mt-2 mb-12" />
+    <Text>Character's name</Text>
+    <Input name="characterName" placeholder="Jimbo" class="mt-2" />
 
     <div v-for="item in demoStatInputDemoItems" :key="item.id">
-      <p>{{ item.title }}</p>
+      <Text>{{ item.title }}</Text>
 
       <Slider
         :name="`stats.${item.id}`"

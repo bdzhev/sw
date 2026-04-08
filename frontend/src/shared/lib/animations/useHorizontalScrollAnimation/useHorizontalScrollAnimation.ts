@@ -2,11 +2,22 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { onBeforeUnmount, nextTick } from 'vue';
 
-interface UseHorizontalScrollAnimationOptions {
-  wrapperSelector: string;
-  rowSelector: string;
-  childrenSelector: string;
-}
+import { Device, getDevice } from '../../system/device';
+
+import type { UseHorizontalScrollAnimationOptions } from './types';
+
+const scrubByDevice: Record<Device, number | boolean> = {
+  // instant
+  [Device.Mobile]: true,
+  [Device.Tablet]: true,
+  [Device.Desktop]: 0.5,
+};
+
+const endMultiplierByDevice: Record<Device, number> = {
+  [Device.Mobile]: 3,
+  [Device.Tablet]: 2,
+  [Device.Desktop]: 1,
+};
 
 export const useHorizontalScrollAnimation = (
   options: UseHorizontalScrollAnimationOptions,
@@ -26,8 +37,6 @@ export const useHorizontalScrollAnimation = (
       return;
     }
 
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-
     scrollTween = gsap.to(sections, {
       xPercent: -100 * (sections.length - 1),
       ease: 'none',
@@ -35,9 +44,22 @@ export const useHorizontalScrollAnimation = (
         trigger: wrapper,
         // markers: true,
         start: 'top top',
-        end: () => wrapper.offsetWidth * (sections.length - 1),
+        end: () => {
+          const device = getDevice();
+
+          return (
+            wrapper.offsetWidth *
+            (sections.length - 1) *
+            endMultiplierByDevice[device]
+          );
+        },
         pin: true,
-        scrub: isMobile ? 0.4 : 0.1,
+        scrub: scrubByDevice[getDevice()],
+        snap: {
+          snapTo: 1 / (sections.length - 1),
+          duration: { min: 0.2, max: 0.5 },
+          ease: 'power1.inOut',
+        },
         invalidateOnRefresh: true,
       },
     });

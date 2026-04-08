@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { characters, db, quizData } from '../../db';
 import { calculateStats } from './calculateStats';
@@ -19,12 +19,13 @@ quizRoutes.get('/:characterId', async (c) => {
     const result = await db.select().from(quizData).where(eq(quizData.characterId, characterId));
 
     if (result.length === 0) {
-      return c.json({ progress: null, results: {} });
+      return c.json({ results: {} });
     }
 
     return c.json(result[0]);
   } catch (err) {
     console.error(err);
+
     return c.json({ error: 'Failed to get quiz data' }, 500);
   }
 });
@@ -32,7 +33,7 @@ quizRoutes.get('/:characterId', async (c) => {
 // PUT /quiz/:characterId — upsert (create or replace)
 quizRoutes.put('/:characterId', async (c) => {
   const characterId = c.req.param('characterId');
-  const { progress, results } = await c.req.json();
+  const { results } = await c.req.json();
 
   if (!results) {
     return c.json({ error: 'results is required' }, 400);
@@ -41,12 +42,16 @@ quizRoutes.put('/:characterId', async (c) => {
   try {
     const result = await db
       .insert(quizData)
-      .values({ characterId, progress: progress ?? 0, results })
+      .values({ characterId, results })
       .onConflictDoUpdate({
         target: quizData.characterId,
-        set: { progress: progress ?? 0, results },
+        set: { results },
       })
       .returning();
+
+    await db.update(characters)
+      .set({ status: 'draft' })
+      .where(and(eq(characters.id, characterId), eq(characters.status, 'pending')));
 
     return c.json(result[0]);
   } catch (err: any) {
@@ -54,6 +59,7 @@ quizRoutes.put('/:characterId', async (c) => {
       return c.json({ error: 'Character not found' }, 404);
     }
     console.error(err);
+
     return c.json({ error: 'Failed to upsert quiz data' }, 500);
   }
 });
@@ -61,15 +67,13 @@ quizRoutes.put('/:characterId', async (c) => {
 // PATCH /quiz/:characterId — partial update
 quizRoutes.patch('/:characterId', async (c) => {
   const characterId = c.req.param('characterId');
-  const { progress, results } = await c.req.json();
+  const { results } = await c.req.json();
 
-  if (progress === undefined && results === undefined) {
-    return c.json({ error: 'At least one of progress or results is required' }, 400);
+  if (results === undefined) {
+    return c.json({ error: 'results is required' }, 400);
   }
 
-  const updates: Record<string, unknown> = {};
-  if (progress !== undefined) updates.progress = progress;
-  if (results !== undefined) updates.results = results;
+  const updates: Record<string, unknown> = { results };
 
   try {
     const result = await db
@@ -85,6 +89,7 @@ quizRoutes.patch('/:characterId', async (c) => {
     return c.json(result[0]);
   } catch (err) {
     console.error(err);
+
     return c.json({ error: 'Failed to update quiz data' }, 500);
   }
 });
@@ -110,9 +115,13 @@ quizRoutes.post('/:characterId/generate', async (c) => {
     const { class: charClass, race } = character[0];
     const stats = calculateStats(quiz[0].results as any, charClass, race);
 
+    await db.update(characters).set({ stats, status: 'active' }).where(eq(characters.id, characterId));
+    await db.delete(quizData).where(eq(quizData.characterId, characterId));
+
     return c.json({ stats });
   } catch (err) {
     console.error(err);
+
     return c.json({ error: 'Failed to generate stats' }, 500);
   }
 });

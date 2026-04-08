@@ -7,7 +7,7 @@ const props = defineProps<CardHeaderProps>();
 <template>
   <div
     :class="{
-      'border-b-1 border-secondary': props.hasDivider,
+      'border-b border-secondary': props.hasDivider,
       'flex w-full flex-row': true,
     }"
   >

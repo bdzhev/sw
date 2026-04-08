@@ -1,12 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
 
 import {
   quizQueries,
   sendQuizResults as sendQuizResultsRequest,
-  type QuizProgress,
-} from '@shared/api/quiz';
+  type QuizResults,
+} from "@shared/api/quiz";
 
-import type { UseSendQuizResultsOptions } from './types';
+import type { UseSendQuizResultsOptions } from "./types";
 
 export const useSendQuizResults = (options: UseSendQuizResultsOptions) => {
   const { characterId, onSuccess } = options;
@@ -14,15 +14,13 @@ export const useSendQuizResults = (options: UseSendQuizResultsOptions) => {
   const qc = useQueryClient();
 
   const { mutateAsync: sendQuizResults, isPending } = useMutation({
-    mutationFn: async (quizResults: QuizProgress) => {
-      await sendQuizResultsRequest({ characterId, quizResults });
-
-      return quizResults;
+    mutationFn: async (results: QuizResults) => {
+      return sendQuizResultsRequest({ characterId, results });
     },
     onSuccess: (data) => {
       qc.setQueryData(
         quizQueries.quizResults(characterId),
-        (oldData: QuizProgress) => {
+        (oldData: QuizResults) => {
           return oldData ? { ...oldData, ...data } : data;
         },
       );

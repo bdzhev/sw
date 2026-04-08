@@ -1,4 +1,6 @@
+import type { RouteLocationRaw } from 'vue-router';
+
 export interface NavLinkProps {
-  link: string;
+  link: RouteLocationRaw;
   onClick?: () => void;
 }

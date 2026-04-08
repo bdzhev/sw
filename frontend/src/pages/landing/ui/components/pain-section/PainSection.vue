@@ -15,7 +15,6 @@ useHorizontalScrollAnimation({
 const { t } = useI18n();
 </script>
 
-<!-- prettier-ignore -->
 <template>
   <section
     id="horizontalWrapper"
@@ -23,10 +22,7 @@ const { t } = useI18n();
   >
     <div id="painSectionScroll" class="relative flex flex-nowrap">
       <span
-        class="
-          absolute top-0 z-10 mt-30 mb-8 translate-y-2 px-20 font-alegreya
-          text-5xl font-extrabold text-primary italic
-        "
+        class="absolute top-0 z-10 mt-30 mb-8 translate-y-2 px-20 font-alegreya text-2xl font-extrabold text-primary italic lg:text-5xl"
         id="title"
       >
         {{ t('Character creation has always been a struggle...') }}
@@ -34,7 +30,7 @@ const { t } = useI18n();
 
       <HorizontalScrollSection>
         <Card class="h-full w-full" variant="outline" size="lg" :blur="false">
-          You get invited to a cool new adventure
+          {{ t('You get invited to a cool new adventure') }}
         </Card>
       </HorizontalScrollSection>
 

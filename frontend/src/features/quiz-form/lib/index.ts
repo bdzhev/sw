@@ -1,1 +1,0 @@
-export { getQuizProgress } from './getQuizProgress';

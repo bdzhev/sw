@@ -2,22 +2,28 @@ import { useQuery } from '@tanstack/vue-query';
 
 import { getQuizResults, quizQueries } from '@shared/api/quiz';
 
-export const useQuizResults = (characterId: string) => {
-  const { data, isFetching } = useQuery({
+import type { UseQuizResultsOptions } from './useQuizResults.types';
+
+export const useQuizResults = (options: UseQuizResultsOptions) => {
+  const { characterId, shouldRefetchOnMount = false } = options || {};
+
+  const {
+    data: quizResults,
+    isFetching: isFetchingQuizResults,
+    refetch: refetchQuizResults,
+    error: quizResultsError,
+  } = useQuery({
     queryKey: quizQueries.quizResults(characterId),
     queryFn: async () => {
-      const data = await getQuizResults(characterId);
-
-      if (data === null) {
-        return { progress: null, results: {} };
-      }
-
-      return data;
+      return await getQuizResults(characterId);
     },
+    refetchOnMount: shouldRefetchOnMount,
   });
 
   return {
-    quizResults: data,
-    isFetchingQuizResults: isFetching,
+    quizResults,
+    isFetchingQuizResults,
+    refetchQuizResults,
+    quizResultsError,
   };
 };

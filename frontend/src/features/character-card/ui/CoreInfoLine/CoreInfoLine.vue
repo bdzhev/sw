@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 
+import { Text } from '@shared/ui/text';
+
 import type { CharCardContext } from '../CharCardRoot.types';
 
 import type { CoreInfoLineProps } from './CoreInfoLine.props';
@@ -8,13 +10,12 @@ import type { CoreInfoLineProps } from './CoreInfoLine.props';
 const ctx = inject<CharCardContext>('charCardCtx')!;
 
 const props = defineProps<CoreInfoLineProps>();
-
 </script>
 
 <template>
   <div class="flex flex-row gap-2">
-    <p class="font-bold">{{ props.label }}</p>
+    <Text class="font-bold">{{ props.label }}</Text>
 
-    <p>{{ ctx[props.field] }}</p>
+    <Text>{{ ctx[props.field] }}</Text>
   </div>
 </template>

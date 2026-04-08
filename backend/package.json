@@ -11,8 +11,7 @@
     "db:migrate": "bunx drizzle-kit migrate"
   },
   "dependencies": {
-    "arctic": "^3.7.0",
-    "drizzle-orm": "^0.45.1",
+"drizzle-orm": "^0.45.1",
     "hono": "^4.11.9",
     "jose": "^6.2.1",
     "pg": "^8.18.0"

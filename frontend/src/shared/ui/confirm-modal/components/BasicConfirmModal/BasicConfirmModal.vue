@@ -1,4 +1,5 @@
-<script setup lang="ts">
+<script setup
+lang="ts">
 import { Button } from '@shared/ui/button';
 import {
   ModalCloseButton,
@@ -39,8 +40,8 @@ const props = defineProps<BaseConfirmModalProps>();
         <div class="
           right-4 bottom-6 flex flex-row items-center justify-end gap-4
         ">
-          <ModalCloser v-slot="{ onClick }">
-            <Button variant="secondary" @click="onClick" :is-disabled="props.isLoading">{{ 'Cancel' }}</Button>
+          <ModalCloser>
+            <Button variant="secondary" :is-disabled="props.isLoading">{{ 'Cancel' }}</Button>
           </ModalCloser>
 
           <Button :variant="props.actionType === 'negative' ? 'danger' : 'primary'" @click="props?.onConfirm"

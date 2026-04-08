@@ -1,16 +1,18 @@
-import { computed } from 'vue';
-import { useInfiniteQuery } from '@tanstack/vue-query';
+import { useInfiniteQuery } from "@tanstack/vue-query";
+import { computed } from "vue";
 
 import {
   getCharactersInfo,
   characterQueries,
   PAGE_SIZE,
-} from '@shared/api/characters';
+} from "@shared/api/characters";
 
 export const useCharactersInfo = () => {
   const { data, isLoading, isRefetching, fetchNextPage } = useInfiniteQuery({
     queryKey: characterQueries.characters(),
-    queryFn: () => getCharactersInfo(),
+    queryFn: ({ pageParam }) => {
+      return getCharactersInfo(pageParam);
+    },
     getNextPageParam: (lastPage, pages) => {
       if (lastPage.length < PAGE_SIZE) {
         return undefined;
@@ -25,7 +27,9 @@ export const useCharactersInfo = () => {
     staleTime: Infinity,
   });
 
-  const characters = computed(() => data.value?.pages.flat() ?? []);
+  const characters = computed(() => {
+    return data.value?.pages.flat() ?? [];
+  });
 
   return {
     characters,

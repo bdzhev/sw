@@ -20,15 +20,22 @@ useScrollSmoother({
  * it will be placed in main, which is not semantically accurate.
  */
 const FancyBackground = defineAsyncComponent({
-  loader: () => import('./components').then((m) => m.FancyBackground),
-  timeout: 3000,
+  loader: async () => {
+    const { FancyBackground } = await import('./components');
+
+    return FancyBackground;
+  },
+  timeout: 1000,
 });
 </script>
 
 <template>
   <TopSection />
+
   <PainSection />
+
   <DemoSection />
+
   <AboutSection />
 
   <transition

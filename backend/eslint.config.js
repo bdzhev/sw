@@ -26,6 +26,17 @@ export default tseslint.config(
       ],
       "@typescript-eslint/consistent-type-imports": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
+      "arrow-body-style": ["error", "always"],
+      "curly": ["error", "all"],
+      "@typescript-eslint/explicit-function-return-type": ["warn", {
+        allowExpressions: true,
+        allowTypedFunctionExpressions: true,
+        allowHigherOrderFunctions: true,
+      }],
+      "padding-line-between-statements": [
+        "error",
+        { blankLine: "always", prev: "*", next: "return" },
+      ],
     },
   },
 

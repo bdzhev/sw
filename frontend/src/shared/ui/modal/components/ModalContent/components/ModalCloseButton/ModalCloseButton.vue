@@ -11,15 +11,11 @@ const handleCloseButtonClick = () => {
 };
 </script>
 
-<!--prettier-ignore-->
 <template>
-  <button
-    @click="handleCloseButtonClick"
-    class="
-      cursor-pointer text-secondary
-      hover:text-primary
-    "
-  >
+  <button type="button" @click="handleCloseButtonClick" class="
+    cursor-pointer text-secondary
+    hover:text-primary
+  ">
     <X :size="20" />
   </button>
 </template>

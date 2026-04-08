@@ -1,16 +1,16 @@
 import { toTypedSchema } from '@vee-validate/zod';
-import z4 from 'zod/v4';
+import { z } from 'zod';
 
 import { CharacterClass, CharacterRace } from '@shared/api/characters';
 import { ONLY_LETTERS_SPACES_APOSTROPHE } from '@shared/lib/regex';
 
-const schema = z4.object({
-  name: z4
+const schema = z.object({
+  name: z
     .string()
     .min(1, 'Please enter a name')
     .regex(ONLY_LETTERS_SPACES_APOSTROPHE, 'Only letters are allowed'),
-  class: z4.enum(CharacterClass),
-  race: z4.enum(CharacterRace),
+  characterClass: z.nativeEnum(CharacterClass),
+  race: z.nativeEnum(CharacterRace),
 });
 
 export const createCharacterSchema = toTypedSchema(schema);

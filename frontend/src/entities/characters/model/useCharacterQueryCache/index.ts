@@ -1,0 +1,1 @@
+export { useCharacterQueryCache } from './useCharacterQueryCache';

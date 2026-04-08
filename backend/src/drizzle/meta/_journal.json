@@ -36,6 +36,20 @@
       "when": 1773653104899,
       "tag": "0004_equal_albert_cleary",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1774021601057,
+      "tag": "0005_yummy_luminals",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1775000000000,
+      "tag": "0006_username_password_auth",
+      "breakpoints": true
     }
   ]
 }

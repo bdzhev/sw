@@ -16,6 +16,7 @@ export enum CharacterClass {
 export enum CharacterStatus {
   ACTIVE = 'active',
   DRAFT = 'draft',
+  PENDING = 'pending',
 }
 
 export enum CharacterStat {
@@ -39,22 +40,34 @@ export enum CharacterRace {
   HALF_ELF = 'half-elf',
 }
 
-export interface CharacterData {
+export interface BaseCharacterData {
   id: string;
   name: string;
   characterClass: CharacterClass;
   race: CharacterRace;
   status: CharacterStatus;
-  stats: Record<CharacterStat, number> | null;
 }
 
-export type AddCharacterPayload = {
-  name: string;
-  characterClass: CharacterClass;
-  race: CharacterRace;
+type CharacterStats = Record<CharacterStat, number> | null;
+
+export interface CharacterData extends BaseCharacterData {
+  stats: CharacterStats;
+}
+
+export type RawBaseCharacterData = Omit<BaseCharacterData, 'characterClass'> & {
+  class: CharacterClass;
 };
 
-export type UpdateCharacterPayload = {
-  id: string;
-  name?: string;
+export type RawCharacterData = RawBaseCharacterData & {
+  stats: CharacterStats;
 };
+
+export type AddCharacterPayload = Omit<BaseCharacterData, 'status' | 'id'>;
+
+/**
+ * For now. Gotta remove it when the character status is not pending or draft.
+ */
+export type UpdateCharacterPayload = Omit<
+  BaseCharacterData,
+  'characterClass' | 'race' | 'status'
+>;

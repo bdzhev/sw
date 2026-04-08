@@ -1,12 +1,12 @@
-import { ref, readonly, computed } from 'vue';
+import { ref, readonly, computed } from "vue";
 
-import { getMe, refreshToken } from '@shared/api/auth';
-import type { User } from '@shared/api/auth';
+import { getMe, refreshToken } from "@shared/api/auth";
+import type { User } from "@shared/api/auth";
 
 const user = ref<User | null>(null);
 const isLoading = ref(true);
 
-async function loadUser() {
+const loadUser = async (): Promise<void> => {
   try {
     await refreshToken();
     user.value = await getMe();
@@ -15,16 +15,20 @@ async function loadUser() {
   } finally {
     isLoading.value = false;
   }
-}
+};
 
 loadUser();
 
-export function useUser() {
+export const useUser = () => {
   return {
     user: readonly(user),
-    isLoggedIn: computed(() => Boolean(user.value)),
+    isLoggedIn: computed(() => {
+      return Boolean(user.value);
+    }),
     isLoading: readonly(isLoading),
     loadUser,
-    setUser: (u: User | null) => { user.value = u; },
+    setUser: (u: User | null): void => {
+      user.value = u;
+    },
   };
-}
+};

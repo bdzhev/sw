@@ -8,7 +8,9 @@ import { SidebarNavigation } from '@widgets/sidebar-navigation';
 
 const route = useRoute();
 
-const layout = computed(() => route.meta.layout);
+const layout = computed(() => {
+  return route.meta.layout;
+});
 </script>
 
 <template>

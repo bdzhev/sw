@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
-import z4 from 'zod/v4';
 
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
@@ -20,19 +18,11 @@ import {
 
 import type { ValidationConfirmModalProps } from '../../ConfirmModal.types';
 
+import { getValidationSchema } from './schema';
+
 const props = defineProps<ValidationConfirmModalProps>();
 
-const schema = toTypedSchema(
-  z4.object({
-    confirmationText: z4.string('').refine((val) => {
-      return val === props.confirmationText;
-    }, ''),
-  }),
-);
-
-const { meta } = useForm({
-  validationSchema: schema,
-});
+const { meta } = useForm({ validationSchema: props.confirmationText ? getValidationSchema(props.confirmationText) : null });
 </script>
 
 <template>
@@ -64,8 +54,8 @@ const { meta } = useForm({
         <div class="
           right-4 bottom-6 flex flex-row items-center justify-end gap-4
         ">
-          <ModalCloser v-slot="{ onClick }">
-            <Button variant="secondary" @click="onClick">{{ 'Cancel' }}</Button>
+          <ModalCloser>
+            <Button variant="secondary">{{ 'Cancel' }}</Button>
           </ModalCloser>
 
           <Button :is-disabled="!meta.valid" :variant="props.actionType === 'negative' ? 'danger' : 'primary'"
