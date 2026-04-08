@@ -4,42 +4,36 @@ Full-stack app with a Hono/Bun backend, Vue frontend, and PostgreSQL.
 
 ## Prerequisites
 
-- [Bun](https://bun.sh)
 - [Docker](https://www.docker.com)
 
 ## Setup
 
-1. Generate a `.env` at the project root:
+1. Generate `.env`:
    ```sh
-   bun run init
+   ./init.sh
    ```
    This creates `.env` from `.env.example` with a random `JWT_SECRET`.
-   Open `.env` and set `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `DATABASE_URL`.
+   Open `.env` and set `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `DATABASE_URL` to match.
 
-2. Run migrations:
+2. Start the app:
    ```sh
-   cd backend && bun run db:migrate
+   docker compose up -d
    ```
 
-## Running
+   - Frontend: http://localhost:8080
+   - Backend: http://localhost:3000
 
-### With Docker
+## Local dev
+
+Requires [Bun](https://bun.sh). Start the database first:
 
 ```sh
-docker compose up
-```
-
-- Frontend: http://localhost:8080
-- Backend: http://localhost:3000
-
-### Local dev (without Docker)
-
-Start the database first:
-```sh
-docker compose up postgres
+docker compose up postgres -d
+cd backend && bun run db:migrate
 ```
 
 Then in separate terminals:
+
 ```sh
 # backend
 cd backend && bun install && bun run dev
