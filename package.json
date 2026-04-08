@@ -1,0 +1,7 @@
+{
+  "name": "sw",
+  "type": "module",
+  "scripts": {
+    "init": "bun run scripts/init.ts"
+  }
+}
