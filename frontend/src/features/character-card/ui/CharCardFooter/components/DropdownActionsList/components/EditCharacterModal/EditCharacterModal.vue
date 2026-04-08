@@ -65,8 +65,12 @@ const handleSubmit = editCharForm.handleSubmit((vals) => {
 </script>
 
 <template>
-  <ModalRoot v-model:open="dropdownCtx.isEditModalOpen.value" is-controlled :disable-outside-click-close="isUpdating"
-    v-on:modal-open="editCharForm.resetForm({ values: initialValues })">
+  <ModalRoot
+    v-model:open="dropdownCtx.isEditModalOpen.value"
+    is-controlled
+    :disable-outside-click-close="isUpdating"
+    v-on:modal-open="editCharForm.resetForm({ values: initialValues })"
+  >
     <ModalPortal>
       <ModalOverlay />
 
@@ -86,8 +90,12 @@ const handleSubmit = editCharForm.handleSubmit((vals) => {
 
           <ModalFooter>
             <div class="flex flex-row gap-2">
-              <ModalCloser>
-                <CfFooterCancelButton variant="secondary" :is-disabled="isUpdating">
+              <ModalCloser v-slot="{ close }">
+                <CfFooterCancelButton
+                  variant="secondary"
+                  :is-disabled="isUpdating"
+                  @click="close"
+                >
                   {{ 'Cancel' }}
                 </CfFooterCancelButton>
               </ModalCloser>

@@ -54,8 +54,8 @@ const { meta } = useForm({ validationSchema: props.confirmationText ? getValidat
         <div class="
           right-4 bottom-6 flex flex-row items-center justify-end gap-4
         ">
-          <ModalCloser>
-            <Button variant="secondary">{{ 'Cancel' }}</Button>
+          <ModalCloser v-slot="{ close }">
+            <Button variant="secondary" @click="close">{{ 'Cancel' }}</Button>
           </ModalCloser>
 
           <Button :is-disabled="!meta.valid" :variant="props.actionType === 'negative' ? 'danger' : 'primary'"

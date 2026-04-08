@@ -40,8 +40,8 @@ const props = defineProps<BaseConfirmModalProps>();
         <div class="
           right-4 bottom-6 flex flex-row items-center justify-end gap-4
         ">
-          <ModalCloser>
-            <Button variant="secondary" :is-disabled="props.isLoading">{{ 'Cancel' }}</Button>
+          <ModalCloser v-slot="{ close }">
+            <Button variant="secondary" :is-disabled="props.isLoading" @click="close">{{ 'Cancel' }}</Button>
           </ModalCloser>
 
           <Button :variant="props.actionType === 'negative' ? 'danger' : 'primary'" @click="props?.onConfirm"

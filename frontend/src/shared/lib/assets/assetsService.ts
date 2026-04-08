@@ -1,10 +1,11 @@
+import { BASE_URL } from "@shared/lib/http";
 import { ImageFolder } from "./types";
 
 class AssetsService {
   private readonly baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_URL as string;
+    this.baseUrl = BASE_URL;
   }
 
   getImagePath(folder: ImageFolder, name: string): string {

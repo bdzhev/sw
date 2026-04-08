@@ -11,5 +11,5 @@ const handleClose = () => {
 </script>
 
 <template>
-  <slot @click="handleClose" />
+  <slot :close="handleClose" />
 </template>
