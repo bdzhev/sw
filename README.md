@@ -50,8 +50,4 @@ make dev
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
 
-On first run, also migrate the database:
-
-```sh
-cd backend && bun run db:migrate
-```
+Database migrations run automatically on startup.

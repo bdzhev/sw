@@ -9,9 +9,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-type QuizCharacterStats = 'str' | 'dex' | 'wis' | 'int' | 'cha';
-
-type QuizResults = Record<string, QuizCharacterStats>;
+import type { QuizResults } from './types';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),

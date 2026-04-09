@@ -1,5 +1,6 @@
-import { BASE_URL } from "@shared/lib/http";
-import { ImageFolder } from "./types";
+import { BASE_URL } from '@shared/lib/http';
+
+import { ImageFolder } from './types';
 
 class AssetsService {
   private readonly baseUrl: string;
