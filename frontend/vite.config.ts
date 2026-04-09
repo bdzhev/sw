@@ -2,9 +2,25 @@ import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
 // import { visualizer } from 'rollup-plugin-visualizer';
+
+const skipConfigJsInDev = (): Plugin => {
+  return {
+    name: 'skip-config-js-in-dev',
+    transformIndexHtml: {
+      order: 'pre',
+      handler: (html: string, ctx: { server?: unknown }) => {
+        if (!ctx.server) {
+          return html;
+        }
+
+        return html.replace(/<script src="\/config\.js"><\/script>\s*/g, '');
+      },
+    },
+  };
+};
 
 export default defineConfig({
   server: {
@@ -12,6 +28,7 @@ export default defineConfig({
     port: 5173,
   },
   plugins: [
+    skipConfigJsInDev(),
     vue(),
     vueDevTools(),
     tailwindcss(),
@@ -48,6 +65,8 @@ export default defineConfig({
               return 'supabase';
             case id.includes('node_modules'):
               return 'vendor';
+            default:
+              return undefined;
           }
         },
       },
