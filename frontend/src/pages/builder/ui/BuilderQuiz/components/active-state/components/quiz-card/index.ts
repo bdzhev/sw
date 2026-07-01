@@ -1,3 +1,3 @@
-import QuizCard from "./QuizCard.vue";
+import QuizCard from './QuizCard.vue';
 
-export { QuizCard }
+export { QuizCard };

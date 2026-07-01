@@ -25,7 +25,6 @@ const iconProps = {
 };
 </script>
 
-<!--prettier-ignore-->
 <template>
   <TooltipRoot placement="right">
     <TooltipPortal v-if="!props.isExpanded">
@@ -38,16 +37,13 @@ const iconProps = {
 
     <RouterLink
       :to="props.url"
-      class="
-        transition-all duration-100
-        hover:text-secondary
-      "
+      class="transition-all duration-100 hover:text-secondary"
     >
       <TooltipTrigger>
         <Button
           :variant="isActive ? 'primary' : 'transparent'"
           equal-padding
-          size="sm"
+          size="xs"
           :class="{
             'relative w-full': true,
             'justify-start gap-2': props.isExpanded,

@@ -12,10 +12,9 @@ const handleClick = () => {
 };
 </script>
 
-<!--prettier-ignore-->
 <template>
   <Button
-    size="sm"
+    size="xs"
     variant="secondary"
     @click="handleClick"
     class="w-full"
@@ -23,11 +22,11 @@ const handleClick = () => {
   >
     <div
       :class="[
-        !uiStore.isCollapsed && 'rotate-[-180deg]',
+        !uiStore.isCollapsed && '-rotate-180',
         `transition-all duration-100`,
       ]"
     >
-      <ArrowRightToLine :size="20" />
+      <ArrowRightToLine :size="16" />
     </div>
   </Button>
 </template>

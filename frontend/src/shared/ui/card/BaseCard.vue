@@ -21,7 +21,6 @@ const isOutline = variant === 'outline';
       'backdrop-blur-xl': blur,
       'bg-primary-bg/80': isPrimary,
       'bg-secondary-bg/80': isSecondary,
-      'bg-transparent': isOutline,
       'ring-2 ring-border': !isOutline,
       'ring-2 ring-border/50': isOutline,
       'rounded-sm': size === 'sm',

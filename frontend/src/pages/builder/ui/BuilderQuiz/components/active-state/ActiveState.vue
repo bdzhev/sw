@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
 import { Carousel } from '@shared/ui/carousel';
 
 import { useQuizData } from '@pages/builder/model/useQuizData';

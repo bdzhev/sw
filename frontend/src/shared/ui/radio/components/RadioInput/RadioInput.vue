@@ -16,19 +16,33 @@ const currentItem = ctx.items.find((item) => {
 
 const isChecked = computed(() => {
   return ctx.currentValue.value === currentItem?.value;
-})
+});
 </script>
 
 <template>
-  <div v-if="currentItem" @click="ctx.onChange(props.name)" :class="[`
+  <div
+    v-if="currentItem"
+    @click="ctx.onChange(props.name)"
+    :class="[
+      `
     cursor-pointer rounded-md ring-2 transition-all duration-100
-  `, isChecked ? `ring-accent-primary` : `
+  `,
+      isChecked
+        ? `text-accent-primary ring-accent-primary`
+        : `
+    text-primary/80
     ring-primary/30
     hover:ring-accent-primary/50
-  `]">
-    <input type="radio" :name="ctx.fieldName" :checked="isChecked" :value="props.name" class="
-      appearance-none
-    ">
-    <label :for="props.name">{{ currentItem.label }}</label>
+  `,
+    ]"
+  >
+    <input
+      type="radio"
+      :name="ctx.fieldName"
+      :checked="isChecked"
+      :value="props.name"
+      class="appearance-none"
+    />
+    <label :for="props.name" class="text-sm">{{ currentItem.label }}</label>
   </div>
 </template>

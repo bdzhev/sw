@@ -3,13 +3,17 @@ import { Skeleton } from '@shared/ui/skeleton';
 </script>
 
 <template>
-  <header class="flex h-40 w-full flex-row items-center justify-between">
-    <Skeleton />
-
-    <div class="flex flex-row">
-      <Skeleton />
-
-      <Skeleton />
+  <div class="relative flex h-full w-full flex-row items-center justify-center">
+    <div class="absolute -left-8 z-0 h-150 w-225 opacity-50">
+      <Skeleton class="rounded-xl" />
     </div>
-  </header>
+
+    <div class="z-10 h-180 w-270 bg-primary-bg">
+      <Skeleton class="rounded-xl" />
+    </div>
+
+    <div class="absolute -right-8 z-0 h-150 w-225 opacity-50">
+      <Skeleton class="rounded-xl" />
+    </div>
+  </div>
 </template>

@@ -19,5 +19,5 @@ const src = computed(() => {
 </script>
 
 <template>
-  <img :src="src" :alt="props.alt" />
+  <img loading="lazy" :src="src" :alt="props.alt" />
 </template>

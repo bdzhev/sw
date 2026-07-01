@@ -99,6 +99,10 @@
   }
 }
 
+@utility fade-bottom {
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
 @utility bg-radial {
   background-image: radial-gradient(circle at center,
       var(--accent) 0%,
@@ -114,7 +118,7 @@ body {
   margin: 0;
 
   font-family: 'TikTok Sans', sans-serif;
-  font-size: medium;
+  font-size: normal;
   font-style: normal;
   color: var(--color-primary);
 

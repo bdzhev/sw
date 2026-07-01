@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useIsFieldDirty } from 'vee-validate';
 import { computed } from 'vue';
 
 import { ImageFolder } from '@shared/lib/assets';
@@ -24,8 +25,10 @@ if (!character.value) {
   throw new Error('Quiz Card requires character data');
 }
 
+const isDirty = useIsFieldDirty(props.quizItem.id);
+
 const formattedInputItems = computed(() => {
-  return props.quizItem.answers.en.map((answer) => {
+  return props.quizItem.answers.ru.map((answer) => {
     return {
       ...answer,
       label: fmt(answer.label, { characterName: character.value.name }),
@@ -35,27 +38,34 @@ const formattedInputItems = computed(() => {
 </script>
 
 <template>
-  <Card class="relative h-180 w-280 p-10">
-    <Image
-      :folder="ImageFolder.Quiz"
-      name="test-image-carousel"
-      class="absolute top-0 h-80 w-80 translate-x-full opacity-20"
-    />
+  <Card
+    :class="[
+      'relative h-180 w-270 p-10 transition-all duration-200',
+      isDirty && 'bg-accent-secondary/20',
+    ]"
+    variant="outline"
+  >
+    <div
+      opacity-20
+      class="absolute top-0 h-80 w-80 translate-x-full fade-bottom opacity-20"
+    >
+      <Image :folder="ImageFolder.Quiz" name="test-image-carousel" />
+    </div>
 
     <CardHeader class="mb-36">
-      <HeaderTitle>{{ props.quizItem.title.en }}</HeaderTitle>
+      <HeaderTitle>{{ props.quizItem.title.ru }}</HeaderTitle>
     </CardHeader>
 
     <Text class="mb-8">
       {{
-        fmt(props.quizItem.description.en, { characterName: character.name })
+        fmt(props.quizItem.description.ru, { characterName: character.name })
       }}
     </Text>
 
     <RadioField :name="props.quizItem.id" :items="formattedInputItems">
       <RadioGroup class="flex flex-col gap-4">
         <RadioInput
-          v-for="answer in props.quizItem.answers.en"
+          v-for="answer in props.quizItem.answers.ru"
           :key="answer.value"
           :name="answer.value"
           class="min-h-12 p-4"
