@@ -1,3 +1,3 @@
-import BuilderQuiz from "./BuilderQuiz.vue";
+import BuilderQuiz from './BuilderQuiz.vue';
 
 export { BuilderQuiz };

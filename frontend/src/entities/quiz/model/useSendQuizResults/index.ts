@@ -1,1 +1,0 @@
-export { useSendQuizResults } from './useSendQuizResults';

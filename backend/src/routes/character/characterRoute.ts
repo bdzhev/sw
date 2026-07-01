@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { characters, db, quizData } from '../../db';
+import { characters, db } from '../../db';
 import type { AuthVariables } from '../../middlewares/auth';
 
 export const characterRoute = new Hono<{ Variables: AuthVariables }>();
@@ -60,8 +60,6 @@ characterRoute.delete('/:id', async (c) => {
   const id = c.req.param('id');
 
   try {
-    await db.delete(quizData).where(eq(quizData.characterId, id));
-
     const result = await db
       .delete(characters)
       .where(and(eq(characters.id, id), eq(characters.userId, userId)))

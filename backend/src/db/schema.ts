@@ -9,8 +9,6 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import type { QuizResults } from './types';
-
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
   username: text('username').notNull().unique(),
@@ -63,19 +61,6 @@ export const characters = pgTable('characters', {
   class: characterClassEnum('class').notNull(),
   race: characterRaceEnum('race').notNull(),
   stats: jsonb('stats'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-export const quizData = pgTable('quiz_data', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  characterId: uuid('character_id')
-    .notNull()
-    .unique()
-    .references(() => {
-      return characters.id;
-    }),
-  progress: integer('progress').notNull().default(0),
-  results: jsonb('results').notNull().$type<QuizResults>(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

@@ -66,6 +66,7 @@ export const setupLocaleGuard = (router: Router) => {
     }
 
     setI18nLanguage(currentLocale);
+
     return true;
   });
 };

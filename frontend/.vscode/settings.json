@@ -22,10 +22,13 @@
     "editor.defaultFormatter": "vscode.html-language-features"
   },
   "eslint.useFlatConfig": true,
-  "eslint.validate": ["javascript", "typescript", "vue"],
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "vue"
+  ],
   "editor.quickSuggestions": {
     "strings": true
   },
-  "vue.format.wrapAttributes": "aligned-multiple",
   "js/ts.tsserver.maxMemory": 4096
 }

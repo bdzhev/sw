@@ -1,10 +1,11 @@
 import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
+import { CharacterStatus } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
 
 import { useCharacter } from '@entities/characters';
-import { useQuizItems, useQuizResults } from '@entities/quiz';
+import { useQuizItems } from '@entities/quiz';
 
 import { useBuilderProvider } from '../../model/useBuilderProvider';
 
@@ -24,12 +25,6 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     characterError,
     isCharacterNotFound,
   } = useCharacter({ id: ctx.characterId, shouldRefetchOnMount });
-  const {
-    isFetchingQuizResults,
-    quizResults,
-    refetchQuizResults,
-    quizResultsError,
-  } = useQuizResults({ characterId: ctx.characterId, shouldRefetchOnMount });
   const { isFetchingQuizItems, quizItems, refetchQuizItems, quizItemsError } =
     useQuizItems();
 
@@ -39,13 +34,24 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     }
   });
 
+  // Guard: an already-created (active) character has no quiz left to take —
+  // send the user to its character page instead of the builder.
+  watch(
+    character,
+    (value) => {
+      if (value?.status === CharacterStatus.ACTIVE) {
+        router.replace({
+          name: RouteName.APP_CHARACTER,
+          params: { id: ctx.characterId },
+        });
+      }
+    },
+    { immediate: true },
+  );
+
   const handleTryAgainClick = () => {
     if (characterError) {
       refetchCharacter();
-    }
-
-    if (quizResultsError) {
-      refetchQuizResults();
     }
 
     if (quizItemsError) {
@@ -54,26 +60,21 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
   };
 
   const hasError = computed(() => {
-    return Boolean(
-      quizItemsError.value || characterError.value || quizResultsError.value,
-    );
+    return Boolean(quizItemsError.value || characterError.value);
   });
 
   const isQuizDataLoading = computed(() => {
     return (
       isFetchingCharacter.value ||
       isFetchingQuizItems.value ||
-      isFetchingQuizResults.value ||
       !Boolean(character.value) ||
-      !Boolean(quizItems.value) ||
-      !Boolean(quizResults.value)
+      !Boolean(quizItems.value)
     );
   });
 
   return {
     isQuizDataLoading,
     character,
-    quizResults,
     quizItems,
     hasError,
     onTryAgainClick: handleTryAgainClick,

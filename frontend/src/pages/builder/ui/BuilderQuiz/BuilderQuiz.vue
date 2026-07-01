@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useQuizData } from '../../model/useQuizData';
 
-import { LoadingState, ErrorState, ActiveState } from './components';
+import { ActiveState } from './active-state';
+import { ErrorState } from './error-state';
+import { LoadingState } from './loading-state';
 
 const { hasError, isQuizDataLoading, onTryAgainClick } = useQuizData({
   shouldRefetchOnMount: true,

@@ -1,0 +1,1 @@
+DROP TABLE "quiz_data" CASCADE;

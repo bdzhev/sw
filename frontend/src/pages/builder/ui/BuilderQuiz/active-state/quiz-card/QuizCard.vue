@@ -11,9 +11,9 @@ import { Text } from '@shared/ui/text';
 
 import { useCharacter } from '@entities/characters';
 
-import { useBuilderProvider } from '../../../../../../model/useBuilderProvider';
+import { useBuilderProvider } from '../../../../model/useBuilderProvider';
 
-import type { QuizCardProps } from './QuizCard.props';
+import type { QuizCardProps } from './QuizCard.types';
 
 const props = defineProps<QuizCardProps>();
 

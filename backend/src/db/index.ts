@@ -5,6 +5,5 @@ export {
   characterClassEnum,
   characterStatusEnum,
   characterRaceEnum,
-  quizData,
   sessions,
 } from './schema';

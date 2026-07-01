@@ -49,11 +49,6 @@ export interface QuizData {
 
 export type QuizResults = Record<string, QuizCharacterStats>;
 
-export interface SendQuizResultsOptions {
-  characterId: string;
-  results: QuizResults;
-}
-
 export interface GenerateStatsPayload {
   results: Partial<QuizResults>;
   characterId: string;
