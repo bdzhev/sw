@@ -20,10 +20,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="
-    relative flex min-h-30 min-w-100 flex-col rounded-md bg-bg-secondary/50
-    backdrop-blur-3xl
-  " ref="modalContentRef">
+  <div
+    class="relative flex min-h-30 min-w-100 flex-col rounded-md bg-bg-secondary/50 backdrop-blur-3xl"
+    ref="modalContentRef"
+  >
     <slot />
   </div>
 </template>

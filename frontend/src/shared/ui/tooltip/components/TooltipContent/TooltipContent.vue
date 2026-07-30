@@ -12,12 +12,14 @@ const { x, y, strategy, update } = useFloating(ctx.triggerRef, ctx.contentRef, {
   middleware: [offset(ctx.offset), flip(), shift()],
 });
 
-const styles = computed(() => {return {
-  position: strategy.value,
-  top: `${y.value}px`,
-  left: `${x.value}px`,
-  zIndex: 1000,
-}});
+const styles = computed(() => {
+  return {
+    position: strategy.value,
+    top: `${y.value}px`,
+    left: `${x.value}px`,
+    zIndex: 1000,
+  };
+});
 
 let cleanup: (() => void) | null = null;
 

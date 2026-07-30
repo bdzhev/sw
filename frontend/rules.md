@@ -15,7 +15,8 @@ bun install
 bun add <pkg>
 bun run dev          # vite dev server
 bun run type-check   # vue-tsc --build
-bun run lint         # eslint . --fix
+bun run lint         # oxlint --fix
+bun run format       # oxfmt --write .
 ```
 
 For a one-off binary: `bunx <tool>`.
@@ -77,10 +78,7 @@ import ScrollArea from './ScrollArea.vue';
 
 export { ScrollArea };
 export { ScrollBar } from './scroll-bar';
-export type {
-  ScrollAreaProps,
-  ScrollAreaOrientation,
-} from './ScrollArea.types';
+export type { ScrollAreaProps, ScrollAreaOrientation } from './ScrollArea.types';
 export type { ScrollBarProps } from './scroll-bar';
 ```
 
@@ -133,9 +131,7 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   ```
 
   ```vue
-  <div
-    :class="{ 'ring-2 ring-border': !isOutline, 'rounded-md': size === 'md' }"
-  ></div>
+  <div :class="{ 'ring-2 ring-border': !isOutline, 'rounded-md': size === 'md' }"></div>
   ```
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
@@ -148,10 +144,10 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
 
 All configuration is **CSS-side, in `src/main.css`**: `@theme` for design tokens, `@utility` for custom utilities.
 
-`tailwind.config.js` is an intentionally empty stub, kept only because the ESLint plugin points at it. **Do not put configuration in it.**
+There is **no `tailwind.config.js`** — it was an empty stub that existed only so the old ESLint plugin had something to point at, and it is gone. Do not recreate it. Tooling that needs to know the design system reads `src/main.css` directly (see `sortTailwindcss.stylesheet` in `.oxfmtrc.json`).
 
 - Use theme tokens — `bg-border`, `text-secondary`, `bg-accent-primary` — not raw palette values like `bg-slate-600`.
-- Custom utilities already defined: `fade-bottom`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
+- Custom utilities already defined: `fade-bottom`, `fade-scroll-top`, `fade-scroll-bottom`, `fade-scroll-y`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
 - **Native scrollbars are hidden globally** by `::-webkit-scrollbar { display: none }` in `main.css`. Anything that needs a visible scroll affordance must render its own — use `@shared/ui/scroll-area`.
 - Scrolling inside a flex column needs `min-h-0` on the scrolling child, otherwise it stretches to content height and never scrolls. `overflow-hidden` on an ancestor (e.g. `Card`) clips instead of scrolling — put the scroll container inside it.
 
@@ -159,10 +155,17 @@ All configuration is **CSS-side, in `src/main.css`**: `@theme` for design tokens
 
 ## 6. Lint & types
 
-ESLint enforces:
+ESLint and Prettier are **gone**. The toolchain is **oxlint** (`.oxlintrc.json`) + **oxfmt** (`.oxfmtrc.json`). Two things that used to be lint rules are now the formatter's job:
 
-- `import/order` — builtin → external → `@shared` → `@entities` → `@features` → `@widgets` → `@pages` → relative, with a blank line between groups.
-- `eslint-plugin-better-tailwindcss` — class ordering inside `class` attributes.
+- **Import order** — `sortImports` in `.oxfmtrc.json`: builtin → external → `@shared` → `@entities` → `@features` → `@widgets` → `@pages` → relative, blank line between groups. Custom groups use **glob** patterns (`@shared/**`), not regex.
+- **Tailwind class order** — `sortTailwindcss` in `.oxfmtrc.json`, pointed at `src/main.css` via `stylesheet`, with `attributes: [":class"]` so Vue bindings are covered too. Because it reads `main.css`, `@utility` definitions sort correctly. Two caveats: utilities whose body is only a nested rule (`shimmer`, `loading-animation`) sort as unknown and land at the front, and **if the `stylesheet` path is wrong oxfmt silently skips Tailwind sorting entirely** rather than erroring — so treat a sudden loss of class ordering as a bad path.
+
+oxlint covers correctness (its `correctness` category is on) plus the house rules `arrow-body-style`, `curly`, `no-console`. What was lost in the move, permanently until oxlint can parse Vue templates ([oxc#15761](https://github.com/oxc-project/oxc/issues/15761)):
+
+- All `eslint-plugin-vue` **template** rules (`require-v-for-key`, `no-mutating-props`, `valid-v-slot`, …). `vue-tsc` catches most real template breakage instead.
+- `better-tailwindcss`'s `no-conflicting-classes` and `no-unregistered-classes`. No oxlint plugin can restore these here: class names live in `<template>`, which oxlint cannot see, and the JS-side detection surface (`cn`/`clsx`/`cva`/`className`) is banned by section 4.
+- `padding-line-between-statements` (deprecated stylistic rule, no oxlint equivalent).
+- `no-unused-vars` does **not** apply to `.vue` files in oxlint. `noUnusedLocals`/`noUnusedParameters` in `tsconfig.app.json` cover it instead, and `vue-tsc` understands template usage, so this is better coverage than before.
 
 Run before committing:
 
@@ -171,6 +174,12 @@ bun run lint
 bun run type-check
 ```
 
-husky + lint-staged gate every commit. The hook lives at the **repo root** (`.husky/pre-commit`, husky is a root devDependency — a subdir install cannot find `.git`); it invokes `lint-staged` once per package, with that package as the cwd so each picks up its own prettier and eslint config. Frontend's task list is `frontend/.lintstagedrc.json`: `prettier --write` then `eslint --fix --max-warnings=0` on staged `.ts`/`.vue`, `prettier --write` on staged `.css`/`.json`/`.md`/`.html`/`.yml`. Order matters — prettier first, eslint last, because `better-tailwindcss` class ordering is an eslint fix and prettier must not get the final word on it.
+husky + lint-staged gate every commit. The hook lives at the **repo root** (`.husky/pre-commit`, husky is a root devDependency — a subdir install cannot find `.git`); it invokes `lint-staged` once per package, with that package as the cwd so each picks up its own config. Frontend's task list is `frontend/lint-staged.config.mjs`: `oxlint --fix --max-warnings=0` then `oxfmt --write` on staged `.ts`/`.vue`, `oxfmt --write` on staged `.css`/`.json`/`.md`/`.html`/`.yml`.
 
-Anything auto-fixable is fixed and re-staged; anything left — an eslint error **or warning** — fails the hook, and lint-staged reverts the working tree to its pre-hook state. Type-checking is deliberately not in the hook (too slow for a commit), so `bun run type-check` stays a manual step, and it must not gain new errors from your change; check that any failures it reports were already there.
+**Order matters — oxlint first, oxfmt last.** This is the reverse of the old prettier-then-eslint order. Class and import ordering are now formatter concerns, so the formatter must get the final word; the conflict that motivated the old ordering no longer exists.
+
+**Type-checking now runs in the hook.** It is the last entry in the `.ts`/`.vue` task list, written as a function so lint-staged calls it **once for the whole group** rather than per file — TypeScript needs whole-program context. It must be a function task for that reason; a plain glob entry would re-check the project once per staged file. Because it runs inside lint-staged, it sees the staged snapshot rather than your full working tree.
+
+Consequence: a type error **anywhere** blocks **any** commit, not just in the files you staged. That is intentional. A full forced rebuild is ~2s, so the cost is small.
+
+Anything auto-fixable is fixed and re-staged; anything left — an oxlint error **or warning**, or any type error — fails the hook, and lint-staged reverts the working tree to its pre-hook state.

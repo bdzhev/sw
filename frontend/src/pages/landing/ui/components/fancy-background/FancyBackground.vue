@@ -83,8 +83,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <div
-    ref="container"
-    class="pointer-events-none fixed top-0 z-0 h-full w-full"
-  />
+  <div ref="container" class="pointer-events-none fixed top-0 z-0 h-full w-full" />
 </template>

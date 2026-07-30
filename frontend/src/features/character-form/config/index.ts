@@ -1,4 +1,1 @@
-export {
-  characterClassSelectItems,
-  characterRaceSelectItems,
-} from './selectItems';
+export { characterClassSelectItems, characterRaceSelectItems } from './selectItems';

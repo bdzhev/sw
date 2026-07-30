@@ -32,9 +32,7 @@ const { signOut } = useSignOut();
           </Button>
 
           <RouterLink :to="{ name: RouteName.APP_SETTINGS }">
-            <Button variant="transparent" size="sm" class="w-full">
-              Edit profile
-            </Button>
+            <Button variant="transparent" size="sm" class="w-full"> Edit profile </Button>
           </RouterLink>
         </div>
       </TooltipContent>

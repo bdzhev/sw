@@ -12,10 +12,11 @@ const handleCloseButtonClick = () => {
 </script>
 
 <template>
-  <button type="button" @click="handleCloseButtonClick" class="
-    cursor-pointer text-secondary
-    hover:text-primary
-  ">
+  <button
+    type="button"
+    @click="handleCloseButtonClick"
+    class="cursor-pointer text-secondary hover:text-primary"
+  >
     <X :size="20" />
   </button>
 </template>

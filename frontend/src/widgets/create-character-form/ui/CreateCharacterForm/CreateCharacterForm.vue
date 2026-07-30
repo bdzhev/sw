@@ -20,7 +20,6 @@ import {
 
 import { initialValues } from '../../config';
 import { createCharacterSchema } from '../../model/schema';
-
 import type { CreateCharacterFormProps } from './CreateCharacterForm.props';
 
 const props = defineProps<CreateCharacterFormProps>();
@@ -56,11 +55,7 @@ const { meta } = form;
       </CfHeader>
 
       <CfBody class="gap-1">
-        <CfInput
-          name="name"
-          :validate-on-change="false"
-          placeholder="Character's name"
-        />
+        <CfInput name="name" :validate-on-change="false" placeholder="Character's name" />
 
         <CfClassSelect name="characterClass" />
 

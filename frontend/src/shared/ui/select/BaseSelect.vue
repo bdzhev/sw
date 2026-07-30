@@ -9,9 +9,9 @@ import type { SelectProps } from './BaseSelect.props';
 
 const props = defineProps<SelectProps>();
 
-const { value, errorMessage, setValue, handleBlur } = useField(
-  () => {return props.name},
-);
+const { value, errorMessage, setValue, handleBlur } = useField(() => {
+  return props.name;
+});
 const isOpen = ref(false);
 const containerRef = ref<HTMLElement | null>(null);
 

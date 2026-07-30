@@ -29,12 +29,14 @@ onBeforeUnmount(() => {
   cleanup?.();
 });
 
-const styles = computed(() => {return {
-  position: strategy.value,
-  top: `${y.value}px`,
-  left: `${x.value}px`,
-  zIndex: 500,
-}});
+const styles = computed(() => {
+  return {
+    position: strategy.value,
+    top: `${y.value}px`,
+    left: `${x.value}px`,
+    zIndex: 500,
+  };
+});
 </script>
 
 <template>

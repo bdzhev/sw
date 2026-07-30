@@ -4,7 +4,6 @@ import { onUnmounted } from 'vue';
 import { Text } from '@shared/ui/text';
 
 import { useDemoStatsStore } from '../../../model/useDemoStatsStore';
-
 import { DemoFormCard, DemoResultCard } from './components';
 
 const demoStore = useDemoStatsStore();

@@ -3,10 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { nextTick } from 'vue';
 
-import type {
-  splitType,
-  UseTextAnimationOptions,
-} from './useTextAnimation.types';
+import type { splitType, UseTextAnimationOptions } from './useTextAnimation.types';
 
 const getElementsBySplitType = (type: splitType, splitText: SplitText) => {
   switch (type) {

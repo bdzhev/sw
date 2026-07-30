@@ -32,9 +32,7 @@ const applyAppearance = (index: number, duration: number) => {
 
     const vars = {
       scale: isActive ? 1 : 0.85,
-      filter: isActive
-        ? 'blur(0px) brightness(1)'
-        : 'blur(3px) brightness(0.55)',
+      filter: isActive ? 'blur(0px) brightness(1)' : 'blur(3px) brightness(0.55)',
       opacity: distance > 1 ? 0 : 1,
     };
 
@@ -142,11 +140,7 @@ useEventListener(window, 'keydown', handleKeydown);
     </div>
 
     <div
-      class="
-        pointer-events-none z-10 flex shrink-0 justify-center gap-4 pb-2
-        md:absolute md:inset-x-4 md:top-1/2 md:-translate-y-1/2
-        md:justify-between md:pb-0
-      "
+      class="pointer-events-none z-10 flex shrink-0 justify-center gap-4 pb-2 md:absolute md:inset-x-4 md:top-1/2 md:-translate-y-1/2 md:justify-between md:pb-0"
     >
       <Button
         :is-disabled="activeIndex === 0"

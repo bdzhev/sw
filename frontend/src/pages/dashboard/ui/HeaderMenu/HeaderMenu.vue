@@ -5,7 +5,6 @@ import { onBeforeRouteLeave } from 'vue-router';
 import { Button } from '@shared/ui/button';
 
 import { useDashboardUiStore } from '../../model/useDashboardUiStore';
-
 import { NewCharacterForm } from './components';
 
 const store = useDashboardUiStore();
@@ -22,10 +21,7 @@ const handleAddButtonClick = () => {
 <template>
   <div class="sticky top-0 z-500 flex w-full flex-col">
     <div class="flex flex-row bg-bg-primary/50 px-6 py-4 backdrop-blur-3xl">
-      <Button
-        @click="handleAddButtonClick"
-        :is-disabled="store.isNewCharacterFormOpen"
-      >
+      <Button @click="handleAddButtonClick" :is-disabled="store.isNewCharacterFormOpen">
         {{ 'New character' }}
         <Plus :size="18" class="ml-1" />
       </Button>

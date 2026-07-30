@@ -1,5 +1,5 @@
 import { and, eq, gt } from 'drizzle-orm';
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { SignJWT } from 'jose';
 
@@ -33,12 +33,14 @@ async function createSession(userId: number): Promise<string> {
   const rawToken = crypto.randomUUID() + crypto.randomUUID();
   const hash = await hashToken(rawToken);
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_TTL_MS);
-  await db.insert(sessions).values({ userId, refreshTokenHash: hash, expiresAt });
+  await db
+    .insert(sessions)
+    .values({ userId, refreshTokenHash: hash, expiresAt });
 
   return rawToken;
 }
 
-function setRefreshCookie(c: any, token: string) {
+function setRefreshCookie(c: Context, token: string): void {
   setCookie(c, 'refresh_token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -48,7 +50,7 @@ function setRefreshCookie(c: any, token: string) {
   });
 }
 
-function setAccessCookie(c: any, token: string) {
+function setAccessCookie(c: Context, token: string): void {
   setCookie(c, 'access_token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -63,19 +65,28 @@ export const authRoutes = new Hono();
 // ─── Register ─────────────────────────────────────────────────────────────────
 
 authRoutes.post('/register', async (c) => {
-  const { username, password } = await c.req.json<{ username: string; password: string }>();
+  const { username, password } = await c.req.json<{
+    username: string;
+    password: string;
+  }>();
 
   if (!username || !password) {
     return c.json({ error: 'Username and password are required' }, 400);
   }
 
-  const existing = await db.select().from(users).where(eq(users.username, username));
+  const existing = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, username));
 
   if (existing.length > 0) {
     return c.json({ error: 'Username already taken' }, 409);
   }
 
-  const created = await db.insert(users).values({ username, password }).returning();
+  const created = await db
+    .insert(users)
+    .values({ username, password })
+    .returning();
   const user = created[0];
 
   const refreshToken = await createSession(user.id);
@@ -90,13 +101,19 @@ authRoutes.post('/register', async (c) => {
 // ─── Login ────────────────────────────────────────────────────────────────────
 
 authRoutes.post('/login', async (c) => {
-  const { username, password } = await c.req.json<{ username: string; password: string }>();
+  const { username, password } = await c.req.json<{
+    username: string;
+    password: string;
+  }>();
 
   if (!username || !password) {
     return c.json({ error: 'Username and password are required' }, 400);
   }
 
-  const result = await db.select().from(users).where(eq(users.username, username));
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.username, username));
 
   if (result.length === 0 || result[0].password !== password) {
     return c.json({ error: 'Invalid username or password' }, 401);
@@ -127,7 +144,9 @@ authRoutes.post('/refresh', async (c) => {
   const result = await db
     .select()
     .from(sessions)
-    .where(and(eq(sessions.refreshTokenHash, hash), gt(sessions.expiresAt, now)));
+    .where(
+      and(eq(sessions.refreshTokenHash, hash), gt(sessions.expiresAt, now))
+    );
 
   if (result.length === 0) {
     return c.json({ error: 'Session expired or invalid' }, 401);

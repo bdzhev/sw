@@ -1,3 +1,5 @@
 export const authQueries = {
-  signUp: () => {return ['signUp']},
+  signUp: () => {
+    return ['signUp'];
+  },
 };

@@ -3,12 +3,7 @@ import { defineAsyncComponent } from 'vue';
 
 import { useScrollSmoother } from '@shared/lib/animations';
 
-import {
-  TopSection,
-  DemoSection,
-  PainSection,
-  AboutSection,
-} from './components';
+import { TopSection, DemoSection, PainSection, AboutSection } from './components';
 
 useScrollSmoother({
   wrapperSelector: '#layout',

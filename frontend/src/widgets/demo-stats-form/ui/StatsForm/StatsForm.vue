@@ -8,7 +8,6 @@ import { formContextKey } from '../../config/stats';
 import { demoStatsSchema } from '../../model/stats';
 import { FormBody } from '../FormBody';
 import { FormHeader } from '../FormHeader';
-
 import type { StatsFormProps } from './StatsForm.props';
 
 const props = defineProps<StatsFormProps>();

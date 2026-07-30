@@ -3,7 +3,6 @@ import { inject } from 'vue';
 
 import { DROPDOWN_MENU_CTX_KEY } from '../../constants';
 import type { DropdownMenuContext } from '../../DropdownMenu.types';
-
 import type { DropdownMenuItemProps } from './DropdownMenuItem.props';
 
 const props = defineProps<DropdownMenuItemProps>();

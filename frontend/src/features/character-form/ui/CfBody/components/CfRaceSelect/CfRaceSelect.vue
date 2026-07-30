@@ -2,7 +2,6 @@
 import { Select } from '@shared/ui/select';
 
 import { characterRaceSelectItems } from '../../../../config';
-
 import type { CfRaceSelectProps } from './CfRaceSelect.props';
 
 const props = defineProps<CfRaceSelectProps>();

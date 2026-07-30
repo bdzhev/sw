@@ -56,10 +56,12 @@
 
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg,
-        transparent,
-        var(--color-primary-muted),
-        transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-primary-muted),
+      transparent
+    );
     animation: loading-shimmer 1.25s infinite;
   }
 }
@@ -70,7 +72,6 @@
   }
 }
 
-
 @utility shimmer {
   &::after {
     content: '';
@@ -79,10 +80,12 @@
     left: -200%;
     height: 100%;
     width: 200%;
-    background: linear-gradient(90deg,
-        transparent,
-        var(--color-secondary-bg),
-        transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-secondary-bg),
+      transparent
+    );
     transform: translateX(0);
   }
 }
@@ -112,21 +115,24 @@
 }
 
 @utility fade-scroll-y {
-  mask-image: linear-gradient(to bottom,
-      transparent 0,
-      black 2rem,
-      black calc(100% - 2rem),
-      transparent 100%);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 2rem,
+    black calc(100% - 2rem),
+    transparent 100%
+  );
 }
 
 @utility bg-radial {
-  background-image: radial-gradient(circle at center,
-      var(--accent) 0%,
-      var(--secondary) 40%,
-      var(--primary-bg) 100%);
+  background-image: radial-gradient(
+    circle at center,
+    var(--accent) 0%,
+    var(--secondary) 40%,
+    var(--primary-bg) 100%
+  );
   background-size: 300% 300%;
   background-position: center;
-
 }
 
 [data-reka-scroll-area-viewport] {

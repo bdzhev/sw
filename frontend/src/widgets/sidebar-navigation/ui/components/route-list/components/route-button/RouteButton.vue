@@ -35,10 +35,7 @@ const iconProps = {
       </TooltipContent>
     </TooltipPortal>
 
-    <RouterLink
-      :to="props.url"
-      class="transition-all duration-100 hover:text-secondary"
-    >
+    <RouterLink :to="props.url" class="transition-all duration-100 hover:text-secondary">
       <TooltipTrigger>
         <Button
           :variant="isActive ? 'primary' : 'transparent'"
@@ -53,9 +50,7 @@ const iconProps = {
 
           <span
             :class="[
-              props.isExpanded
-                ? 'max-w-[200px] opacity-100'
-                : `max-w-0 opacity-0`,
+              props.isExpanded ? 'max-w-[200px] opacity-100' : `max-w-0 opacity-0`,
               `overflow-hidden whitespace-nowrap transition-all duration-50`,
             ]"
           >

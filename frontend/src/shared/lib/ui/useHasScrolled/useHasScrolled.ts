@@ -11,7 +11,9 @@ export const useHasScrolled = ({
   const { y } = useWindowScroll({ throttle });
 
   watch(
-    () => {return y.value},
+    () => {
+      return y.value;
+    },
     (newY) => {
       setHasScrolled(newY > threshold);
     },

@@ -1,1 +1,1 @@
-export const BUILDER_QUIZ_CTX_KEY = "builderQuizContext";
+export const BUILDER_QUIZ_CTX_KEY = 'builderQuizContext';

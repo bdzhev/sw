@@ -2,11 +2,7 @@
 import { provide } from 'vue';
 
 import { BUILDER_QUIZ_CTX_KEY } from '../../config';
-
-import type {
-  BuilderContextValues,
-  BuilderProviderProps,
-} from './BuilderProvider.types';
+import type { BuilderContextValues, BuilderProviderProps } from './BuilderProvider.types';
 
 const props = defineProps<BuilderProviderProps>();
 

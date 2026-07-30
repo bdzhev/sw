@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-  import { noop } from '@vueuse/core';
-  import { RouterLink } from 'vue-router';
+import { noop } from '@vueuse/core';
+import { RouterLink } from 'vue-router';
 
-  import type { NavLinkProps } from './NavLink.props';
+import type { NavLinkProps } from './NavLink.props';
 
-  const props = withDefaults(defineProps<NavLinkProps>(), {
-    onClick: noop,
-  });
+const props = withDefaults(defineProps<NavLinkProps>(), {
+  onClick: noop,
+});
 
-  const { link, onClick: handleLinkClick } = props;
+const { link, onClick: handleLinkClick } = props;
 </script>
 
 <template>

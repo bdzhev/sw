@@ -3,7 +3,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { onBeforeUnmount, nextTick } from 'vue';
 
 import { Device, getDevice } from '../../system/device';
-
 import type { UseHorizontalScrollAnimationOptions } from './types';
 
 const scrubByDevice: Record<Device, number | boolean> = {
@@ -48,9 +47,7 @@ export const useHorizontalScrollAnimation = (
           const device = getDevice();
 
           return (
-            wrapper.offsetWidth *
-            (sections.length - 1) *
-            endMultiplierByDevice[device]
+            wrapper.offsetWidth * (sections.length - 1) * endMultiplierByDevice[device]
           );
         },
         pin: true,

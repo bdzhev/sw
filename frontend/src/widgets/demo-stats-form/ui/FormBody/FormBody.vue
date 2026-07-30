@@ -13,11 +13,7 @@ import { demoStatInputDemoItems } from '../../config/stats/stats';
     <div v-for="item in demoStatInputDemoItems" :key="item.id">
       <Text>{{ item.title }}</Text>
 
-      <Slider
-        :name="`stats.${item.id}`"
-        :title="item.title"
-        should-show-ticks
-      />
+      <Slider :name="`stats.${item.id}`" :title="item.title" should-show-ticks />
     </div>
   </div>
 </template>

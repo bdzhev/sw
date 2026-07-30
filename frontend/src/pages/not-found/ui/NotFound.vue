@@ -9,9 +9,7 @@ import { useUser } from '@entities/user';
 const { isLoggedIn } = useUser();
 
 const redirectLink = computed(() => {
-  return isLoggedIn.value
-    ? { name: RouteName.APP_HOME }
-    : { name: RouteName.HOME };
+  return isLoggedIn.value ? { name: RouteName.APP_HOME } : { name: RouteName.HOME };
 });
 </script>
 

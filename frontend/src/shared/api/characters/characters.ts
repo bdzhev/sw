@@ -23,9 +23,7 @@ const mapFullData = (raw: RawCharacterData) => {
   return { ...rest, characterClass };
 };
 
-export const getCharactersInfo = async (
-  offset: number,
-): Promise<BaseCharacterData[]> => {
+export const getCharactersInfo = async (offset: number): Promise<BaseCharacterData[]> => {
   const data = await http.get<RawBaseCharacterData[]>(
     `/characters?offset=${offset}&limit=${PAGE_SIZE}`,
   );

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { navRoutes } from '../../../config/navRoutes';
 import { useSidebarUi } from '../../../model/useSidebarUi';
-
 import { RouteButton } from './components';
 
 const uiStore = useSidebarUi();

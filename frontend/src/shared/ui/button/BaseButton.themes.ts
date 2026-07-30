@@ -33,8 +33,7 @@ export const variantClasses = {
   primary:
     'bg-none text-accent-primary inset-ring-2 ring-accent-primary hover:bg-accent-secondary hover:inset-ring-0',
   secondary: 'bg-secondary-button hover:bg-secondary-button-hover text-primary',
-  transparent:
-    'bg-transparent text-secondary hover:text-primary hover:bg-primary/10',
+  transparent: 'bg-transparent text-secondary hover:text-primary hover:bg-primary/10',
   danger:
     'bg-none text-danger inset-ring-danger inset-ring-2 ring-danger hover:bg-danger hover:text-primary hover:inset-ring-0',
 };

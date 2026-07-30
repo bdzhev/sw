@@ -17,12 +17,15 @@ import {
 } from '@shared/ui/modal';
 
 import type { ValidationConfirmModalProps } from '../../ConfirmModal.types';
-
 import { getValidationSchema } from './schema';
 
 const props = defineProps<ValidationConfirmModalProps>();
 
-const { meta } = useForm({ validationSchema: props.confirmationText ? getValidationSchema(props.confirmationText) : null });
+const { meta } = useForm({
+  validationSchema: props.confirmationText
+    ? getValidationSchema(props.confirmationText)
+    : null,
+});
 </script>
 
 <template>
@@ -45,21 +48,27 @@ const { meta } = useForm({ validationSchema: props.confirmationText ? getValidat
           <div>
             <label for="confirmationText">{{ props.confirmationLabel }}</label>
 
-            <Input class="pt-2" name="confirmationText" :clean-errors-on-focus="false" :show-error="false" />
+            <Input
+              class="pt-2"
+              name="confirmationText"
+              :clean-errors-on-focus="false"
+              :show-error="false"
+            />
           </div>
         </div>
       </ModalBody>
 
       <ModalFooter>
-        <div class="
-          right-4 bottom-6 flex flex-row items-center justify-end gap-4
-        ">
+        <div class="right-4 bottom-6 flex flex-row items-center justify-end gap-4">
           <ModalCloser v-slot="{ close }">
             <Button variant="secondary" @click="close">{{ 'Cancel' }}</Button>
           </ModalCloser>
 
-          <Button :is-disabled="!meta.valid" :variant="props.actionType === 'negative' ? 'danger' : 'primary'"
-            @click="props?.onConfirm">
+          <Button
+            :is-disabled="!meta.valid"
+            :variant="props.actionType === 'negative' ? 'danger' : 'primary'"
+            @click="props?.onConfirm"
+          >
             {{ props.confirmButtonText || 'Confirm' }}
           </Button>
         </div>

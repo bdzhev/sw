@@ -21,10 +21,15 @@ const schema = toTypedSchema(
       password: z.string().min(1, 'Password is required'),
       confirmPassword: z.string(),
     })
-    .refine((d) => { return d.password === d.confirmPassword; }, {
-      message: 'Passwords do not match',
-      path: ['confirmPassword'],
-    }),
+    .refine(
+      (d) => {
+        return d.password === d.confirmPassword;
+      },
+      {
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      },
+    ),
 );
 
 const form = useForm({ validationSchema: schema });
@@ -39,11 +44,9 @@ const handleSubmit = form.handleSubmit(async (values) => {
 <template>
   <form @submit.prevent="handleSubmit">
     <Input name="username" placeholder="Username" autocomplete="username" />
-    <SensitiveInput
-      name="password"
-      placeholder="Password"
-      autocomplete="new-password"
-    />
+
+    <SensitiveInput name="password" placeholder="Password" autocomplete="new-password" />
+
     <SensitiveInput
       name="confirmPassword"
       placeholder="Confirm password"

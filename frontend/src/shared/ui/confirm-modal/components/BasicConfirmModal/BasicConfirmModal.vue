@@ -1,5 +1,4 @@
-<script setup
-lang="ts">
+<script setup lang="ts">
 import { Button } from '@shared/ui/button';
 import {
   ModalCloseButton,
@@ -37,15 +36,18 @@ const props = defineProps<BaseConfirmModalProps>();
       </ModalBody>
 
       <ModalFooter>
-        <div class="
-          right-4 bottom-6 flex flex-row items-center justify-end gap-4
-        ">
+        <div class="right-4 bottom-6 flex flex-row items-center justify-end gap-4">
           <ModalCloser v-slot="{ close }">
-            <Button variant="secondary" :is-disabled="props.isLoading" @click="close">{{ 'Cancel' }}</Button>
+            <Button variant="secondary" :is-disabled="props.isLoading" @click="close">{{
+              'Cancel'
+            }}</Button>
           </ModalCloser>
 
-          <Button :variant="props.actionType === 'negative' ? 'danger' : 'primary'" @click="props?.onConfirm"
-            :is-loading="props.isLoading">
+          <Button
+            :variant="props.actionType === 'negative' ? 'danger' : 'primary'"
+            @click="props?.onConfirm"
+            :is-loading="props.isLoading"
+          >
             {{ props.confirmButtonText || 'Confirm' }}
           </Button>
         </div>

@@ -8,7 +8,6 @@ import { useCharacter } from '@entities/characters';
 import { useQuizItems } from '@entities/quiz';
 
 import { useBuilderProvider } from '../../model/useBuilderProvider';
-
 import type { UseQuizDataOptions } from './useQuizData.types';
 
 export const useQuizData = (options?: UseQuizDataOptions) => {
@@ -69,8 +68,8 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     return (
       isFetchingCharacter.value ||
       isFetchingQuizItems.value ||
-      !Boolean(character.value) ||
-      !Boolean(quizItems.value)
+      !character.value ||
+      !quizItems.value
     );
   });
 

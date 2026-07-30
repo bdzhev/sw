@@ -36,9 +36,7 @@ const handleSubmit = form.handleSubmit(async (values) => {
             class="h-8 w-8"
           />
 
-          <span class="font-alegreya text-3xl font-bold text-primary">
-            Statwizard
-          </span>
+          <span class="font-alegreya text-3xl font-bold text-primary"> Statwizard </span>
         </div>
 
         <HeaderTitle>Sign in</HeaderTitle>

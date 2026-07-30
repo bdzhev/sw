@@ -1,3 +1,3 @@
-import LoadingState from "./LoadingState.vue";
+import LoadingState from './LoadingState.vue';
 
 export { LoadingState };

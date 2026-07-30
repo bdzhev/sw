@@ -32,7 +32,6 @@ provide<DropdownActionsContext>('dropdownMenuActions', {
 });
 </script>
 
-
 <template>
   <DeleteCharacterModal />
 
@@ -40,10 +39,9 @@ provide<DropdownActionsContext>('dropdownMenuActions', {
 
   <DropdownMenuRoot :close-on-outside-click="false" portal-to="main">
     <DropdownMenuTrigger>
-      <IconButton class="
-        rounded-sm bg-bg-secondary/50 p-1 text-secondary transition-all
-        hover:bg-fg/50 hover:text-primary
-      ">
+      <IconButton
+        class="rounded-sm bg-bg-secondary/50 p-1 text-secondary transition-all hover:bg-fg/50 hover:text-primary"
+      >
         <EllipsisVertical :size="18" />
       </IconButton>
     </DropdownMenuTrigger>

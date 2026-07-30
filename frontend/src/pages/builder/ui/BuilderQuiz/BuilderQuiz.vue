@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useQuizData } from '../../model/useQuizData';
-
 import { ActiveState } from './active-state';
 import { ErrorState } from './error-state';
 import { LoadingState } from './loading-state';

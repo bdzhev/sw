@@ -6,12 +6,25 @@ const props = defineProps<ConfirmModalProps>();
 </script>
 
 <template>
-  <ValidationConfirmModal v-if="props.type === 'validation'" :confirmation-text="props.confirmationText"
-    :confirmation-label="props.confirmationLabel" :action-type="props.actionType" :modal-title="props.modalTitle"
-    :modal-description="props.modalDescription" :confirm-button-text="props.confirmButtonText"
-    :is-loading="props.isLoading" :on-confirm="props.onConfirm" />
+  <ValidationConfirmModal
+    v-if="props.type === 'validation'"
+    :confirmation-text="props.confirmationText"
+    :confirmation-label="props.confirmationLabel"
+    :action-type="props.actionType"
+    :modal-title="props.modalTitle"
+    :modal-description="props.modalDescription"
+    :confirm-button-text="props.confirmButtonText"
+    :is-loading="props.isLoading"
+    :on-confirm="props.onConfirm"
+  />
 
-  <BasicConfirmModal :action-type="props.actionType" :modal-title="props.modalTitle"
-    :modal-description="props.modalDescription" :confirm-button-text="props.confirmButtonText"
-    :is-loading="props.isLoading" :on-confirm="props.onConfirm" v-else />
+  <BasicConfirmModal
+    :action-type="props.actionType"
+    :modal-title="props.modalTitle"
+    :modal-description="props.modalDescription"
+    :confirm-button-text="props.confirmButtonText"
+    :is-loading="props.isLoading"
+    :on-confirm="props.onConfirm"
+    v-else
+  />
 </template>

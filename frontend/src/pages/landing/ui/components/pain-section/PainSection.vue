@@ -42,8 +42,8 @@ const { t } = useI18n();
 
       <HorizontalScrollSection>
         <Card class="h-full w-full" variant="outline" size="lg" :blur="false">
-          But, figuring how to beat the scariest dragons seems to be easier than
-          to figure out the point distribution system
+          But, figuring how to beat the scariest dragons seems to be easier than to figure
+          out the point distribution system
         </Card>
       </HorizontalScrollSection>
     </div>

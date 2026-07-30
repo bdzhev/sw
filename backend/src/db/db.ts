@@ -2,7 +2,8 @@ import { SQL } from 'bun';
 import { drizzle } from 'drizzle-orm/bun-sql';
 import { migrate } from 'drizzle-orm/bun-sql/migrator';
 
-const url = process.env.DATABASE_URL ?? 'postgresql://user:pass@localhost:5432/sw';
+const url =
+  process.env.DATABASE_URL ?? 'postgresql://user:pass@localhost:5432/sw';
 
 const client = new SQL(url, {
   max: 10,

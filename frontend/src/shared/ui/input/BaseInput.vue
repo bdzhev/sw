@@ -50,9 +50,7 @@ const innerInputClasses =
       {{ props.label }}
     </label>
 
-    <div
-      :class="[inputClasses, 'mb-6 flex items-center gap-2 overflow-hidden']"
-    >
+    <div :class="[inputClasses, 'mb-6 flex items-center gap-2 overflow-hidden']">
       <slot name="left" />
 
       <input
@@ -69,10 +67,7 @@ const innerInputClasses =
 
       <slot name="right" />
     </div>
-    <p
-      v-if="errorMessage && props.showError"
-      class="absolute top-10 text-xs text-danger"
-    >
+    <p v-if="errorMessage && props.showError" class="absolute top-10 text-xs text-danger">
       {{ errorMessage }}
     </p>
   </div>

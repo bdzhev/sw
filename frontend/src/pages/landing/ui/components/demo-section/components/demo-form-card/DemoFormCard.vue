@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { Card } from '@shared/ui/card';
 
-import {
-  DemoStatsForm,
-  type DemoStatsFormValues,
-} from '@widgets/demo-stats-form';
+import { DemoStatsForm, type DemoStatsFormValues } from '@widgets/demo-stats-form';
 
 import { useDemoStatsStore } from '../../../../../model/useDemoStatsStore';
 

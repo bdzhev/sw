@@ -11,7 +11,6 @@ import { Image } from '@shared/ui/image';
 import { useUser } from '@entities/user';
 
 import { useHeaderUiStore } from '../model/useHeaderUiStore';
-
 import { NavLink } from './components';
 
 const SCROLL_THRESHOLD = 300;
@@ -44,13 +43,7 @@ onUnmounted(() => {
           'flex flex-row items-center justify-between rounded-full p-2 transition-all duration-300': true,
           'bg-primary-bg/80 backdrop-blur-sm': uiStore.hasScrolled,
         },
-        uiStore.hasScrolled
-          ? `
-            pl-8
-            sm:w-[80%]
-            lg:w-[30%]
-          `
-          : `w-full px-20`,
+        uiStore.hasScrolled ? `pl-8 sm:w-[80%] lg:w-[30%]` : `w-full px-20`,
       ]"
     >
       <NavLink :link="{ name: RouteName.HOME }">
@@ -72,11 +65,7 @@ onUnmounted(() => {
         </NavLink>
 
         <RouterLink
-          :to="
-            isLoggedIn
-              ? { name: RouteName.APP_HOME }
-              : { name: RouteName.SIGNUP }
-          "
+          :to="isLoggedIn ? { name: RouteName.APP_HOME } : { name: RouteName.SIGNUP }"
           @click="handleLinkClick"
         >
           <Button :is-round="true" size="md">

@@ -1,7 +1,7 @@
-import { ref, readonly, computed } from "vue";
+import { ref, readonly, computed } from 'vue';
 
-import { getMe, refreshToken } from "@shared/api/auth";
-import type { User } from "@shared/api/auth";
+import { getMe, refreshToken } from '@shared/api/auth';
+import type { User } from '@shared/api/auth';
 
 const user = ref<User | null>(null);
 const isLoading = ref(true);

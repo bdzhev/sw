@@ -1,2 +1,2 @@
-export { ImageFolder } from "./types";
-export { assetsService } from "./assetsService";
+export { ImageFolder } from './types';
+export { assetsService } from './assetsService';

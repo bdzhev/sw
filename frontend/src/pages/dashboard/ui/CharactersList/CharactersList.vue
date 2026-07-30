@@ -15,8 +15,7 @@ import {
 
 const SKELETON_CARD_COUNT = 4;
 
-const { characters, isCharInfoLoading, isCharInfoRefetching } =
-  useCharactersInfo();
+const { characters, isCharInfoLoading, isCharInfoRefetching } = useCharactersInfo();
 </script>
 
 <template>
@@ -29,9 +28,12 @@ const { characters, isCharInfoLoading, isCharInfoRefetching } =
       <CharacterCardSkeleton class="h-50" />
     </div>
 
-    <CharCardRoot v-for="char in characters" :key="char.id" v-bind="char" class="
-      col-span-1 row-span-1 h-50
-    ">
+    <CharCardRoot
+      v-for="char in characters"
+      :key="char.id"
+      v-bind="char"
+      class="col-span-1 row-span-1 h-50"
+    >
       <CharCardHeader>
         <CoreInfoLine label="Class" field="characterClass" />
 

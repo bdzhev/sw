@@ -10,15 +10,10 @@ import { ModalRoot } from '@shared/ui/modal';
 
 import { useQuizData } from '@pages/builder/model/useQuizData';
 
-import {
-  clearQuizDraft,
-  readQuizDraft,
-  writeQuizDraft,
-} from '../../../lib/quizDraft';
+import { clearQuizDraft, readQuizDraft, writeQuizDraft } from '../../../lib/quizDraft';
 import { useBuilderProvider } from '../../../model/useBuilderProvider';
 import { useCreateCharacter } from '../../../model/useCreateCharacter';
 import { useQuizForm } from '../../../model/useQuizForm';
-
 import { QuizCard } from './quiz-card';
 import { QuizHeader } from './quiz-header';
 
