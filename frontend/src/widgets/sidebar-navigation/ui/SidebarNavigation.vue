@@ -1,19 +1,16 @@
 <script lang="ts" setup>
 import { useBreakpoint } from '@shared/lib/ui';
 
-import { MobileBar } from './mobile-bar';
 import { SidebarRail } from './sidebar-rail';
 
 /**
- * A rail and a drawer share no layout, so this is a switch rather than one tree
- * carrying both through `md:` prefixes — the same split the landing page's pain
- * section uses.
+ * Desktop only. Below md the navigation is a burger and a drawer, and those live
+ * in each page's own mobile header via MobileNavHeader — a page needs to put its
+ * actions next to the burger, and App.vue renders this once for every route.
  */
 const { isMobile } = useBreakpoint();
 </script>
 
 <template>
-  <MobileBar v-if="isMobile" />
-
-  <SidebarRail v-else />
+  <SidebarRail v-if="!isMobile" />
 </template>

@@ -20,7 +20,7 @@ import {
 
 import { initialValues } from '../../config';
 import { createCharacterSchema } from '../../model/schema';
-import type { CreateCharacterFormProps } from './CreateCharacterForm.props';
+import type { CreateCharacterFormProps } from './CreateCharacterForm.types';
 
 const props = defineProps<CreateCharacterFormProps>();
 
