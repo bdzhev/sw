@@ -3,6 +3,10 @@
   "author": "bdzhev",
   "type": "module",
   "scripts": {
-    "init": "bun run scripts/init.ts"
+    "init": "bun run scripts/init.ts",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }

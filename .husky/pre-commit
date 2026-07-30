@@ -1,0 +1,7 @@
+set -e
+
+# Hooks run from the git root. Each package owns its own eslint flat config,
+# so lint-staged has to run with that package as the cwd — it filters the
+# staged file list down to the cwd subtree, so an unrelated commit is a no-op.
+(cd frontend && bunx lint-staged)
+(cd backend && bunx lint-staged)

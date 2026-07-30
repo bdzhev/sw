@@ -77,7 +77,10 @@ import ScrollArea from './ScrollArea.vue';
 
 export { ScrollArea };
 export { ScrollBar } from './scroll-bar';
-export type { ScrollAreaProps, ScrollAreaOrientation } from './ScrollArea.types';
+export type {
+  ScrollAreaProps,
+  ScrollAreaOrientation,
+} from './ScrollArea.types';
 export type { ScrollBarProps } from './scroll-bar';
 ```
 
@@ -99,13 +102,13 @@ import { ScrollBar } from './scroll-bar';
 
 Much of `src/shared/ui` predates these rules. Three dead patterns you will encounter:
 
-| Legacy | Current |
-| --- | --- |
-| `BaseCard.vue` | `Card.vue` |
+| Legacy                        | Current             |
+| ----------------------------- | ------------------- |
+| `BaseCard.vue`                | `Card.vue`          |
 | `card/components/CardHeader/` | `card/card-header/` |
-| `BaseCard.props.ts` | `Card.types.ts` |
+| `BaseCard.props.ts`           | `Card.types.ts`     |
 
-These are being migrated branch by branch. When you touch such a folder: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do. Never add a new file *into* a legacy `components/` folder — create the properly-placed folder instead.
+These are being migrated branch by branch. When you touch such a folder: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do. Never add a new file _into_ a legacy `components/` folder — create the properly-placed folder instead.
 
 ### Compound components
 
@@ -128,8 +131,11 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   type CardVariant = 'primary' | 'secondary' | 'outline';
   const isOutline = variant === 'outline';
   ```
+
   ```vue
-  <div :class="{ 'ring-2 ring-border': !isOutline, 'rounded-md': size === 'md' }">
+  <div
+    :class="{ 'ring-2 ring-border': !isOutline, 'rounded-md': size === 'md' }"
+  ></div>
   ```
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
@@ -165,4 +171,6 @@ bun run lint
 bun run type-check
 ```
 
-husky + lint-staged also run lint on commit. `bun run type-check` must not gain new errors from your change — check that any failures it reports were already there.
+husky + lint-staged gate every commit. The hook lives at the **repo root** (`.husky/pre-commit`, husky is a root devDependency — a subdir install cannot find `.git`); it invokes `lint-staged` once per package, with that package as the cwd so each picks up its own prettier and eslint config. Frontend's task list is `frontend/.lintstagedrc.json`: `prettier --write` then `eslint --fix --max-warnings=0` on staged `.ts`/`.vue`, `prettier --write` on staged `.css`/`.json`/`.md`/`.html`/`.yml`. Order matters — prettier first, eslint last, because `better-tailwindcss` class ordering is an eslint fix and prettier must not get the final word on it.
+
+Anything auto-fixable is fixed and re-staged; anything left — an eslint error **or warning** — fails the hook, and lint-staged reverts the working tree to its pre-hook state. Type-checking is deliberately not in the hook (too slow for a commit), so `bun run type-check` stays a manual step, and it must not gain new errors from your change; check that any failures it reports were already there.
