@@ -136,7 +136,7 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
 - Icons come from `lucide-vue-next`.
-- Headless primitives come from `reka-ui`. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
+- Headless primitives come from `reka-ui`. **Overlays are already wrapped: `@shared/ui/dialog` (centred, with `DialogHeader`/`Body`/`Footer`/`CloseButton`), `@shared/ui/drawer` (off-canvas, swipe-to-close), `@shared/ui/confirm-dialog` on top of them.** The hand-rolled `shared/ui/modal` they replaced is gone — do not rebuild that pattern: it had no focus trap, no Escape, no scroll lock, and positioned itself `absolute` inside `body`. Enter/leave animation for these is CSS keyframes keyed off `data-[state=open]`/`data-[state=closed]`, because reka's `Presence` holds the element mounted until the animation ends; a Vue `<Transition>` would need `forceMount` and manual presence. A dialog with no `DialogDescription` must pass `:aria-describedby="undefined"` — the JS value, not the string `"undefined"`, since reka reads the rendered attribute. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
 
 ---
 
@@ -165,6 +165,8 @@ There is **no `tailwind.config.js`** — it was an empty stub that existed only 
 **No `h-screen` on a full-height section, and no `w-screen` anywhere.** `100vh` counts the collapsible mobile browser chrome, so the bottom of the section sits under the address bar — use `min-h-[100svh]` (`svh`, not `dvh`: `dvh` resizes as the chrome hides, which makes pinned GSAP sections jump). `100vw` includes the desktop scrollbar gutter and causes horizontal overflow — `w-full`/`min-w-full` is what is always meant.
 
 **Horizontal gutters come from `page-x`**, not a per-section `px-*` ladder.
+
+**`translate-*` utilities are not `transform`.** In v4 they set the separate `translate` property (`translate: var(--tw-translate-x) var(--tw-translate-y)`). A `@keyframes` that animates `transform: translate(...)` therefore _stacks_ on top of them instead of overriding — a `-translate-1/2`-centred element animated that way visibly slides in offset and snaps into place when the animation ends. Animate `transform` for scale/rotate only, and let the utility own the translate.
 
 **A `z-*` needs a `position` on the same element.** A z-index on a static box does nothing. This bit the landing layout: it relied on ScrollSmoother making its wrapper `fixed`, so the stacking silently collapsed on the viewports where the smoother is inert and an opaque background canvas painted over the page.
 

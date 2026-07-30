@@ -1,21 +1,19 @@
 <script lang="ts" setup>
-import { useSidebarUi } from '../model/useSidebarUi';
-import { CollapseButton, RouteList } from './components';
+import { useBreakpoint } from '@shared/lib/ui';
 
-const uiStore = useSidebarUi();
+import { MobileBar } from './mobile-bar';
+import { SidebarRail } from './sidebar-rail';
+
+/**
+ * A rail and a drawer share no layout, so this is a switch rather than one tree
+ * carrying both through `md:` prefixes — the same split the landing page's pain
+ * section uses.
+ */
+const { isMobile } = useBreakpoint();
 </script>
 
 <template>
-  <aside
-    :class="[
-      `flex h-screen flex-col items-center justify-between border-r-border/50 bg-bg-secondary/50 px-2 py-4 transition-all duration-200`,
-      uiStore.isCollapsed ? 'w-16' : 'w-40',
-    ]"
-  >
-    <div :class="['flex flex-col items-center gap-2', !uiStore.isCollapsed && `w-full`]">
-      <RouteList />
-    </div>
+  <MobileBar v-if="isMobile" />
 
-    <CollapseButton />
-  </aside>
+  <SidebarRail v-else />
 </template>

@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
-import { inject, computed } from 'vue';
+import { inject, computed, watch } from 'vue';
 
 import {
-  ModalPortal,
-  ModalContent,
-  ModalBody,
-  ModalHeader,
-  ModalFooter,
-  ModalTitle,
-  ModalCloseButton,
-  ModalOverlay,
-  ModalCloser,
-  ModalRoot,
-} from '@shared/ui/modal';
+  DialogBody,
+  DialogCloseButton,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+} from '@shared/ui/dialog';
 
 import { useUpdateCharacter } from '@entities/characters';
 
@@ -37,8 +36,8 @@ const initialValues = computed(() => {
   };
 });
 
-const handleUpdateSuccess = () => {
-  if (!dropdownCtx.isEditModalOpen) {
+const closeDialog = () => {
+  if (!dropdownCtx.isEditModalOpen.value) {
     return;
   }
 
@@ -46,7 +45,7 @@ const handleUpdateSuccess = () => {
 };
 
 const { updateCharacter, isUpdating } = useUpdateCharacter({
-  onSuccess: handleUpdateSuccess,
+  onSuccess: closeDialog,
 });
 
 const editCharForm = useForm({
@@ -62,51 +61,69 @@ const handleSubmit = editCharForm.handleSubmit((vals) => {
     name: vals.name,
   });
 });
+
+/**
+ * Replaces the modal's `onModalOpen` callback: the dialog primitive has no
+ * equivalent hook, and watching the open state is what that callback was
+ * standing in for anyway.
+ */
+watch(
+  () => {
+    return dropdownCtx.isEditModalOpen.value;
+  },
+  (isOpen) => {
+    if (!isOpen) {
+      return;
+    }
+
+    editCharForm.resetForm({ values: initialValues.value });
+  },
+);
 </script>
 
 <template>
-  <ModalRoot
-    v-model:open="dropdownCtx.isEditModalOpen.value"
-    is-controlled
-    :disable-outside-click-close="isUpdating"
-    v-on:modal-open="editCharForm.resetForm({ values: initialValues })"
-  >
-    <ModalPortal>
-      <ModalOverlay />
+  <DialogRoot v-model:open="dropdownCtx.isEditModalOpen.value">
+    <DialogPortal>
+      <DialogOverlay />
 
-      <ModalContent>
+      <!-- One labelled field, nothing to describe — see the Drawer for why `undefined`. -->
+      <DialogContent :disable-outside-close="isUpdating" :aria-describedby="undefined">
         <CfProvider v-on:submit="handleSubmit" :form-context="editCharForm">
-          <ModalHeader>
-            <ModalTitle>
+          <DialogHeader>
+            <DialogTitle>
               {{ 'Edit character' }}
-            </ModalTitle>
+            </DialogTitle>
 
-            <ModalCloseButton />
-          </ModalHeader>
+            <DialogCloseButton />
+          </DialogHeader>
 
-          <ModalBody>
+          <DialogBody>
             <CfInput name="name" label="Name" />
-          </ModalBody>
+          </DialogBody>
 
-          <ModalFooter>
+          <DialogFooter>
             <div class="flex flex-row gap-2">
-              <ModalCloser v-slot="{ close }">
-                <CfFooterCancelButton
-                  variant="secondary"
-                  :is-disabled="isUpdating"
-                  @click="close"
-                >
-                  {{ 'Cancel' }}
-                </CfFooterCancelButton>
-              </ModalCloser>
+              <!--
+                The cancel button already owns a click handler (it resets the
+                form), so it closes through its own `onCancelClick` rather than
+                being wrapped in a DialogClose whose handler would have to merge
+                with that one.
+              -->
+              <CfFooterCancelButton
+                variant="secondary"
+                :is-disabled="isUpdating"
+                :on-cancel-click="closeDialog"
+              >
+                {{ 'Cancel' }}
+              </CfFooterCancelButton>
 
               <CfFooterSubmitButton :is-loading="isUpdating">
                 {{ 'Save' }}
               </CfFooterSubmitButton>
             </div>
-          </ModalFooter>
+          </DialogFooter>
         </CfProvider>
-      </ModalContent>
-    </ModalPortal>
-  </ModalRoot>
+      </DialogContent>
+    </DialogPortal>
+  </DialogRoot>
 </template>

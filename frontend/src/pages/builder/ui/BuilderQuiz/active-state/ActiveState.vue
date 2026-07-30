@@ -5,8 +5,8 @@ import { useRouter } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
 import { Carousel } from '@shared/ui/carousel';
-import { ConfirmModal } from '@shared/ui/confirm-modal';
-import { ModalRoot } from '@shared/ui/modal';
+import { ConfirmDialog } from '@shared/ui/confirm-dialog';
+import { DialogRoot } from '@shared/ui/dialog';
 
 import { useQuizData } from '@pages/builder/model/useQuizData';
 
@@ -90,14 +90,14 @@ const handleCreate = form.handleSubmit((values) => {
     </div>
   </div>
 
-  <ModalRoot v-model:open="isErrorModalOpen" is-controlled>
-    <ConfirmModal
+  <DialogRoot v-model:open="isErrorModalOpen">
+    <ConfirmDialog
       type="basic"
-      :modal-title="t('Failed to create character')"
-      :modal-description="t('Something went wrong. Please try again.')"
+      :dialog-title="t('Failed to create character')"
+      :dialog-description="t('Something went wrong. Please try again.')"
       :confirm-button-text="t('Try again')"
       :is-loading="isCreating"
       @confirm="handleCreate"
     />
-  </ModalRoot>
+  </DialogRoot>
 </template>

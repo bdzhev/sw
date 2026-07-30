@@ -15,6 +15,21 @@
 
   --font-alegreya: 'Alegreya', sans-serif;
 
+  /**
+   * Enter/leave animations for reka-ui overlay primitives. They are driven by
+   * `data-[state=open]` / `data-[state=closed]` rather than a Vue <Transition>,
+   * because reka's Presence keeps the element mounted until the CSS animation
+   * ends — a transition would need forceMount and manual presence handling.
+   */
+  --animate-dialog-in: dialog-in 150ms ease-out;
+  --animate-dialog-out: dialog-out 120ms ease-in;
+  --animate-overlay-in: overlay-in 150ms ease-out;
+  --animate-overlay-out: overlay-out 120ms ease-in;
+  --animate-drawer-in-left: drawer-in-left 200ms ease-out;
+  --animate-drawer-out-left: drawer-out-left 150ms ease-in;
+  --animate-drawer-in-right: drawer-in-right 200ms ease-out;
+  --animate-drawer-out-right: drawer-out-right 150ms ease-in;
+
   --color-bg-primary: var(--color-slate-950);
   --color-bg-secondary: var(--color-slate-800);
   --color-fg: var(--color-slate-500);
@@ -111,6 +126,96 @@
 @keyframes shimmer {
   100% {
     transform: translateX(200%);
+  }
+}
+
+/**
+ * These animate `transform` only. The dialog is centred with `-translate-1/2`,
+ * which in Tailwind v4 sets the separate `translate` property — so a keyframe
+ * that also translated would stack on top of the centring and the dialog would
+ * visibly slide in from the left before snapping back.
+ */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dialog-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlay-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-out-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes drawer-in-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-out-right {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
   }
 }
 
