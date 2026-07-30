@@ -11,7 +11,7 @@ import { Image } from '@shared/ui/image';
 import { useUser } from '@entities/user';
 
 import { useHeaderUiStore } from '../model/useHeaderUiStore';
-import { NavLink } from './components';
+import { NavLink } from './nav-link';
 
 const SCROLL_THRESHOLD = 300;
 

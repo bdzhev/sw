@@ -16,6 +16,8 @@ onClickOutside(ctx.contentEl, () => {
 
 const { x, y, strategy, update } = useFloating(ctx.triggerEl, ctx.contentEl, {
   placement: ctx.placement,
+  /** Viewport-relative, so scrolling does not leave the menu a frame behind. */
+  strategy: 'fixed',
   middleware: [offset(4), flip(), shift()],
 });
 

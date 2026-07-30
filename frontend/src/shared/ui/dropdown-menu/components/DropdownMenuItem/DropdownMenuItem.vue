@@ -20,8 +20,9 @@ const handleClick = () => {
   <div
     @click="handleClick"
     class="
-      flex cursor-pointer flex-row items-center gap-2 px-4 py-2 transition-all
+      flex cursor-pointer flex-row items-center gap-2 px-4 py-3 transition-all
       hover:bg-bg-primary/20 hover:text-accent-primary
+      md:py-2
     "
   >
     <slot />

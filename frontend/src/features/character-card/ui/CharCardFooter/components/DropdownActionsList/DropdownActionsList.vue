@@ -40,7 +40,7 @@ provide<DropdownActionsContext>('dropdownMenuActions', {
   <DropdownMenuRoot :close-on-outside-click="false" portal-to="main">
     <DropdownMenuTrigger>
       <IconButton
-        class="rounded-sm bg-bg-secondary/50 p-1 text-secondary transition-all hover:bg-fg/50 hover:text-primary"
+        class="flex min-h-11 min-w-11 items-center justify-center rounded-sm bg-bg-secondary/50 p-1 text-secondary transition-all hover:bg-fg/50 hover:text-primary md:min-h-0 md:min-w-0"
       >
         <EllipsisVertical :size="18" />
       </IconButton>

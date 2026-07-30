@@ -2,7 +2,7 @@
 import { noop } from '@vueuse/core';
 import { RouterLink } from 'vue-router';
 
-import type { NavLinkProps } from './NavLink.props';
+import type { NavLinkProps } from './NavLink.types';
 
 const props = withDefaults(defineProps<NavLinkProps>(), {
   onClick: noop,

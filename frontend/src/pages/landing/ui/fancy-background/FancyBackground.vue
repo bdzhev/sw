@@ -9,8 +9,8 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 
 import { useBreakpoint } from '@shared/lib/ui';
 
-import basicFragment from '../../../lib/shaders/basicFragment.glsl?raw';
-import basicVertex from '../../../lib/shaders/basicVertex.glsl?raw';
+import basicFragment from '../../lib/shaders/basicFragment.glsl?raw';
+import basicVertex from '../../lib/shaders/basicVertex.glsl?raw';
 
 /**
  * What is visible here is the shader, not the silhouette, so a phone can afford

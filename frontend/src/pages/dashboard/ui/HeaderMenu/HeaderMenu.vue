@@ -14,21 +14,19 @@ onBeforeRouteLeave(() => {
 });
 
 const handleAddButtonClick = () => {
-  store.toggleIsNewCharacterFormOpen(!store.isNewCharacterFormOpen);
+  store.toggleIsNewCharacterFormOpen(true);
 };
 </script>
 
 <template>
-  <div class="sticky top-0 z-500 flex w-full flex-col">
-    <div class="flex flex-row bg-bg-primary/50 px-6 py-4 backdrop-blur-3xl">
-      <Button @click="handleAddButtonClick" :is-disabled="store.isNewCharacterFormOpen">
-        {{ 'New character' }}
-        <Plus :size="18" class="ml-1" />
-      </Button>
-    </div>
+  <header
+    class="sticky top-mobile-bar z-500 flex w-full flex-row bg-bg-primary/50 page-x py-3 backdrop-blur-3xl md:top-0 md:py-4"
+  >
+    <Button @click="handleAddButtonClick" class="min-h-11 md:min-h-0">
+      {{ 'New character' }}
+      <Plus :size="18" class="ml-1" />
+    </Button>
+  </header>
 
-    <NewCharacterForm
-      class="absolute top-20 left-4 bg-bg-secondary/80 backdrop-blur-3xl"
-    />
-  </div>
+  <NewCharacterForm />
 </template>

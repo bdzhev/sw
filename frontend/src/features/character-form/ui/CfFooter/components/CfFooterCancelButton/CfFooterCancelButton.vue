@@ -17,7 +17,7 @@ const handleClick = () => {
 </script>
 
 <template>
-  <Button variant="secondary" @click="handleClick">
+  <Button variant="secondary" @click="handleClick" class="min-h-11 md:min-h-0">
     <slot />
   </Button>
 </template>

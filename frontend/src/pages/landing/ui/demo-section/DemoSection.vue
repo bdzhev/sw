@@ -3,8 +3,9 @@ import { onUnmounted } from 'vue';
 
 import { Text } from '@shared/ui/text';
 
-import { useDemoStatsStore } from '../../../model/useDemoStatsStore';
-import { DemoFormCard, DemoResultCard } from './components';
+import { useDemoStatsStore } from '../../model/useDemoStatsStore';
+import { DemoFormCard } from './demo-form-card';
+import { DemoResultCard } from './demo-result-card';
 
 const demoStore = useDemoStatsStore();
 

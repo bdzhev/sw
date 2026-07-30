@@ -13,26 +13,37 @@ import {
   EditActionItem,
 } from '@features/character-card';
 
+import { EmptyState } from './empty-state';
+
 const SKELETON_CARD_COUNT = 4;
 
 const { characters, isCharInfoLoading, isCharInfoRefetching } = useCharactersInfo();
 </script>
 
 <template>
-  <div v-if="isCharInfoLoading" class="row-auto grid grid-cols-3 gap-8 px-10">
-    <CharacterCardSkeleton class="h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
+  <!-- lg, not md, for the third column: from md up the rail takes 160px back. -->
+  <div
+    v-if="isCharInfoLoading"
+    class="grid grid-cols-1 gap-4 page-x sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+  >
+    <CharacterCardSkeleton class="min-h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
   </div>
 
-  <div v-else class="row-auto grid grid-cols-3 gap-8 px-10" id="characterInfoList">
-    <div v-if="isCharInfoRefetching">
-      <CharacterCardSkeleton class="h-50" />
-    </div>
+  <EmptyState v-else-if="!characters?.length" />
 
+  <!-- Refetching dims the list instead of adding a skeleton cell, which used to
+       shift every card one position. -->
+  <div
+    v-else
+    class="grid grid-cols-1 gap-4 page-x transition-opacity sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+    :class="{ 'opacity-60': isCharInfoRefetching }"
+    id="characterInfoList"
+  >
     <CharCardRoot
       v-for="char in characters"
       :key="char.id"
       v-bind="char"
-      class="col-span-1 row-span-1 h-50"
+      class="min-h-50"
     >
       <CharCardHeader>
         <CoreInfoLine label="Class" field="characterClass" />

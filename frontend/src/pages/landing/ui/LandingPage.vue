@@ -3,7 +3,10 @@ import { defineAsyncComponent } from 'vue';
 
 import { useScrollSmoother } from '@shared/lib/animations';
 
-import { TopSection, DemoSection, PainSection, AboutSection } from './components';
+import { AboutSection } from './about-section';
+import { DemoSection } from './demo-section';
+import { PainSection } from './pain-section';
+import { TopSection } from './top-section';
 
 useScrollSmoother({
   wrapperSelector: '#layout',
@@ -16,7 +19,7 @@ useScrollSmoother({
  */
 const FancyBackground = defineAsyncComponent({
   loader: async () => {
-    const { FancyBackground } = await import('./components');
+    const { FancyBackground } = await import('./fancy-background');
 
     return FancyBackground;
   },

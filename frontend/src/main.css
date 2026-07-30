@@ -13,6 +13,12 @@
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
 
+  /**
+   * The mobile nav bar's height. A page-level sticky header has to offset by it
+   * below md, so both sides read it from here.
+   */
+  --spacing-mobile-bar: 3.5rem;
+
   --font-alegreya: 'Alegreya', sans-serif;
 
   /**

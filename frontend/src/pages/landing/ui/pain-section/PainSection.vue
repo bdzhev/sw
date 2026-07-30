@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useHorizontalScrollAnimation } from '@shared/lib/animations';
 import { Card } from '@shared/ui/card';
 
-import { HorizontalScrollSection } from './components';
+import { HorizontalScrollSection } from './horizontal-scroll-section';
 
 /**
  * Defaults to md and up. Below that the panels below are a plain vertical stack

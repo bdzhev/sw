@@ -40,8 +40,12 @@ const inputClasses = computed(() => {
   ];
 });
 
+/**
+ * `text-base` below md: iOS Safari auto-zooms the page on focusing an input
+ * whose font-size is under 16px.
+ */
 const innerInputClasses =
-  'm-0 flex-1 border-none bg-transparent bg-none px-2 py-2 text-sm text-inherit outline-none placeholder:text-secondary';
+  'm-0 flex-1 border-none bg-transparent bg-none px-2 py-3 text-base text-inherit outline-none placeholder:text-secondary md:py-2 md:text-sm';
 </script>
 
 <template>

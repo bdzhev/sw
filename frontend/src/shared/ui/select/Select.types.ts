@@ -1,4 +1,4 @@
-interface SelectOption {
+export interface SelectOption {
   value: string | number;
   label: string;
 }
@@ -6,4 +6,5 @@ interface SelectOption {
 export interface SelectProps {
   name: string;
   options: SelectOption[];
+  placeholder?: string;
 }

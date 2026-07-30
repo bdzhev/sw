@@ -35,9 +35,10 @@ onBeforeUnmount(uiStore.closeDrawer);
     `sticky`, not `fixed`: below md the document is the scroller, so the bar can
     stay in flow and the content underneath needs no compensating top padding.
     z-500 keeps it under the drawer and the dialogs, which own z-1000.
+    The height is a token because page headers offset by it (`--spacing-mobile-bar`).
   -->
   <header
-    class="sticky top-0 z-500 flex h-14 w-full shrink-0 flex-row items-center gap-2 border-b border-border/50 bg-bg-secondary/80 px-2 backdrop-blur-md"
+    class="sticky top-0 z-500 flex h-mobile-bar w-full shrink-0 flex-row items-center gap-2 border-b border-border/50 bg-bg-secondary/80 px-2 backdrop-blur-md"
   >
     <BurgerButton />
 

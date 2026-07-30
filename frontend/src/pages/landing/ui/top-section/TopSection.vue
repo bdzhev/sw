@@ -10,7 +10,7 @@ import { useUser } from '@entities/user';
 
 import { useHeaderUiStore } from '@widgets/landing-header';
 
-import { useTopSectionAnimation } from '../../../lib';
+import { useTopSectionAnimation } from '../../lib';
 
 const store = useHeaderUiStore();
 

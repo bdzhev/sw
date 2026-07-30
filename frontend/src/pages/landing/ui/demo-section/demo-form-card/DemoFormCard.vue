@@ -3,7 +3,7 @@ import { Card } from '@shared/ui/card';
 
 import { DemoStatsForm, type DemoStatsFormValues } from '@widgets/demo-stats-form';
 
-import { useDemoStatsStore } from '../../../../../model/useDemoStatsStore';
+import { useDemoStatsStore } from '../../../model/useDemoStatsStore';
 
 const { updateCharName, updateAllStats, resetAll, state } = useDemoStatsStore();
 
