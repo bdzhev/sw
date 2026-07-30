@@ -1,6 +1,18 @@
 @import 'tailwindcss';
 
 @theme {
+  /**
+   * Breakpoints. These are Tailwind's own defaults, restated explicitly so that
+   * retuning them later is a one-line change here instead of a hunt through
+   * components. Only sm/md/lg are used in the app — no arbitrary min-[...] variants.
+   *
+   * Twin of `breakpoints` in shared/lib/ui/breakpoints, which is the JS-side
+   * source for matchMedia and GSAP. Change both together.
+   */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+
   --font-alegreya: 'Alegreya', sans-serif;
 
   --color-bg-primary: var(--color-slate-950);
@@ -124,6 +136,14 @@
   );
 }
 
+/**
+ * The single horizontal page gutter. Sections use this instead of their own
+ * px-* ladder, so the whole app's edge spacing is retuned in one place.
+ */
+@utility page-x {
+  @apply px-5 md:px-10 lg:px-22;
+}
+
 @utility bg-radial {
   background-image: radial-gradient(
     circle at center,
@@ -163,21 +183,26 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  /* svh, not vh: vh counts the collapsible mobile browser chrome. */
+  min-height: 100svh;
 }
 
+/**
+ * Headings scale with the viewport here, once, so a section only overrides the
+ * scale when its type is genuinely special (the landing hero, for instance).
+ */
 h1 {
-  @apply text-4xl font-extrabold;
+  @apply text-2xl font-extrabold md:text-3xl lg:text-4xl;
 }
 
 h2 {
-  @apply text-3xl font-bold;
+  @apply text-xl font-bold md:text-2xl lg:text-3xl;
 }
 
 h3 {
-  @apply text-2xl font-extrabold;
+  @apply text-lg font-extrabold md:text-xl lg:text-2xl;
 }
 
 h4 {
-  @apply text-xl font-bold;
+  @apply text-base font-bold md:text-lg lg:text-xl;
 }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Input } from '@shared/ui/input';
 import { Slider } from '@shared/ui/slider';
+import { Text } from '@shared/ui/text';
 
 import { demoStatInputDemoItems } from '../../config/stats/stats';
 </script>

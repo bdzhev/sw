@@ -147,9 +147,28 @@ All configuration is **CSS-side, in `src/main.css`**: `@theme` for design tokens
 There is **no `tailwind.config.js`** — it was an empty stub that existed only so the old ESLint plugin had something to point at, and it is gone. Do not recreate it. Tooling that needs to know the design system reads `src/main.css` directly (see `sortTailwindcss.stylesheet` in `.oxfmtrc.json`).
 
 - Use theme tokens — `bg-border`, `text-secondary`, `bg-accent-primary` — not raw palette values like `bg-slate-600`.
-- Custom utilities already defined: `fade-bottom`, `fade-scroll-top`, `fade-scroll-bottom`, `fade-scroll-y`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
+- Custom utilities already defined: `page-x`, `fade-bottom`, `fade-scroll-top`, `fade-scroll-bottom`, `fade-scroll-y`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
 - **Native scrollbars are hidden globally** by `::-webkit-scrollbar { display: none }` in `main.css`. Anything that needs a visible scroll affordance must render its own — use `@shared/ui/scroll-area`.
 - Scrolling inside a flex column needs `min-h-0` on the scrolling child, otherwise it stretches to content height and never scrolls. `overflow-hidden` on an ancestor (e.g. `Card`) clips instead of scrolling — put the scroll container inside it.
+
+### Responsive layout
+
+**Write mobile-first.** Base classes describe the phone; `md:`/`lg:` add the wider layout on top. Some older components are still written the other way round (large base class, no mobile base) — those are bugs waiting to be rewritten, not a pattern to copy.
+
+**Only the named breakpoints.** `sm:` `md:` `lg:`, never an arbitrary `min-[500px]:`. The values are declared as `--breakpoint-sm/md/lg` in `@theme` so retuning them is one line; an arbitrary variant escapes that.
+
+`shared/lib/ui/breakpoints` is the **JS twin** of those tokens and the only place px breakpoint values may be written in TS. Change it and `@theme` together. Use it via:
+
+- `useBreakpoint()` — reactive `isMobile` / `isTablet` / `isDesktop` / `isCompact`, for what CSS cannot express (canvas sizing, whether to mount something, animation offsets). If the answer is only visual, use a Tailwind variant instead.
+- `mediaFrom('md')` / `mediaBelow('md')` — query strings for `matchMedia` and `gsap.matchMedia`.
+
+**No `h-screen` on a full-height section, and no `w-screen` anywhere.** `100vh` counts the collapsible mobile browser chrome, so the bottom of the section sits under the address bar — use `min-h-[100svh]` (`svh`, not `dvh`: `dvh` resizes as the chrome hides, which makes pinned GSAP sections jump). `100vw` includes the desktop scrollbar gutter and causes horizontal overflow — `w-full`/`min-w-full` is what is always meant.
+
+**Horizontal gutters come from `page-x`**, not a per-section `px-*` ladder.
+
+**A `z-*` needs a `position` on the same element.** A z-index on a static box does nothing. This bit the landing layout: it relied on ScrollSmoother making its wrapper `fixed`, so the stacking silently collapsed on the viewports where the smoother is inert and an opaque background canvas painted over the page.
+
+**Scroll-driven GSAP goes inside `gsap.matchMedia()`**, never a one-off `getDevice()` check at mount: a context rebuilds when the viewport crosses a breakpoint, a mount-time snapshot does not. `useScrollSmoother` and `useHorizontalScrollAnimation` both take a `mediaQuery` option defaulting to md and up, and are inert below it — a consumer that uses them owes its mobile users a non-pinned fallback layout (see `pain-section`).
 
 ---
 

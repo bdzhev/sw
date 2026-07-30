@@ -43,7 +43,9 @@ onUnmounted(() => {
           'flex flex-row items-center justify-between rounded-full p-2 transition-all duration-300': true,
           'bg-primary-bg/80 backdrop-blur-sm': uiStore.hasScrolled,
         },
-        uiStore.hasScrolled ? `pl-8 sm:w-[80%] lg:w-[30%]` : `w-full px-20`,
+        uiStore.hasScrolled
+          ? `w-[calc(100%-2rem)] pl-4 sm:w-[80%] sm:pl-8 lg:w-[30%]`
+          : `w-full page-x`,
       ]"
     >
       <NavLink :link="{ name: RouteName.HOME }">
@@ -51,11 +53,11 @@ onUnmounted(() => {
           :folder="ImageFolder.Base"
           name="goblin-fairy"
           alt="Flying goblin fairy"
-          class="h-12 w-12"
+          class="h-10 w-10 md:h-12 md:w-12"
         />
       </NavLink>
 
-      <div class="flex flex-row items-center gap-8">
+      <div class="flex flex-row items-center gap-3 md:gap-8">
         <NavLink
           v-if="!isLoggedIn"
           :link="{ name: RouteName.LOGIN }"

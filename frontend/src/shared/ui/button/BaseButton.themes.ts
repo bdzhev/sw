@@ -5,6 +5,12 @@ export const textClasses = {
   lg: 'text-lg font-medium',
 };
 
+export const widthClasses = {
+  fit: 'w-fit',
+  full: 'w-full',
+  fullOnMobile: 'w-full sm:w-fit',
+};
+
 export const paddingClasses = {
   equalPadding: {
     xs: 'p-2',

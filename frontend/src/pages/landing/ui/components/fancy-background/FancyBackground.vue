@@ -1,28 +1,108 @@
 <script lang="ts" setup>
+import {
+  useDocumentVisibility,
+  useEventListener,
+  usePreferredReducedMotion,
+} from '@vueuse/core';
 import { Renderer, Camera, Transform, Sphere, Program, Mesh } from 'ogl';
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+
+import { useBreakpoint } from '@shared/lib/ui';
 
 import basicFragment from '../../../lib/shaders/basicFragment.glsl?raw';
 import basicVertex from '../../../lib/shaders/basicVertex.glsl?raw';
 
+/**
+ * What is visible here is the shader, not the silhouette, so a phone can afford
+ * a coarser sphere.
+ */
+const SEGMENTS = 16;
+const MOBILE_SEGMENTS = 10;
+
 const container = ref<HTMLDivElement | null>(null);
 
-let renderer: Renderer;
+const { isMobile } = useBreakpoint();
+const visibility = useDocumentVisibility();
+const preferredMotion = usePreferredReducedMotion();
+
+let renderer: Renderer | null = null;
 let scene: Transform;
 let camera: Camera;
 let sphere: Mesh;
 let program: Program;
-let animationId: number;
+let animationId: number | null = null;
+let lastTime = 0;
+let lastWidth = 0;
+
+const stopLoop = () => {
+  if (animationId === null) {
+    return;
+  }
+
+  cancelAnimationFrame(animationId);
+  animationId = null;
+};
+
+const runLoop = () => {
+  const activeRenderer = renderer;
+
+  if (!activeRenderer || animationId !== null) {
+    return;
+  }
+
+  lastTime = performance.now();
+
+  const animate = () => {
+    animationId = requestAnimationFrame(animate);
+
+    const now = performance.now();
+    const delta = (now - lastTime) * 0.001;
+    lastTime = now;
+
+    program.uniforms.u_time.value += delta;
+
+    activeRenderer.render({ scene, camera });
+  };
+
+  animate();
+};
+
+const handleResize = () => {
+  if (!renderer) {
+    return;
+  }
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  /**
+   * On mobile every browser-chrome collapse fires a resize with an unchanged
+   * width. Re-projecting on those makes the sphere visibly shift mid-scroll, so
+   * only a real width change counts there.
+   */
+  if (isMobile.value && width === lastWidth) {
+    return;
+  }
+
+  lastWidth = width;
+
+  camera.perspective({ aspect: width / height });
+  renderer.setSize(width, height);
+};
 
 onMounted(() => {
-  if (!container.value) {
+  /**
+   * The background is pure decoration and it animates continuously, so reduced
+   * motion means not mounting it at all — the layout's radial gradient still
+   * carries the look.
+   */
+  if (!container.value || preferredMotion.value === 'reduce') {
     return;
   }
 
   renderer = new Renderer({ antialias: false });
   const gl = renderer.gl;
   container.value.appendChild(gl.canvas);
-  renderer.setSize(window.innerWidth, window.innerHeight);
 
   camera = new Camera(gl, { fov: 20, near: 0.1, far: 20 });
   camera.position.set(0, 2, 8);
@@ -41,44 +121,40 @@ onMounted(() => {
     },
   });
 
+  const segments = isMobile.value ? MOBILE_SEGMENTS : SEGMENTS;
+
   const geometry = new Sphere(gl, {
     radius: 4,
-    widthSegments: 16,
-    heightSegments: 16,
+    widthSegments: segments,
+    heightSegments: segments,
   });
   sphere = new Mesh(gl, { geometry, program });
   sphere.position.set(0, 0, 0);
   sphere.setParent(scene);
 
-  const onResize = () => {
-    camera.perspective({ aspect: window.innerWidth / window.innerHeight });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  };
+  handleResize();
+  runLoop();
+});
 
-  window.addEventListener('resize', onResize);
-  onResize();
+useEventListener(window, 'resize', handleResize);
 
-  let lastTime = performance.now();
+/**
+ * A backgrounded tab has no reason to keep a render loop alive.
+ */
+watch(visibility, (state) => {
+  if (state === 'visible') {
+    runLoop();
 
-  const animate = () => {
-    animationId = requestAnimationFrame(animate);
+    return;
+  }
 
-    const now = performance.now();
-    const delta = (now - lastTime) * 0.001;
-    lastTime = now;
+  stopLoop();
+});
 
-    program.uniforms.u_time.value += delta;
-
-    renderer.render({ scene, camera });
-  };
-
-  animate();
-
-  onBeforeUnmount(() => {
-    cancelAnimationFrame(animationId);
-    window.removeEventListener('resize', onResize);
-    renderer.gl.getExtension('WEBGL_lose_context')?.loseContext();
-  });
+onBeforeUnmount(() => {
+  stopLoop();
+  renderer?.gl.getExtension('WEBGL_lose_context')?.loseContext();
+  renderer = null;
 });
 </script>
 
