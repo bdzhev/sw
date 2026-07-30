@@ -14,7 +14,7 @@ const { value, setValue } = useField<string | number>(() => {
 
 const handleChange = (newValue: string | number) => {
   setValue(newValue);
-}
+};
 
 provide<RadioContext>(RADIO_CTX_KEY, {
   onChange: handleChange,

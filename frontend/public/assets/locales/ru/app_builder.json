@@ -1,3 +1,6 @@
 {
-  "Create character": "Создать персонажа"
+  "Create character": "Создать персонажа",
+  "Failed to create character": "Не удалось создать персонажа",
+  "Something went wrong. Please try again.": "Что-то пошло не так. Попробуйте ещё раз.",
+  "Try again": "Попробовать снова"
 }

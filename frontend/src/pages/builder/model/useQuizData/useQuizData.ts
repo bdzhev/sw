@@ -34,8 +34,10 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     }
   });
 
-  // Guard: an already-created (active) character has no quiz left to take —
-  // send the user to its character page instead of the builder.
+  /**
+   * Need proper guards? TODO - think of a proper guard
+   * general page loader for these cases (while data fetches)
+   */
   watch(
     character,
     (value) => {

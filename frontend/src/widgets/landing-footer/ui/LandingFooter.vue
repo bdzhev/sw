@@ -4,7 +4,7 @@
 
   const route = useRoute();
 
-  const shouldShowFooter = computed(() => route.name === 'home');
+  const shouldShowFooter = computed(() => {return route.name === 'home'});
 </script>
 
 <template>

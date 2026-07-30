@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
-import { useRouter } from 'vue-router';
 
 import {
   characterQueries,
@@ -10,18 +9,18 @@ import {
   generateStats as generateStatsRequest,
   type QuizResults,
 } from '@shared/api/quiz';
-import { RouteName } from '@shared/lib/router';
 
-import { clearQuizDraft } from '../../lib/quizDraft';
 import { useBuilderProvider } from '../useBuilderProvider';
 
-export const useCreateCharacter = () => {
+import type { UseCreateCharacterOptions } from './useCreateCharacter.types';
+
+export const useCreateCharacter = (options?: UseCreateCharacterOptions) => {
+  const { onError, onSuccess } = options || {};
   const { characterId } = useBuilderProvider()!;
 
-  const router = useRouter();
   const qc = useQueryClient();
 
-  const { mutateAsync: createCharacter, isPending: isCreating } = useMutation({
+  const { mutate: createCharacter, isPending: isCreating } = useMutation({
     mutationFn: (results: QuizResults) => {
       return generateStatsRequest({ characterId, results });
     },
@@ -35,13 +34,9 @@ export const useCreateCharacter = () => {
 
       qc.invalidateQueries({ queryKey: characterQueries.characters() });
 
-      clearQuizDraft(characterId);
-
-      router.replace({
-        name: RouteName.APP_CHARACTER,
-        params: { id: characterId },
-      });
+      onSuccess?.();
     },
+    onError,
   });
 
   return { createCharacter, isCreating };

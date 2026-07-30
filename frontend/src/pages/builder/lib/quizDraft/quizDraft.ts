@@ -4,11 +4,11 @@ const draftKey = (characterId: string) => {
   return `builder:quiz-draft:${characterId}`;
 };
 
-export const readQuizDraft = (characterId: string): QuizResults => {
+export const readQuizDraft = (characterId: string): Partial<QuizResults> => {
   try {
     const raw = localStorage.getItem(draftKey(characterId));
 
-    return raw ? (JSON.parse(raw) as QuizResults) : {};
+    return raw ? (JSON.parse(raw) as Partial<QuizResults>) : {};
   } catch {
     return {};
   }
@@ -16,7 +16,7 @@ export const readQuizDraft = (characterId: string): QuizResults => {
 
 export const writeQuizDraft = (
   characterId: string,
-  results: QuizResults,
+  results: Partial<QuizResults>,
 ): void => {
   try {
     localStorage.setItem(draftKey(characterId), JSON.stringify(results));

@@ -26,8 +26,9 @@ export const useDeleteCharacter = () => {
           (old: InfiniteData<CharacterData[]>) => {
             if (!old) return old;
             const pagesFiltered = old.pages.map((page) =>
-              page.filter((charInfo) => charInfo.id !== id),
+              {return page.filter((charInfo) => {return charInfo.id !== id})},
             );
+
             return { ...old, pages: pagesFiltered };
           },
         );

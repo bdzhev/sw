@@ -1,4 +1,5 @@
 import { gsap } from 'gsap';
+import type { SplitText } from 'gsap/SplitText';
 
 import type { UseFadeInAnimationOptions } from './useFadeInAnimation.types';
 
@@ -11,7 +12,7 @@ export const useFadeInAnimation = (options?: UseFadeInAnimationOptions) => {
     shouldRevert,
   } = options || {};
 
-  return (elements: Element[], textSplit?: globalThis.SplitText) => {
+  return (elements: Element[], textSplit?: SplitText) => {
     gsap.from(elements, {
       duration: duration,
       y: y,
@@ -21,7 +22,7 @@ export const useFadeInAnimation = (options?: UseFadeInAnimationOptions) => {
       ease: 'power2.out',
       onComplete: () => {
         if (textSplit && shouldRevert) {
-          return textSplit.revert();
+          textSplit.revert();
         }
       },
     });

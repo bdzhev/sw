@@ -26,8 +26,9 @@ export const useUpdateCharacter = (options?: UseUpdateCharacterOptions) => {
         (old: InfiniteData<CharacterData[]> | undefined) => {
           if (!old) return old;
           const updatedPages = old.pages.map((page) =>
-            page.map((char) => (char.id === updated.id ? { ...char, ...updated } : char)),
+            {return page.map((char) => {return (char.id === updated.id ? { ...char, ...updated } : char)})},
           );
+
           return { ...old, pages: updatedPages };
         },
       );

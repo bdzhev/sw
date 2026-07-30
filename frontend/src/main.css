@@ -103,6 +103,22 @@
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
 
+@utility fade-scroll-top {
+  mask-image: linear-gradient(to bottom, transparent 0, black 2rem);
+}
+
+@utility fade-scroll-bottom {
+  mask-image: linear-gradient(to bottom, black calc(100% - 2rem), transparent 100%);
+}
+
+@utility fade-scroll-y {
+  mask-image: linear-gradient(to bottom,
+      transparent 0,
+      black 2rem,
+      black calc(100% - 2rem),
+      transparent 100%);
+}
+
 @utility bg-radial {
   background-image: radial-gradient(circle at center,
       var(--accent) 0%,
@@ -111,6 +127,12 @@
   background-size: 300% 300%;
   background-position: center;
 
+}
+
+[data-reka-scroll-area-viewport] {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 html,

@@ -8,10 +8,7 @@ import type {
   UseTextAnimationOptions,
 } from './useTextAnimation.types';
 
-const getElementsBySplitType = (
-  type: splitType,
-  splitText: globalThis.SplitText,
-) => {
+const getElementsBySplitType = (type: splitType, splitText: SplitText) => {
   switch (type) {
     case 'words':
       return splitText.words;

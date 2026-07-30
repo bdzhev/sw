@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
-import type { QuizResults } from '@shared/api/quiz';
+import { RouteName } from '@shared/lib/router';
 import { Carousel } from '@shared/ui/carousel';
+import { ConfirmModal } from '@shared/ui/confirm-modal';
+import { ModalRoot } from '@shared/ui/modal';
 
 import { useQuizData } from '@pages/builder/model/useQuizData';
 
-import { readQuizDraft, writeQuizDraft } from '../../../lib/quizDraft';
+import {
+  clearQuizDraft,
+  readQuizDraft,
+  writeQuizDraft,
+} from '../../../lib/quizDraft';
 import { useBuilderProvider } from '../../../model/useBuilderProvider';
 import { useCreateCharacter } from '../../../model/useCreateCharacter';
 import { useQuizForm } from '../../../model/useQuizForm';
@@ -14,7 +22,11 @@ import { useQuizForm } from '../../../model/useQuizForm';
 import { QuizCard } from './quiz-card';
 import { QuizHeader } from './quiz-header';
 
+const { t } = useI18n();
+
 const { characterId } = useBuilderProvider()!;
+const router = useRouter();
+const isErrorModalOpen = ref(false);
 
 const { character, quizItems } = useQuizData();
 
@@ -27,41 +39,70 @@ const form = useQuizForm({
   items: quizItems.value.questions,
 });
 
-// Persist answers locally so a page reload doesn't lose progress.
 watch(
   form.values,
   (values) => {
-    writeQuizDraft(characterId, values as QuizResults);
+    writeQuizDraft(characterId, values);
   },
   { deep: true },
 );
+
+const handleCreateCharacterError = () => {
+  isErrorModalOpen.value = true;
+};
+
+const handleCreateCharacterSuccess = () => {
+  router.replace({
+    name: RouteName.APP_CHARACTER,
+    params: { id: characterId },
+  });
+
+  clearQuizDraft(characterId);
+};
 
 const isFormValid = computed(() => {
   return form.meta.value.valid;
 });
 
-const { createCharacter, isCreating } = useCreateCharacter();
+const { createCharacter, isCreating } = useCreateCharacter({
+  onError: handleCreateCharacterError,
+  onSuccess: handleCreateCharacterSuccess,
+});
 
-// handleSubmit re-validates, so this only fires once every question is answered.
-const onCreate = form.handleSubmit((values) => {
-  createCharacter(values as QuizResults).catch(() => {
-    /* failure is reflected in the mutation state; stay on the builder */
-  });
+const handleCreate = form.handleSubmit((values) => {
+  createCharacter(values);
 });
 </script>
 
 <template>
-  <QuizHeader
-    :is-valid="isFormValid"
-    :is-creating="isCreating"
-    @create="onCreate"
-  />
-
-  <Carousel>
-    <QuizCard
-      v-for="item in quizItems.questions"
-      :key="item.id"
-      :quiz-item="item"
+  <div class="flex h-full flex-col overflow-hidden">
+    <QuizHeader
+      class="mb-4 shrink-0 p-4"
+      :is-valid="isFormValid"
+      :is-creating="isCreating"
+      @create="handleCreate"
     />
-  </Carousel>
+
+    <div class="min-h-0 flex-1">
+      <Carousel>
+        <QuizCard
+          v-for="item in quizItems.questions"
+          :key="item.id"
+          :quiz-item="item"
+          :is-picked="Boolean(form.values[item.id])"
+        />
+      </Carousel>
+    </div>
+  </div>
+
+  <ModalRoot v-model:open="isErrorModalOpen" is-controlled>
+    <ConfirmModal
+      type="basic"
+      :modal-title="t('Failed to create character')"
+      :modal-description="t('Something went wrong. Please try again.')"
+      :confirm-button-text="t('Try again')"
+      :is-loading="isCreating"
+      @confirm="handleCreate"
+    />
+  </ModalRoot>
 </template>

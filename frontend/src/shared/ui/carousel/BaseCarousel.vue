@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { useEventListener } from '@vueuse/core';
+import { useEventListener, useResizeObserver } from '@vueuse/core';
 import { gsap } from 'gsap';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
 
 import { Button } from '@shared/ui/button';
 
-import type { BaseCarouselProps } from './BaseCarousel.props';
+import type { BaseCarouselProps } from './BaseCarousel.types';
 
 const props = withDefaults(defineProps<BaseCarouselProps>(), {
   initialIndex: 0,
@@ -21,35 +21,61 @@ const outerRef = ref<HTMLElement>();
 const trackRef = ref<HTMLElement>();
 
 const activeIndex = ref(props.initialIndex);
-let items: Element[] = [];
+const items = ref<HTMLElement[]>([]);
 
-const updateCarousel = (index: number, animate = true) => {
-  const duration = animate ? 0.45 : 0;
-
-  items.forEach((el, i) => {
+const applyAppearance = (index: number, duration: number) => {
+  items.value.forEach((el, i) => {
     const distance = Math.abs(i - index);
     const isActive = i === index;
 
-    (el as HTMLElement).style.pointerEvents = isActive ? 'auto' : 'none';
+    el.style.pointerEvents = isActive ? 'auto' : 'none';
 
-    gsap.to(el, {
+    const vars = {
       scale: isActive ? 1 : 0.85,
       filter: isActive
         ? 'blur(0px) brightness(1)'
         : 'blur(3px) brightness(0.55)',
       opacity: distance > 1 ? 0 : 1,
-      duration,
-      ease: 'power2.out',
-    });
+    };
+
+    if (!duration) {
+      gsap.set(el, vars);
+
+      return;
+    }
+
+    gsap.to(el, { ...vars, duration, ease: 'power2.out', overwrite: true });
   });
+};
 
-  if (!trackRef.value || !outerRef.value || !items.length) return;
+const applyPosition = (index: number, duration: number) => {
+  if (!trackRef.value || !outerRef.value || !items.value.length) {
+    return;
+  }
 
-  const itemW = (items[0] as HTMLElement).offsetWidth;
+  const itemW = items.value[0].offsetWidth;
   const containerW = outerRef.value.offsetWidth;
+
+  if (!itemW || !containerW) {
+    return;
+  }
+
   const x = containerW / 2 - index * (itemW + props.gap) - itemW / 2;
 
-  gsap.to(trackRef.value, { x, duration, ease: 'power2.out' });
+  if (!duration) {
+    gsap.set(trackRef.value, { x });
+
+    return;
+  }
+
+  gsap.to(trackRef.value, { x, duration, ease: 'power2.out', overwrite: true });
+};
+
+const updateCarousel = (index: number, animate = true) => {
+  const duration = animate ? 0.45 : 0;
+
+  applyAppearance(index, duration);
+  applyPosition(index, duration);
 };
 
 const go = (index: number) => {
@@ -65,62 +91,82 @@ const prev = () => {
 };
 
 const next = () => {
-  if (activeIndex.value < items.length - 1) {
+  if (activeIndex.value < items.value.length - 1) {
     go(activeIndex.value + 1);
   }
 };
 
-onMounted(() => {
+const handleMount = () => {
   if (!trackRef.value) {
     return;
   }
 
-  items = Array.from(trackRef.value.children);
+  items.value = Array.from(trackRef.value.children) as HTMLElement[];
   updateCarousel(activeIndex.value, false);
-});
+};
 
-useEventListener(window, 'keydown', (e: KeyboardEvent) => {
-  if (e.key === 'ArrowLeft') {
+const handleResize = () => {
+  applyPosition(activeIndex.value, 0);
+};
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'ArrowLeft') {
     prev();
   }
 
-  if (e.key === 'ArrowRight') {
+  if (event.key === 'ArrowRight') {
     next();
   }
-});
+};
+
+onMounted(handleMount);
+
+useResizeObserver([outerRef, trackRef], handleResize);
+
+useEventListener(window, 'keydown', handleKeydown);
 </script>
 
 <template>
-  <div
-    ref="outerRef"
-    class="relative flex h-full w-full items-center overflow-hidden"
-  >
-    <Button
-      :is-disabled="activeIndex === 0"
-      :is-round="true"
-      :equal-padding="true"
-      class="absolute left-4 z-10"
-      @click="prev"
-    >
-      <ChevronLeft :size="20" />
-    </Button>
-
+  <div class="relative flex h-full min-h-0 w-full flex-col">
     <div
-      ref="trackRef"
-      class="flex will-change-transform"
-      :style="{ gap: `${gap}px` }"
+      ref="outerRef"
+      class="relative flex min-h-0 w-full flex-1 items-center overflow-hidden py-4"
     >
-      <slot />
+      <div
+        ref="trackRef"
+        class="flex h-full will-change-transform"
+        :style="{ gap: `${gap}px` }"
+      >
+        <slot />
+      </div>
     </div>
 
-    <Button
-      :is-disabled="activeIndex === items.length - 1"
-      :is-round="true"
-      :equal-padding="true"
-      class="absolute right-4 z-10"
-      @click="next"
+    <div
+      class="
+        pointer-events-none z-10 flex shrink-0 justify-center gap-4 pb-2
+        md:absolute md:inset-x-4 md:top-1/2 md:-translate-y-1/2
+        md:justify-between md:pb-0
+      "
     >
-      <ChevronRight :size="20" />
-    </Button>
+      <Button
+        :is-disabled="activeIndex === 0"
+        :is-round="true"
+        :equal-padding="true"
+        class="pointer-events-auto"
+        @click="prev"
+      >
+        <ChevronLeft :size="20" />
+      </Button>
+
+      <Button
+        :is-disabled="activeIndex === items.length - 1 || !items.length"
+        :is-round="true"
+        :equal-padding="true"
+        class="pointer-events-auto"
+        @click="next"
+      >
+        <ChevronRight :size="20" />
+      </Button>
+    </div>
   </div>
 </template>
