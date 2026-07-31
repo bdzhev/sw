@@ -115,9 +115,10 @@ onMounted(() => {
     fragment: basicFragment,
     uniforms: {
       u_time: { value: 0 },
+      /* sRGB 0..1. u_color2 is --color-branding (#fe6e00); keep them in step. */
       u_color0: { value: [0.054, 0.042, 0.129] },
       u_color1: { value: [0.052, 0.2, 0.2] },
-      u_color2: { value: [0.678, 0.561, 0.819] },
+      u_color2: { value: [0.996, 0.431, 0.0] },
     },
   });
 

@@ -64,7 +64,6 @@ const selectedLabel = computed(() => {
       </SelectTrigger>
 
       <SelectPortal>
-        <!-- z above the dialog's 1000: a select inside a dialog is the common case. -->
         <SelectContent
           position="popper"
           :side-offset="4"

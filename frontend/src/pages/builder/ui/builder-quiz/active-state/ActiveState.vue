@@ -70,8 +70,8 @@ const handleCreate = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <!-- No `h-full` below md: `main` has no definite height there, so it would
-       resolve to auto and collapse the carousel's own height chain. -->
+  <!-- No `h-full` below md: `main` has no definite height there, so it resolves
+       to auto and collapses the carousel's height chain. -->
   <div
     class="flex min-h-[calc(100svh-var(--spacing-mobile-bar))] flex-col md:h-full md:min-h-0 md:overflow-hidden"
   >

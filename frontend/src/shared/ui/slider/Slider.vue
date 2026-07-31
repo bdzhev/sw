@@ -69,7 +69,7 @@ const tickPercents = computed(() => {
       />
     </SliderTrack>
 
-    <!-- `after:` widens the grab area to 44px without growing the circle. -->
+    <!-- `after:` is the 44px touch target; the circle stays 28px. -->
     <SliderThumb
       :aria-label="props.label"
       class="relative flex h-7 w-7 items-center justify-center rounded-full border-2 border-accent-primary bg-bg-secondary text-xs font-bold text-primary transition-colors after:absolute after:-inset-2 after:content-[''] focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:outline-none md:after:hidden"

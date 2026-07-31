@@ -3,7 +3,6 @@ import { Skeleton } from '@shared/ui/skeleton';
 </script>
 
 <template>
-  <!-- Centre follows QuizCard's width ladder so nothing jumps on load. -->
   <div class="relative flex h-full w-full flex-row items-center justify-center py-4">
     <div class="absolute -left-8 z-0 hidden h-3/4 w-150 opacity-50 md:block lg:w-200">
       <Skeleton class="rounded-xl" />

@@ -25,10 +25,6 @@ const { t } = useI18n();
     class="relative w-full overflow-hidden bg-primary-bg/70 pb-16 backdrop-blur-3xl md:pb-0"
   >
     <div id="painSectionScroll" class="relative flex flex-col md:flex-row md:flex-nowrap">
-      <!--
-        In flow on mobile, where it reads as the stack's heading; lifted out of
-        flow from md up, where it floats above the pinned panels.
-      -->
       <span
         id="title"
         class="relative z-10 mt-20 mb-8 page-x font-alegreya text-xl font-extrabold text-primary italic md:absolute md:top-0 md:mt-30 md:translate-y-2 md:text-2xl lg:text-5xl"

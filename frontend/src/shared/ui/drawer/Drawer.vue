@@ -50,11 +50,6 @@ usePointerSwipe(panelRef, {
     <DialogPortal>
       <DialogOverlay />
 
-      <!--
-        A nav drawer has nothing to describe beyond its title. Passing the value
-        `undefined` (not the string) drops the attribute, so reka neither warns
-        nor leaves `aria-describedby` pointing at an element that never renders.
-      -->
       <DialogContent
         :aria-describedby="undefined"
         :class="[
@@ -65,7 +60,6 @@ usePointerSwipe(panelRef, {
       >
         <DialogTitle class="sr-only">{{ props.title }}</DialogTitle>
 
-        <!-- The swipe surface, and the scroll container if the nav outgrows the screen. -->
         <div ref="panelRef" class="flex min-h-0 flex-1 flex-col gap-4 p-4">
           <slot />
         </div>

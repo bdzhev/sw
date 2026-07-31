@@ -21,7 +21,6 @@ const { characters, isCharInfoLoading, isCharInfoRefetching } = useCharactersInf
 </script>
 
 <template>
-  <!-- lg, not md, for the third column: from md up the rail takes 160px back. -->
   <div
     v-if="isCharInfoLoading"
     class="grid grid-cols-1 gap-4 page-x sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"

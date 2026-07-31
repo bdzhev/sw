@@ -60,7 +60,6 @@ const { meta } = useForm({
 
       <DialogFooter>
         <div class="flex flex-row items-center justify-end gap-4">
-          <!-- `as-child` so the close lands on our Button instead of nesting one. -->
           <DialogClose as-child>
             <Button variant="secondary">{{ 'Cancel' }}</Button>
           </DialogClose>

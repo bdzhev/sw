@@ -1,5 +1,4 @@
-import TooltipRoot from './TooltipRoot.vue';
+import TooltipContent from './TooltipContent.vue';
 
-export { TooltipRoot };
-
-export { TooltipContent, TooltipPortal, TooltipTrigger } from './components';
+export { TooltipProvider, TooltipRoot, TooltipTrigger, TooltipPortal } from 'reka-ui';
+export { TooltipContent };

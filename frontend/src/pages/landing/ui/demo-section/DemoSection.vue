@@ -15,11 +15,6 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!--
-    Height is only clamped from md up. Below that the two cards stack, and a
-    stats form plus a result card do not fit one phone screen — clamping would
-    clip the form rather than shrink it.
-  -->
   <section
     class="grid max-w-full grid-flow-row auto-rows-min grid-cols-1 gap-4 page-x pt-24 md:min-h-[100svh] md:grid-cols-6 md:pt-30"
   >

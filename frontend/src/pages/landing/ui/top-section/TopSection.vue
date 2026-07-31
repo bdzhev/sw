@@ -25,6 +25,12 @@ useTopSectionAnimation();
   <section
     class="relative flex min-h-[100svh] w-full flex-col page-x pt-24 md:pt-48 lg:pt-60"
   >
+    <div
+      class="mb-6 h-48 w-full sm:h-64 md:absolute md:top-20 md:mb-0 md:h-160 md:w-[60%]"
+    >
+      <Skeleton />
+    </div>
+
     <div class="z-1 flex w-full flex-col gap-6 md:gap-10">
       <article class="flex flex-col font-alegreya">
         <span
@@ -58,14 +64,6 @@ useTopSectionAnimation();
           {{ isLoggedIn ? 'Go to account' : 'Start now' }}
         </Button>
       </RouterLink>
-    </div>
-
-    <!--
-      Hero art is decoration, and at this size it would sit on top of the copy on
-      a phone. The slogan animation carries the first screen on mobile instead.
-    -->
-    <div class="absolute top-20 hidden h-160 w-[60%] md:block">
-      <Skeleton />
     </div>
   </section>
 </template>

@@ -20,7 +20,6 @@ const handleConfirmDelete = () => {
 </script>
 
 <template>
-  <!-- No `is-controlled` flag: a bound `v-model:open` is what makes it controlled. -->
   <DialogRoot v-model:open="dropdownCtx.isDeleteModalOpen.value">
     <ConfirmDialog
       type="validation"

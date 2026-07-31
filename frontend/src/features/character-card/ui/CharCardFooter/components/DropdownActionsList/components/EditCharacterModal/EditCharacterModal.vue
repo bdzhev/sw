@@ -86,7 +86,6 @@ watch(
     <DialogPortal>
       <DialogOverlay />
 
-      <!-- One labelled field, nothing to describe — see the Drawer for why `undefined`. -->
       <DialogContent :disable-outside-close="isUpdating" :aria-describedby="undefined">
         <CfProvider v-on:submit="handleSubmit" :form-context="editCharForm">
           <DialogHeader>
@@ -103,12 +102,6 @@ watch(
 
           <DialogFooter>
             <div class="flex flex-row gap-2">
-              <!--
-                The cancel button already owns a click handler (it resets the
-                form), so it closes through its own `onCancelClick` rather than
-                being wrapped in a DialogClose whose handler would have to merge
-                with that one.
-              -->
               <CfFooterCancelButton
                 variant="secondary"
                 :is-disabled="isUpdating"

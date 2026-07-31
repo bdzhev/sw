@@ -59,7 +59,6 @@ const closeDialog = () => {
     <DialogPortal>
       <DialogOverlay />
 
-      <!-- The form renders the visible heading; this only feeds aria-labelledby. -->
       <DialogContent :aria-describedby="undefined">
         <DialogTitle class="sr-only">{{ t('Create a new character') }}</DialogTitle>
 
