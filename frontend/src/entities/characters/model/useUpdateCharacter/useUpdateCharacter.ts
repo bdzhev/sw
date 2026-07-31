@@ -1,12 +1,14 @@
-import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
+import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
   updateCharacter as updateCharacterRequest,
   characterQueries,
-  type CharacterData,
 } from '@shared/api/characters';
 
-import type { UseUpdateCharacterOptions } from './useUpdateCharacter.types';
+import type {
+  CharactersCache,
+  UseUpdateCharacterOptions,
+} from './useUpdateCharacter.types';
 
 export const useUpdateCharacter = (options?: UseUpdateCharacterOptions) => {
   const { onSuccess } = options || {};
@@ -15,21 +17,26 @@ export const useUpdateCharacter = (options?: UseUpdateCharacterOptions) => {
 
   const { mutate: updateCharacter, isPending: isUpdating } = useMutation({
     mutationFn: updateCharacterRequest,
-    onSuccess: (resp) => {
-      const updated = resp;
-      qc.setQueryData(
-        characterQueries.characters(),
-        (old: InfiniteData<CharacterData[]> | undefined) => {
-          if (!old) return old;
-          const updatedPages = old.pages.map((page) => {
-            return page.map((char) => {
-              return char.id === updated.id ? { ...char, ...updated } : char;
-            });
-          });
+    onSuccess: (updated) => {
+      qc.setQueryData(characterQueries.characters(), (old: CharactersCache) => {
+        if (!old) return old;
 
-          return { ...old, pages: updatedPages };
-        },
-      );
+        return {
+          ...old,
+          pages: old.pages.map((page) => {
+            return {
+              ...page,
+              items: page.items.map((char) => {
+                return char.id === updated.id ? { ...char, ...updated } : char;
+              }),
+            };
+          }),
+        };
+      });
+
+      /** Also cached on its own key, which the sheet reads. */
+      qc.setQueryData(characterQueries.character(updated.id), updated);
+
       onSuccess?.();
     },
   });

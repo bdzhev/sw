@@ -37,6 +37,8 @@
   --animate-drawer-out-right: drawer-out-right 150ms ease-in;
   --animate-toast-in: toast-in 180ms ease-out;
   --animate-toast-out: toast-out 140ms ease-in;
+  --animate-menu-in: menu-in 120ms ease-out;
+  --animate-menu-out: menu-out 100ms ease-in;
 
   /**
    * Values come from the shadcn preset `b1Lhw7mSAq`, `.dark` block only — the app
@@ -266,6 +268,34 @@
 
   to {
     opacity: 0;
+  }
+}
+
+/**
+ * Scale only, no translate: reka positions the popper by writing `transform` on
+ * the content's wrapper, and a translating keyframe here would compound with it.
+ */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes menu-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.96);
   }
 }
 

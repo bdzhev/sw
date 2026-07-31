@@ -9,13 +9,18 @@ import { useDeleteCharacter } from '@entities/characters';
 import type { CharCardContext } from '../../../../../CharCardRoot.types';
 import type { DropdownActionsContext } from '../../DropdownActionsList.types';
 
-const { deleteCharacter } = useDeleteCharacter();
+const { deleteCharacter, isDeletingCharacter } = useDeleteCharacter();
 
 const charCardCtx = inject<CharCardContext>('charCardCtx')!;
 const dropdownCtx = inject<DropdownActionsContext>('dropdownMenuActions')!;
 
+/** Closing is per-call, not in the hook: the hook has no idea who opened it. */
 const handleConfirmDelete = () => {
-  deleteCharacter(charCardCtx.id);
+  deleteCharacter(charCardCtx.id, {
+    onSuccess: () => {
+      dropdownCtx.isDeleteModalOpen.value = false;
+    },
+  });
 };
 </script>
 
@@ -23,6 +28,7 @@ const handleConfirmDelete = () => {
   <DialogRoot v-model:open="dropdownCtx.isDeleteModalOpen.value">
     <ConfirmDialog
       type="validation"
+      :is-loading="isDeletingCharacter"
       :confirmation-text="charCardCtx?.name || ''"
       confirmation-label="Enter the name of your character to confirm"
       action-type="negative"
