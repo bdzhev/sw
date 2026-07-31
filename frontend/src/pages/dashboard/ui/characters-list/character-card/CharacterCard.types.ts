@@ -1,5 +1,5 @@
-import type { BaseCharacterData } from '@shared/api/characters';
+import type { CharacterSummary } from '@shared/api/characters';
 
 export interface CharacterCardProps {
-  character: BaseCharacterData;
+  character: CharacterSummary;
 }

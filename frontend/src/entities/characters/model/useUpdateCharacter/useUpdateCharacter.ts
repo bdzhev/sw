@@ -6,6 +6,7 @@ import {
 } from '@shared/api/characters';
 
 import type {
+  CharacterDetailCache,
   CharactersCache,
   UseUpdateCharacterOptions,
 } from './useUpdateCharacter.types';
@@ -34,8 +35,19 @@ export const useUpdateCharacter = (options?: UseUpdateCharacterOptions) => {
         };
       });
 
-      /** Also cached on its own key, which the sheet reads. */
-      qc.setQueryData(characterQueries.character(updated.id), updated);
+      /**
+       * Also cached on its own key, which the sheet reads. Merged into
+       * `character`, never assigned over the whole entry — that key holds the
+       * full detail (sheet + sub-collections) and a plain assign would drop it.
+       */
+      qc.setQueryData(
+        characterQueries.character(updated.id),
+        (old: CharacterDetailCache) => {
+          if (!old) return old;
+
+          return { ...old, character: { ...old.character, ...updated } };
+        },
+      );
 
       onSuccess?.();
     },

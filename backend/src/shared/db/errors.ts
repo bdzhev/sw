@@ -11,6 +11,8 @@ import { SQL } from 'bun';
 export const PG_ERROR = {
   /** 23503 foreign_key_violation */
   FOREIGN_KEY_VIOLATION: '23503',
+  /** 22P02 invalid_text_representation — e.g. a value outside a pgEnum */
+  INVALID_TEXT_REPRESENTATION: '22P02',
 } as const;
 
 export type PgErrorCode = (typeof PG_ERROR)[keyof typeof PG_ERROR];

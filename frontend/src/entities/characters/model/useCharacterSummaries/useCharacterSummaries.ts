@@ -2,12 +2,12 @@ import { useInfiniteQuery } from '@tanstack/vue-query';
 import { computed } from 'vue';
 
 import {
-  getCharactersInfo,
+  getCharacterSummaries,
   characterQueries,
   MAX_CHARACTERS,
 } from '@shared/api/characters';
 
-export const useCharactersInfo = () => {
+export const useCharacterSummaries = () => {
   const {
     data,
     isLoading,
@@ -18,7 +18,7 @@ export const useCharactersInfo = () => {
   } = useInfiniteQuery({
     queryKey: characterQueries.characters(),
     queryFn: ({ pageParam }) => {
-      return getCharactersInfo(pageParam);
+      return getCharacterSummaries(pageParam);
     },
     /**
      * The next offset is how many rows are actually held, not
@@ -62,10 +62,10 @@ export const useCharactersInfo = () => {
     characters,
     charactersTotal,
     isAtCharacterLimit,
-    isCharInfoLoading: isLoading,
-    isCharInfoRefetching: isRefetching,
-    isFetchingNextCharactersInfo: isFetchingNextPage,
-    hasMoreCharactersInfo: hasNextPage,
-    loadNextCharactersInfo: fetchNextPage,
+    isLoadingCharacterSummaries: isLoading,
+    isRefetchingCharacterSummaries: isRefetching,
+    isFetchingNextCharacterSummaries: isFetchingNextPage,
+    hasMoreCharacterSummaries: hasNextPage,
+    loadNextCharacterSummaries: fetchNextPage,
   };
 };

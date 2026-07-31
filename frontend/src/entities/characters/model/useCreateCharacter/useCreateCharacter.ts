@@ -1,23 +1,23 @@
 import { noop, useMutation, useQueryClient } from '@tanstack/vue-query';
 
 import {
-  addCharacter as addCharacterRequest,
+  createCharacter as createCharacterRequest,
   characterQueries,
 } from '@shared/api/characters';
 import { getApiErrorMessage } from '@shared/lib/http';
 import { useToast } from '@shared/lib/ui';
 
-import type { UseAddCharacterOptions } from './useAddCharacter.types';
+import type { UseCreateCharacterOptions } from './useCreateCharacter.types';
 
-export const useAddCharacter = (options?: UseAddCharacterOptions) => {
+export const useCreateCharacter = (options?: UseCreateCharacterOptions) => {
   const { onSuccess = noop } = options || {};
 
   const qc = useQueryClient();
   const { showToast } = useToast();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationKey: characterQueries.addCharacter(),
-    mutationFn: addCharacterRequest,
+    mutationKey: characterQueries.createCharacter(),
+    mutationFn: createCharacterRequest,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: characterQueries.characters() });
       onSuccess();
@@ -35,5 +35,5 @@ export const useAddCharacter = (options?: UseAddCharacterOptions) => {
     },
   });
 
-  return { addCharacter: mutateAsync, isAddingCharacter: isPending };
+  return { createCharacter: mutateAsync, isCreatingCharacter: isPending };
 };

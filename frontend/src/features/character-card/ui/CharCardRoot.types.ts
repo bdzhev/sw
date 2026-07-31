@@ -1,3 +1,3 @@
-import type { BaseCharacterData } from '@shared/api/characters';
+import type { CharacterSummary } from '@shared/api/characters';
 
-export type CharCardContext = BaseCharacterData;
+export type CharCardContext = CharacterSummary;

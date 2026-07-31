@@ -66,12 +66,27 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: 'character/:id',
+        // The tab is a route param so a tab is deep-linkable, the back button
+        // works, and the sheet survives the mid-combat refresh the save
+        // strategy is designed for. Missing tab redirects to main.
+        path: 'character/:id/:tab?',
         name: RouteName.APP_CHARACTER,
         component: () => {
           return import('@pages/character');
         },
         meta: { layout: DefaultLayout },
+        beforeEnter: (to, _from, next) => {
+          if (to.params.tab) {
+            next();
+
+            return;
+          }
+
+          next({
+            name: RouteName.APP_CHARACTER,
+            params: { id: to.params.id, tab: 'main' },
+          });
+        },
       },
       {
         path: 'settings',

@@ -40,7 +40,7 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
   watch(
     character,
     (value) => {
-      if (value?.status === CharacterStatus.ACTIVE) {
+      if (value?.character.status === CharacterStatus.ACTIVE) {
         router.replace({
           name: RouteName.APP_CHARACTER,
           params: { id: ctx.characterId },

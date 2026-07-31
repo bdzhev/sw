@@ -30,8 +30,8 @@ export const useDeleteCharacter = () => {
           pages: old.pages.map((page) => {
             return {
               ...page,
-              items: page.items.filter((charInfo) => {
-                return charInfo.id !== id;
+              items: page.items.filter((summary) => {
+                return summary.id !== id;
               }),
               total: Math.max(0, page.total - 1),
             };

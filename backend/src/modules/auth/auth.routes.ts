@@ -1,9 +1,13 @@
+import { zValidator } from '@hono/zod-validator';
 import { and, eq, gt } from 'drizzle-orm';
 import { Hono, type Context } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { SignJWT } from 'jose';
 
 import { db, sessions, users } from '@/shared/db';
+import { errorHook } from '@/shared/validation';
+
+import { loginSchema, registerSchema } from './auth.schemas';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 const ACCESS_TOKEN_TTL = '7d';
@@ -64,70 +68,64 @@ export const authRoutes = new Hono();
 
 // ─── Register ─────────────────────────────────────────────────────────────────
 
-authRoutes.post('/register', async (c) => {
-  const { username, password } = await c.req.json<{
-    username: string;
-    password: string;
-  }>();
+authRoutes.post(
+  '/register',
+  zValidator('json', registerSchema, errorHook),
+  async (c) => {
+    const { username, password } = c.req.valid('json');
 
-  if (!username || !password) {
-    return c.json({ error: 'Username and password are required' }, 400);
+    const existing = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+
+    if (existing.length > 0) {
+      return c.json({ error: 'Username already taken' }, 409);
+    }
+
+    const created = await db
+      .insert(users)
+      .values({ username, password })
+      .returning();
+    const user = created[0];
+
+    const refreshToken = await createSession(user.id);
+    const accessToken = await signAccessToken(user.id);
+
+    setRefreshCookie(c, refreshToken);
+    setAccessCookie(c, accessToken);
+
+    return c.json({ id: user.id, username: user.username }, 201);
   }
-
-  const existing = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username));
-
-  if (existing.length > 0) {
-    return c.json({ error: 'Username already taken' }, 409);
-  }
-
-  const created = await db
-    .insert(users)
-    .values({ username, password })
-    .returning();
-  const user = created[0];
-
-  const refreshToken = await createSession(user.id);
-  const accessToken = await signAccessToken(user.id);
-
-  setRefreshCookie(c, refreshToken);
-  setAccessCookie(c, accessToken);
-
-  return c.json({ id: user.id, username: user.username }, 201);
-});
+);
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 
-authRoutes.post('/login', async (c) => {
-  const { username, password } = await c.req.json<{
-    username: string;
-    password: string;
-  }>();
+authRoutes.post(
+  '/login',
+  zValidator('json', loginSchema, errorHook),
+  async (c) => {
+    const { username, password } = c.req.valid('json');
 
-  if (!username || !password) {
-    return c.json({ error: 'Username and password are required' }, 400);
+    const result = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
+
+    if (result.length === 0 || result[0].password !== password) {
+      return c.json({ error: 'Invalid username or password' }, 401);
+    }
+
+    const user = result[0];
+    const refreshToken = await createSession(user.id);
+    const accessToken = await signAccessToken(user.id);
+
+    setRefreshCookie(c, refreshToken);
+    setAccessCookie(c, accessToken);
+
+    return c.json({ id: user.id, username: user.username });
   }
-
-  const result = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, username));
-
-  if (result.length === 0 || result[0].password !== password) {
-    return c.json({ error: 'Invalid username or password' }, 401);
-  }
-
-  const user = result[0];
-  const refreshToken = await createSession(user.id);
-  const accessToken = await signAccessToken(user.id);
-
-  setRefreshCookie(c, refreshToken);
-  setAccessCookie(c, accessToken);
-
-  return c.json({ id: user.id, username: user.username });
-});
+);
 
 // ─── Refresh ──────────────────────────────────────────────────────────────────
 

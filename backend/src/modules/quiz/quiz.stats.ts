@@ -1,4 +1,5 @@
 import type { characterClassEnum, characterRaceEnum } from '@/shared/db';
+import { QuizAnswerStat, type QuizResults } from '@/shared/db/types';
 
 type CharacterClass = (typeof characterClassEnum.enumValues)[number];
 type CharacterRace = (typeof characterRaceEnum.enumValues)[number];
@@ -12,9 +13,22 @@ enum Stat {
   CHA = 'cha',
 }
 
-type QuizCharacterStats = Exclude<Stat, Stat.CON>;
-type QuizResults = Record<string, QuizCharacterStats>;
 type CharacterStats = Record<Stat, number>;
+
+/**
+ * The answer side is the shared five-value `QuizAnswerStat`; the scoring side is
+ * the six-value `Stat` above, which includes CON. They hold identical strings but
+ * are separate enums, so the bridge is an explicit map rather than a cast — and
+ * the missing CON entry is the type-level statement that no answer can point at
+ * it (it is synthesised from `baseConWeight` below).
+ */
+const ANSWER_TO_STAT: Record<QuizAnswerStat, Stat> = {
+  [QuizAnswerStat.Str]: Stat.STR,
+  [QuizAnswerStat.Dex]: Stat.DEX,
+  [QuizAnswerStat.Int]: Stat.INT,
+  [QuizAnswerStat.Wis]: Stat.WIS,
+  [QuizAnswerStat.Cha]: Stat.CHA,
+};
 
 const ALL_STATS: Stat[] = [
   Stat.STR,
@@ -81,7 +95,7 @@ const sanitize = (value: number): number => {
 };
 
 export const calculateStats = (
-  results: Partial<QuizResults>,
+  results: QuizResults,
   charClass: CharacterClass,
   race: CharacterRace
 ): CharacterStats => {
@@ -89,8 +103,8 @@ export const calculateStats = (
     return { ...acc, [stat]: 0 };
   }, {} as CharacterStats);
 
-  for (const stat of Object.values(results)) {
-    points[stat as Stat]++;
+  for (const answer of Object.values(results)) {
+    points[ANSWER_TO_STAT[answer]]++;
   }
 
   const priorities = classStatPriorities[charClass] ?? [];

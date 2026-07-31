@@ -20,7 +20,7 @@ import {
   TooltipTrigger,
 } from '@shared/ui/tooltip';
 
-import { useCharactersInfo } from '@entities/characters';
+import { useCharacterSummaries } from '@entities/characters';
 
 import { CreateCharacterForm } from '../create-character-form';
 import type { AddCharacterButtonProps } from './AddCharacterButton.types';
@@ -38,7 +38,7 @@ const props = withDefaults(defineProps<AddCharacterButtonProps>(), {
 
 const { t } = useI18n();
 
-const { isAtCharacterLimit } = useCharactersInfo();
+const { isAtCharacterLimit } = useCharacterSummaries();
 
 const isOpen = ref(false);
 

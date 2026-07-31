@@ -1,5 +1,6 @@
 export { db } from './db';
 export { PG_ERROR, isPgError, type PgErrorCode } from './errors';
+export { assertOwnedCharacter } from './ownership';
 export {
   users,
   characters,
@@ -7,4 +8,17 @@ export {
   characterStatusEnum,
   characterRaceEnum,
   sessions,
+  characterSheets,
+  spellcastingProgressionEnum,
+  attacks,
+  attackAbilityEnum,
+  attackDeliveryEnum,
+  damageTypeEnum,
+  traits,
+  traitTagEnum,
+  classResources,
+  resetTriggerEnum,
+  inventoryItems,
+  spells,
+  characterSpells,
 } from './schema';

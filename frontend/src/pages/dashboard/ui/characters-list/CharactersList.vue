@@ -3,7 +3,7 @@ import { useTemplateRef } from 'vue';
 
 import { useBreakpoint, useVirtualGrid } from '@shared/lib/ui';
 
-import { useCharactersInfo } from '@entities/characters';
+import { useCharacterSummaries } from '@entities/characters';
 
 import { CharacterCardSkeleton } from '@features/character-card';
 
@@ -20,12 +20,12 @@ const ROW_CLASSES =
 
 const {
   characters,
-  isCharInfoLoading,
-  isCharInfoRefetching,
-  isFetchingNextCharactersInfo,
-  hasMoreCharactersInfo,
-  loadNextCharactersInfo,
-} = useCharactersInfo();
+  isLoadingCharacterSummaries,
+  isRefetchingCharacterSummaries,
+  isFetchingNextCharacterSummaries,
+  hasMoreCharacterSummaries,
+  loadNextCharacterSummaries,
+} = useCharacterSummaries();
 
 const { isDesktop } = useBreakpoint();
 
@@ -40,15 +40,15 @@ const { columns, visibleRows, totalHeight } = useVirtualGrid({
     return isDesktop.value ? ROW_HEIGHT_LG : ROW_HEIGHT;
   },
   onEndReached: () => {
-    if (hasMoreCharactersInfo.value && !isFetchingNextCharactersInfo.value) {
-      loadNextCharactersInfo();
+    if (hasMoreCharacterSummaries.value && !isFetchingNextCharacterSummaries.value) {
+      loadNextCharacterSummaries();
     }
   },
 });
 </script>
 
 <template>
-  <div v-if="isCharInfoLoading" :class="[ROW_CLASSES, 'page-x']">
+  <div v-if="isLoadingCharacterSummaries" :class="[ROW_CLASSES, 'page-x']">
     <CharacterCardSkeleton class="h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
   </div>
 
@@ -57,7 +57,7 @@ const { columns, visibleRows, totalHeight } = useVirtualGrid({
   <div
     v-else
     class="page-x transition-opacity"
-    :class="{ 'opacity-60': isCharInfoRefetching }"
+    :class="{ 'opacity-60': isRefetchingCharacterSummaries }"
   >
     <div
       ref="list"
@@ -77,7 +77,7 @@ const { columns, visibleRows, totalHeight } = useVirtualGrid({
 
     <div ref="sentinel" aria-hidden="true" class="h-px w-full" />
 
-    <div v-if="isFetchingNextCharactersInfo" :class="ROW_CLASSES">
+    <div v-if="isFetchingNextCharacterSummaries" :class="ROW_CLASSES">
       <CharacterCardSkeleton class="h-50" v-for="n in columns" :key="`next-${n}`" />
     </div>
   </div>

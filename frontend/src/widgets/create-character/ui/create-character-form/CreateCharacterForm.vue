@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
-import { useAddCharacter } from '@entities/characters';
+import { useCreateCharacter } from '@entities/characters';
 
 import {
   CfProvider,
@@ -24,7 +24,7 @@ import type { CreateCharacterFormProps } from './CreateCharacterForm.types';
 
 const props = defineProps<CreateCharacterFormProps>();
 
-const { addCharacter, isAddingCharacter } = useAddCharacter();
+const { createCharacter, isCreatingCharacter } = useCreateCharacter();
 
 const form = useForm({
   validationSchema: createCharacterSchema,
@@ -38,7 +38,7 @@ const form = useForm({
  */
 const submitCharacter = form.handleSubmit(async (values) => {
   try {
-    await addCharacter(values);
+    await createCharacter(values);
   } catch {
     return;
   }
@@ -78,7 +78,7 @@ const { meta } = form;
       <CfFooter class="items-center justify-end">
         <div class="flex flex-row gap-2">
           <CfFooterCancelButton
-            :is-loading="isAddingCharacter"
+            :is-loading="isCreatingCharacter"
             v-on:cancel-click="props?.onCancel"
           >
             Cancel
@@ -86,7 +86,7 @@ const { meta } = form;
 
           <CfFooterSubmitButton
             :is-disabled="!meta.dirty || !meta.valid"
-            :is-loading="isAddingCharacter"
+            :is-loading="isCreatingCharacter"
           >
             Create
           </CfFooterSubmitButton>

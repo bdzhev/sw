@@ -58,7 +58,38 @@ Three layers, borrowed from the frontend's FSD setup so both halves of the repo 
 
 ---
 
-## 3. Database errors — read this fully
+## 3. Request validation
+
+**Every route that reads a body or a query string validates it with Zod first.** No hand-rolled `if (!name) return 400` guards, no destructuring straight out of `c.req.json()`.
+
+```ts
+import { zValidator } from '@hono/zod-validator';
+import { errorHook } from '@/shared/validation';
+
+charactersRoutes.post(
+  '/',
+  zValidator('json', createCharacterSchema, errorHook),
+  async (c) => {
+    const { name, characterClass, race } = c.req.valid('json');
+    // ...
+  }
+);
+```
+
+- **Schemas live in the module, in `<subject>.schemas.ts`**, next to the routes they guard, and export their inferred input type (`export type CreateCharacterInput = z.infer<typeof createCharacterSchema>`).
+- **Always pass `errorHook`** (from `@/shared/validation`) as the third argument. Without it the validator answers with its own body shape instead of the `{ error: string }` every other response here uses.
+- **Read the parsed value with `c.req.valid('json' | 'query')`**, never from `c.req.json()` again. It is typed from the schema, which is what lets the handler drop its field whitelist and hand the result straight to Drizzle with no cast.
+- **There is deliberately no `validateJson(schema)` wrapper.** One would need an explicit return type (§7), `zValidator` is overloaded so an instantiation expression over it has no single signature, and its real return type is built from `DefaultInput`, which the package does not export — so annotating it means copying package internals and keeping them in sync. Naming `zValidator` at the call site is the cheaper trade.
+- **Enum members come off the Drizzle `pgEnum`**, never retyped: `z.enum(characterRaceEnum.enumValues)`. A retyped list drifts, and then the validator accepts a value Postgres rejects.
+- **Query params are strings.** Coerce (`z.coerce.number()`), give a default, and **bound anything that reaches `LIMIT`** so a client cannot ask for the whole table.
+- **PATCH schemas are `.partial().strict()` plus a non-empty `.refine`.** `.strict()` is load-bearing, not tidiness: a field the route must not write (`level`, which moves only through the level-up action) has to be a **400**, because silently dropping it lets the caller believe a write it never got had succeeded. The `.refine` keeps an empty body from becoming a no-op 200.
+- **Zod is v4 on the backend, v3 on the frontend.** Deliberate: backend validation was greenfield so it took the current line, and bumping the frontend is its own job (vee-validate resolver compatibility). Don't copy frontend schema idioms over without checking them.
+
+Validation does not replace §4's SQLSTATE branches — it makes them backstops. `22P02` can now only fire from a route that forgot a schema, which is exactly when a 500 would be most confusing, so the branch stays.
+
+---
+
+## 4. Database errors — read this fully
 
 **Never branch on `err.code`.** It does not contain what you expect, and a comparison against it fails _silently_ — the branch simply never runs. Two independent reasons stack up:
 
@@ -103,17 +134,17 @@ If you add a code, **verify the branch actually fires** against a real database.
 
 ---
 
-## 4. Schema & migrations
+## 5. Schema & migrations
 
 - Schema is defined in `src/shared/db/schema.ts` with `pgTable` / `pgEnum`. Enums are declared once and reused; don't inline string unions in a column.
 - Change flow: edit `schema.ts` → `bun run db:generate` → review the generated SQL → `bun run db:migrate`.
 - **Never hand-edit anything in `src/shared/db/migrations/`.** It is generated, and it is excluded from lint and format.
-- **`bunx drizzle-kit check` before you generate.** It validates the snapshot chain and needs no database. It caught a real breakage once (see section 7) where `generate` refused to run and wrote nothing — the failure mode is an error about snapshots "pointing to a parent snapshot ... which is a collision", not anything about your schema edit.
+- **`bunx drizzle-kit check` before you generate.** It validates the snapshot chain and needs no database. It caught a real breakage once (see section 8) where `generate` refused to run and wrote nothing — the failure mode is an error about snapshots "pointing to a parent snapshot ... which is a collision", not anything about your schema edit.
 - The chain it checks: each `meta/NNNN_snapshot.json` carries its own `id` and its parent's `prevId`. `0000` is the only one whose `prevId` is all-zeros. Two snapshots sharing a `prevId` is the collision.
 
 ---
 
-## 5. Queries
+## 6. Queries
 
 **A `LIMIT`/`OFFSET` query must carry a deterministic `ORDER BY`, ending in a unique column.** SQL guarantees no row order without one, so the planner is free to return page 1 as any ten rows it likes — which means a row can appear on two pages, another can never appear at all, and neither shows up as an error. This shipped: `GET /characters` paged without ordering, so from the eleventh character on, a newly created one was frequently absent from the list while the row sat in the table. There is no symptom to debug — the response is a valid 200 with ten valid rows.
 
@@ -123,7 +154,7 @@ If you add a code, **verify the branch actually fires** against a real database.
 
 ---
 
-## 6. Types & style
+## 7. Types & style
 
 Enforced by `oxlint` (see `.oxlintrc.json`), so these are not suggestions:
 
@@ -141,10 +172,10 @@ Handlers return `c.json(...)` with an explicit status: `c.json({ error: 'User no
 
 ---
 
-## 7. Known cruft
+## 8. Known cruft
 
 Not rules, just things not to be confused by:
 
 - **`pg` is an unused dependency.** The driver is Bun's built-in `SQL` via `drizzle-orm/bun-sql`; nothing in `src/` imports `pg`. Do not reach for `pg`'s `DatabaseError` — those errors are never thrown here.
-- Several `catch (err)` blocks collapse every failure into a generic 500. Giving them specific SQLSTATE branches (e.g. `23505` unique_violation for a duplicate username on register) is welcome, following section 3.
+- Several `catch (err)` blocks collapse every failure into a generic 500. Giving them specific SQLSTATE branches (e.g. `23505` unique_violation for a duplicate username on register) is welcome, following section 4.
 - **The `0000` migration metadata was hand-authored at some point** — `_journal.json`'s first entry has a suspiciously round `when` (1775000000000), and `0000_snapshot.json` carried an all-zeros `id` identical to its own `prevId`. That made `0000` and `0001` both claim the all-zeros parent, so `drizzle-kit generate` aborted with a collision and silently produced no migration. Repaired by giving `0000` a real uuid `id` and pointing `0001.prevId` at it; `drizzle-kit check` now passes. If you ever hand-edit migration metadata again, the chain is the invariant to preserve.

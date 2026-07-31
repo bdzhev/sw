@@ -9,6 +9,7 @@ import {
 import type { UseCharacterOptions } from './useCharacter.types';
 
 const RETRIES = 2;
+const NOT_FOUND = 404;
 
 export const useCharacter = (options: UseCharacterOptions) => {
   const { id, shouldRefetchOnMount = false } = options;
@@ -28,7 +29,7 @@ export const useCharacter = (options: UseCharacterOptions) => {
   });
 
   const isCharacterNotFound = computed(() => {
-    return characterError.value?.status !== 404;
+    return characterError.value?.status === NOT_FOUND;
   });
 
   return {

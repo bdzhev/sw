@@ -15,6 +15,20 @@
       "when": 1782923737173,
       "tag": "0001_little_firebrand",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1785507203568,
+      "tag": "0002_yummy_secret_warriors",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1785508214269,
+      "tag": "0003_hard_millenium_guard",
+      "breakpoints": true
     }
   ]
 }

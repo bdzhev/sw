@@ -28,7 +28,7 @@ const formattedInputItems = computed(() => {
   return props.quizItem.answers.ru.map((answer) => {
     return {
       ...answer,
-      label: fmt(answer.label, { characterName: character.value.name }),
+      label: fmt(answer.label, { characterName: character.value.character.name }),
     };
   });
 });
@@ -54,7 +54,9 @@ const formattedInputItems = computed(() => {
       </CardHeader>
 
       <Text>
-        {{ fmt(props.quizItem.description.ru, { characterName: character.name }) }}
+        {{
+          fmt(props.quizItem.description.ru, { characterName: character.character.name })
+        }}
       </Text>
     </div>
 
