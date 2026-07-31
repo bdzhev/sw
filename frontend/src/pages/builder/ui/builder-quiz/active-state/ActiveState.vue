@@ -70,9 +70,17 @@ const handleCreate = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col overflow-hidden">
+  <!--
+    `h-full` only from md up. Below md `main` is flex-sized with no definite
+    height, so a percentage height there resolves to auto and the carousel's own
+    `h-full` chain collapses. The mobile frame is the first screen minus the nav
+    bar instead, and it does not clip — the document scrolls.
+  -->
+  <div
+    class="flex min-h-[calc(100svh-var(--spacing-mobile-bar))] flex-col md:h-full md:min-h-0 md:overflow-hidden"
+  >
     <QuizHeader
-      class="mb-4 shrink-0 p-4"
+      class="shrink-0 md:mb-4"
       :is-valid="isFormValid"
       :is-creating="isCreating"
       @create="handleCreate"

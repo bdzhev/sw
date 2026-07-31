@@ -14,10 +14,17 @@ const redirectLink = computed(() => {
 </script>
 
 <template>
-  <div class="p-8 text-center">
-    <h1 class="text-4xl font-bold">404</h1>
-    <p class="mt-2 text-lg">Oops! Page not found.</p>
-    <RouterLink :to="redirectLink" class="mt-4 inline-block text-accent">
+  <div class="page-x py-12 text-center">
+    <!-- No `text-4xl`: main.css already gives h1 a responsive scale, and a fixed
+         size here pinned it to the desktop step on every screen. -->
+    <h1>404</h1>
+
+    <p class="mt-2 text-base md:text-lg">Oops! Page not found.</p>
+
+    <RouterLink
+      :to="redirectLink"
+      class="mt-4 inline-flex min-h-11 items-center justify-center text-accent md:min-h-0"
+    >
       Go back home
     </RouterLink>
   </div>

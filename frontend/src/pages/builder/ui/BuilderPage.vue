@@ -5,7 +5,7 @@ import { MobileNavHeader } from '@widgets/sidebar-navigation';
 
 import { useRouteParam } from '../lib/useRouteParam';
 import { BuilderProvider } from '../model/BuilderProvider';
-import { BuilderQuiz } from './BuilderQuiz';
+import { BuilderQuiz } from './builder-quiz';
 
 const { characterId } = useRouteParam();
 const { isMobile } = useBreakpoint();

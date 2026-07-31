@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 
 import { Button } from '@shared/ui/button';
 import { Card, CardHeader, HeaderTitle } from '@shared/ui/card';
+import { Text } from '@shared/ui/text';
 
 import type { TryAgainCardProps } from './TryAgainCard.props';
 
@@ -32,7 +33,7 @@ const handleTryAgainClick = async () => {
 </script>
 
 <template>
-  <Card>
+  <Card class="flex flex-col gap-4 p-5 md:p-6">
     <CardHeader v-if="props.title">
       <HeaderTitle>
         {{ t(props.title) }}
@@ -44,7 +45,12 @@ const handleTryAgainClick = async () => {
       <Text>{{ t(props.decription) }}</Text>
     </div>
 
-    <Button :is-loading="isPending" @click="handleTryAgainClick">
+    <Button
+      :is-loading="isPending"
+      width="fullOnMobile"
+      class="min-h-11 md:min-h-0"
+      @click="handleTryAgainClick"
+    >
       {{ t('Try again') }}
     </Button>
   </Card>

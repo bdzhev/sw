@@ -37,7 +37,7 @@ const formattedInputItems = computed(() => {
 <template>
   <Card
     :class="[
-      `relative flex h-full max-h-180 w-72 shrink-0 flex-col gap-4 p-4 transition-all duration-200 sm:w-128 md:w-160 md:flex-row md:gap-10 md:p-10 lg:w-200 xl:w-240 2xl:w-270`,
+      `relative flex h-full max-h-180 w-80 shrink-0 flex-col gap-4 p-4 transition-all duration-200 sm:w-128 md:w-160 md:flex-row md:gap-10 md:p-10 lg:w-200 xl:w-240`,
       props.isPicked && 'bg-accent-secondary/20',
     ]"
     variant="outline"

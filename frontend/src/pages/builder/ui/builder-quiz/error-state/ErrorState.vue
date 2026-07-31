@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TryAgainCard } from '@widgets/try-again-card';
 
-import type { ErrorStateProps } from './ErrorState.props';
+import type { ErrorStateProps } from './ErrorState.types';
 
 const props = defineProps<ErrorStateProps>();
 </script>

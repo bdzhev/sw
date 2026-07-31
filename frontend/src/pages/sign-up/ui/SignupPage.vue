@@ -5,7 +5,7 @@ import { SignUpForm } from './sign-up-form';
 </script>
 
 <template>
-  <Card size="lg" class="w-full max-w-sm p-8">
+  <Card size="lg" class="w-full max-w-sm p-5 md:p-8">
     <CardHeader class="mb-6">
       <HeaderTitle>Sign up</HeaderTitle>
     </CardHeader>
