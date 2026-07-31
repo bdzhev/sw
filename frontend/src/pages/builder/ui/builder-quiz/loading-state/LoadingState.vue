@@ -3,11 +3,7 @@ import { Skeleton } from '@shared/ui/skeleton';
 </script>
 
 <template>
-  <!--
-    The side peeks were fixed 900px boxes offset off-canvas, i.e. pure horizontal
-    overflow on a phone. md and up only now, and the centre follows QuizCard's
-    width ladder so nothing jumps when the data lands.
-  -->
+  <!-- Centre follows QuizCard's width ladder so nothing jumps on load. -->
   <div class="relative flex h-full w-full flex-row items-center justify-center py-4">
     <div class="absolute -left-8 z-0 hidden h-3/4 w-150 opacity-50 md:block lg:w-200">
       <Skeleton class="rounded-xl" />

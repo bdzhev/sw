@@ -25,7 +25,7 @@ onBeforeUnmount(uiStore.closeDrawer);
 
 <template>
   <header
-    class="sticky top-0 z-500 flex h-mobile-bar w-full shrink-0 flex-row items-center gap-2 border-b border-border/50 bg-bg-secondary/80 page-x backdrop-blur-md"
+    class="sticky top-0 z-500 flex h-mobile-bar w-full shrink-0 flex-row items-center gap-2 border-b border-border bg-bg-secondary/80 page-x backdrop-blur-md"
   >
     <BurgerButton class="-ml-3" />
 

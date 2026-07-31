@@ -15,8 +15,6 @@ const redirectLink = computed(() => {
 
 <template>
   <div class="page-x py-12 text-center">
-    <!-- No `text-4xl`: main.css already gives h1 a responsive scale, and a fixed
-         size here pinned it to the desktop step on every screen. -->
     <h1>404</h1>
 
     <p class="mt-2 text-base md:text-lg">Oops! Page not found.</p>

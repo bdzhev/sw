@@ -64,8 +64,7 @@ const selectedLabel = computed(() => {
       </SelectTrigger>
 
       <SelectPortal>
-        <!-- Above the dialog's z-1000, since a select inside a dialog is the
-            common case. `popper` gives collision flipping near a screen edge. -->
+        <!-- z above the dialog's 1000: a select inside a dialog is the common case. -->
         <SelectContent
           position="popper"
           :side-offset="4"

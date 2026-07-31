@@ -6,9 +6,9 @@ import { Button } from '@shared/ui/button';
 
 import { formContextKey } from '../../config/stats';
 import { demoStatsSchema } from '../../model/stats';
-import { FormBody } from '../FormBody';
-import { FormHeader } from '../FormHeader';
-import type { StatsFormProps } from './StatsForm.props';
+import { FormBody } from '../form-body';
+import { FormHeader } from '../form-header';
+import type { StatsFormProps } from './StatsForm.types';
 
 const props = defineProps<StatsFormProps>();
 
@@ -32,8 +32,16 @@ provide(formContextKey, form);
 
     <FormBody />
 
-    <Button type="submit" :is-disabled="!meta.valid || !meta.dirty" size="md">
-      Calc my stats
-    </Button>
+    <div class="px-5 pb-5 md:px-8 md:pb-6">
+      <Button
+        type="submit"
+        :is-disabled="!meta.valid || !meta.dirty"
+        size="md"
+        width="fullOnMobile"
+        class="min-h-11 md:min-h-0"
+      >
+        Calc my stats
+      </Button>
+    </div>
   </form>
 </template>

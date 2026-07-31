@@ -31,8 +31,6 @@ const { characters, isCharInfoLoading, isCharInfoRefetching } = useCharactersInf
 
   <EmptyState v-else-if="!characters?.length" />
 
-  <!-- Refetching dims the list instead of adding a skeleton cell, which used to
-       shift every card one position. -->
   <div
     v-else
     class="grid grid-cols-1 gap-4 page-x transition-opacity sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
