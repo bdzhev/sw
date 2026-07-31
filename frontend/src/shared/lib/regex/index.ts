@@ -1,1 +1,1 @@
-export { ONLY_LETTERS_SPACES_APOSTROPHE } from './strings';
+export { NO_CONTROL_CHARS } from './strings';

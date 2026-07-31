@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { inject } from 'vue';
 
-import { ConfirmModal } from '@shared/ui/confirm-modal';
-import { ModalRoot } from '@shared/ui/modal';
+import { ConfirmDialog } from '@shared/ui/confirm-dialog';
+import { DialogRoot } from '@shared/ui/dialog';
 
 import { useDeleteCharacter } from '@entities/characters';
 
@@ -20,15 +20,15 @@ const handleConfirmDelete = () => {
 </script>
 
 <template>
-  <ModalRoot v-model:open="dropdownCtx.isDeleteModalOpen.value" is-controlled>
-    <ConfirmModal
+  <DialogRoot v-model:open="dropdownCtx.isDeleteModalOpen.value">
+    <ConfirmDialog
       type="validation"
       :confirmation-text="charCardCtx?.name || ''"
       confirmation-label="Enter the name of your character to confirm"
       action-type="negative"
-      :modal-title="`Delete ${charCardCtx?.name}?`"
-      :modal-description="'You wont be able to recover the character'"
+      :dialog-title="`Delete ${charCardCtx?.name}?`"
+      :dialog-description="'You wont be able to recover the character'"
       @confirm="handleConfirmDelete"
     />
-  </ModalRoot>
+  </DialogRoot>
 </template>

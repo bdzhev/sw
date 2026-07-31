@@ -1,0 +1,34 @@
+{
+  "singleQuote": true,
+  "semi": true,
+  "tabWidth": 2,
+  "printWidth": 90,
+  "sortImports": {
+    "groups": [
+      "builtin",
+      "external",
+      "shared",
+      "entities",
+      "features",
+      "widgets",
+      "pages",
+      ["parent", "sibling", "index"],
+      "style",
+      "unknown"
+    ],
+    "customGroups": [
+      { "groupName": "shared", "elementNamePattern": ["@shared/**", "@shared"] },
+      { "groupName": "entities", "elementNamePattern": ["@entities/**", "@entities"] },
+      { "groupName": "features", "elementNamePattern": ["@features/**", "@features"] },
+      { "groupName": "widgets", "elementNamePattern": ["@widgets/**", "@widgets"] },
+      { "groupName": "pages", "elementNamePattern": ["@pages/**", "@pages"] }
+    ],
+    "newlinesBetween": true,
+    "ignoreCase": true,
+    "order": "asc"
+  },
+  "sortTailwindcss": {
+    "stylesheet": "src/main.css",
+    "attributes": [":class"]
+  }
+}

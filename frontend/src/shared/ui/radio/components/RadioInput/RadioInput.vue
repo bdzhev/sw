@@ -3,7 +3,6 @@ import { computed, inject } from 'vue';
 
 import { RADIO_CTX_KEY } from '../../constants';
 import type { RadioContext } from '../../types';
-
 import type { RadioInputProps } from './RadioInput.props';
 
 const props = defineProps<RadioInputProps>();
@@ -24,16 +23,10 @@ const isChecked = computed(() => {
     v-if="currentItem"
     @click="ctx.onChange(props.name)"
     :class="[
-      `
-    cursor-pointer rounded-md ring-2 transition-all duration-100
-  `,
+      `cursor-pointer rounded-md ring-2 transition-all duration-100`,
       isChecked
         ? `text-accent-primary ring-accent-primary`
-        : `
-    text-primary/80
-    ring-primary/30
-    hover:ring-accent-primary/50
-  `,
+        : `text-primary/80 ring-primary/30 hover:ring-accent-primary/50`,
     ]"
   >
     <input

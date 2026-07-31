@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { z } from 'zod';
 
-import { signUp } from '@shared/api/auth';
+import { getApiErrorMessage } from '@shared/lib/http';
+import { RouteName } from '@shared/lib/router';
 import { Button } from '@shared/ui/button';
 import { Input } from '@shared/ui/input';
 import { SensitiveInput } from '@shared/ui/sensitive-input';
+import { Text } from '@shared/ui/text';
 
-import { useUser } from '@entities/user';
+import { useSignUp } from '@entities/user';
 
 const router = useRouter();
-const { setUser } = useUser();
 
 const schema = toTypedSchema(
   z
@@ -21,34 +23,64 @@ const schema = toTypedSchema(
       password: z.string().min(1, 'Password is required'),
       confirmPassword: z.string(),
     })
-    .refine((d) => { return d.password === d.confirmPassword; }, {
-      message: 'Passwords do not match',
-      path: ['confirmPassword'],
-    }),
+    .refine(
+      (d) => {
+        return d.password === d.confirmPassword;
+      },
+      {
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+      },
+    ),
 );
 
 const form = useForm({ validationSchema: schema });
 
-const handleSubmit = form.handleSubmit(async (values) => {
-  const user = await signUp(values.username, values.password);
-  setUser(user);
-  router.replace('/app');
+const handleSignUpSuccess = () => {
+  router.replace({ name: RouteName.APP_HOME });
+};
+
+const { signUp, isSigningUp, signUpError, resetSignUpError } = useSignUp({
+  onSuccess: handleSignUpSuccess,
+});
+
+const handleSubmit = form.handleSubmit((values) => {
+  resetSignUpError();
+  signUp(values);
+});
+
+const errorMessage = computed(() => {
+  if (!signUpError.value) {
+    return null;
+  }
+
+  return getApiErrorMessage(signUpError.value, 'Could not sign up. Please try again.');
 });
 </script>
 
 <template>
   <form @submit.prevent="handleSubmit">
     <Input name="username" placeholder="Username" autocomplete="username" />
-    <SensitiveInput
-      name="password"
-      placeholder="Password"
-      autocomplete="new-password"
-    />
+
+    <SensitiveInput name="password" placeholder="Password" autocomplete="new-password" />
+
     <SensitiveInput
       name="confirmPassword"
       placeholder="Confirm password"
       autocomplete="new-password"
     />
-    <Button class="w-full!" type="submit">Sign up</Button>
+
+    <Text v-if="errorMessage" theme="danger" size="sm" role="alert" class="mb-4">
+      {{ errorMessage }}
+    </Text>
+
+    <Button
+      width="full"
+      type="submit"
+      class="min-h-11 md:min-h-0"
+      :is-loading="isSigningUp"
+    >
+      Sign up
+    </Button>
   </form>
 </template>

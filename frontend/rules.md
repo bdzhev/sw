@@ -2,6 +2,8 @@
 
 **Read this before writing or moving any file in `frontend/`.** These rules override habit, override what surrounding legacy code looks like, and override any framework's default scaffolding.
 
+**Agents: never run `git commit`, in any form, `--amend` included.** Finish the work, run the checks below, report what changed, and leave it in the working tree — commits are the maintainer's. Staging, `git mv` and branches are fine when asked for.
+
 Stack: Vue 3 (`<script setup>`) + Vite (rolldown-vite) + TypeScript + Tailwind v4 + Bun.
 
 ---
@@ -15,7 +17,8 @@ bun install
 bun add <pkg>
 bun run dev          # vite dev server
 bun run type-check   # vue-tsc --build
-bun run lint         # eslint . --fix
+bun run lint         # oxlint --fix
+bun run format       # oxfmt --write .
 ```
 
 For a one-off binary: `bunx <tool>`.
@@ -99,13 +102,13 @@ import { ScrollBar } from './scroll-bar';
 
 Much of `src/shared/ui` predates these rules. Three dead patterns you will encounter:
 
-| Legacy | Current |
-| --- | --- |
-| `BaseCard.vue` | `Card.vue` |
+| Legacy                        | Current             |
+| ----------------------------- | ------------------- |
+| `BaseCard.vue`                | `Card.vue`          |
 | `card/components/CardHeader/` | `card/card-header/` |
-| `BaseCard.props.ts` | `Card.types.ts` |
+| `BaseCard.props.ts`           | `Card.types.ts`     |
 
-These are being migrated branch by branch. When you touch such a folder: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do. Never add a new file *into* a legacy `components/` folder — create the properly-placed folder instead.
+These are being migrated branch by branch. When you touch such a folder: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do. Never add a new file _into_ a legacy `components/` folder — create the properly-placed folder instead.
 
 ### Compound components
 
@@ -128,13 +131,15 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   type CardVariant = 'primary' | 'secondary' | 'outline';
   const isOutline = variant === 'outline';
   ```
+
   ```vue
-  <div :class="{ 'ring-2 ring-border': !isOutline, 'rounded-md': size === 'md' }">
+  <div :class="{ 'ring-2 ring-border': !isOutline, 'rounded-md': size === 'md' }"></div>
   ```
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
+- **Do not comment templates.** No prose restating a class list, and no notes on what a change fixed — that belongs in the design docs, not the markup. The rare exception is a line someone would otherwise "simplify" and break: a browser or library behaviour the code cannot show. Keep it to one line.
 - Icons come from `lucide-vue-next`.
-- Headless primitives come from `reka-ui`. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
+- Headless primitives come from `reka-ui`. **Overlays are already wrapped: `@shared/ui/dialog` (centred, with `DialogHeader`/`Body`/`Footer`/`CloseButton`), `@shared/ui/drawer` (off-canvas, swipe-to-close), `@shared/ui/select` (field-bound, portalled), `@shared/ui/slider`, `@shared/ui/tooltip` (needs one `TooltipProvider` at the app root, already in `App.vue`), `@shared/ui/confirm-dialog` on top of them.** **Any overlay must escape its container through a portal** — an ancestor with non-`visible` overflow clips an absolutely-positioned descendant, and `z-index` cannot undo that. This is what broke the old `shared/ui/select` inside a dialog. `shared/ui/dropdown-menu` is the one overlay still hand-rolled and is slated for the same migration; do not copy its shape. **Do not let a reka part derive displayed state from its children's mount lifecycle** — `SelectValue`'s label comes from a registry `SelectItemText` fills on mount, and closing the list remounts every item, so it blanks for a frame; derive that display from your own props instead (as `select/Select.vue` does). The hand-rolled `shared/ui/modal` they replaced is gone — do not rebuild that pattern: it had no focus trap, no Escape, no scroll lock, and positioned itself `absolute` inside `body`. Enter/leave animation for these is CSS keyframes keyed off `data-[state=open]`/`data-[state=closed]`, because reka's `Presence` holds the element mounted until the animation ends; a Vue `<Transition>` would need `forceMount` and manual presence. A dialog with no `DialogDescription` must pass `:aria-describedby="undefined"` — the JS value, not the string `"undefined"`, since reka reads the rendered attribute. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
 
 ---
 
@@ -142,21 +147,49 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
 
 All configuration is **CSS-side, in `src/main.css`**: `@theme` for design tokens, `@utility` for custom utilities.
 
-`tailwind.config.js` is an intentionally empty stub, kept only because the ESLint plugin points at it. **Do not put configuration in it.**
+There is **no `tailwind.config.js`** — it was an empty stub that existed only so the old ESLint plugin had something to point at, and it is gone. Do not recreate it. Tooling that needs to know the design system reads `src/main.css` directly (see `sortTailwindcss.stylesheet` in `.oxfmtrc.json`).
 
 - Use theme tokens — `bg-border`, `text-secondary`, `bg-accent-primary` — not raw palette values like `bg-slate-600`.
-- Custom utilities already defined: `fade-bottom`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
+- Custom utilities already defined: `page-x`, `fade-bottom`, `fade-scroll-top`, `fade-scroll-bottom`, `fade-scroll-y`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
 - **Native scrollbars are hidden globally** by `::-webkit-scrollbar { display: none }` in `main.css`. Anything that needs a visible scroll affordance must render its own — use `@shared/ui/scroll-area`.
 - Scrolling inside a flex column needs `min-h-0` on the scrolling child, otherwise it stretches to content height and never scrolls. `overflow-hidden` on an ancestor (e.g. `Card`) clips instead of scrolling — put the scroll container inside it.
+
+### Responsive layout
+
+**Write mobile-first.** Base classes describe the phone; `md:`/`lg:` add the wider layout on top. Some older components are still written the other way round (large base class, no mobile base) — those are bugs waiting to be rewritten, not a pattern to copy.
+
+**Only the named breakpoints.** `sm:` `md:` `lg:`, never an arbitrary `min-[500px]:`. The values are declared as `--breakpoint-sm/md/lg` in `@theme` so retuning them is one line; an arbitrary variant escapes that.
+
+`shared/lib/ui/breakpoints` is the **JS twin** of those tokens and the only place px breakpoint values may be written in TS. Change it and `@theme` together. Use it via:
+
+- `useBreakpoint()` — reactive `isMobile` / `isTablet` / `isDesktop` / `isCompact`, for what CSS cannot express (canvas sizing, whether to mount something, animation offsets). If the answer is only visual, use a Tailwind variant instead.
+- `mediaFrom('md')` / `mediaBelow('md')` — query strings for `matchMedia` and `gsap.matchMedia`.
+
+**No `h-screen` on a full-height section, and no `w-screen` anywhere.** `100vh` counts the collapsible mobile browser chrome, so the bottom of the section sits under the address bar — use `min-h-[100svh]` (`svh`, not `dvh`: `dvh` resizes as the chrome hides, which makes pinned GSAP sections jump). `100vw` includes the desktop scrollbar gutter and causes horizontal overflow — `w-full`/`min-w-full` is what is always meant.
+
+**Horizontal gutters come from `page-x`**, not a per-section `px-*` ladder.
+
+**`translate-*` utilities are not `transform`.** In v4 they set the separate `translate` property (`translate: var(--tw-translate-x) var(--tw-translate-y)`). A `@keyframes` that animates `transform: translate(...)` therefore _stacks_ on top of them instead of overriding — a `-translate-1/2`-centred element animated that way visibly slides in offset and snaps into place when the animation ends. Animate `transform` for scale/rotate only, and let the utility own the translate.
+
+**A `z-*` needs a `position` on the same element.** A z-index on a static box does nothing. This bit the landing layout: it relied on ScrollSmoother making its wrapper `fixed`, so the stacking silently collapsed on the viewports where the smoother is inert and an opaque background canvas painted over the page.
+
+**Scroll-driven GSAP goes inside `gsap.matchMedia()`**, never a one-off `getDevice()` check at mount: a context rebuilds when the viewport crosses a breakpoint, a mount-time snapshot does not. `useScrollSmoother` and `useHorizontalScrollAnimation` both take a `mediaQuery` option defaulting to md and up, and are inert below it — a consumer that uses them owes its mobile users a non-pinned fallback layout (see `pain-section`).
 
 ---
 
 ## 6. Lint & types
 
-ESLint enforces:
+ESLint and Prettier are **gone**. The toolchain is **oxlint** (`.oxlintrc.json`) + **oxfmt** (`.oxfmtrc.json`). Two things that used to be lint rules are now the formatter's job:
 
-- `import/order` — builtin → external → `@shared` → `@entities` → `@features` → `@widgets` → `@pages` → relative, with a blank line between groups.
-- `eslint-plugin-better-tailwindcss` — class ordering inside `class` attributes.
+- **Import order** — `sortImports` in `.oxfmtrc.json`: builtin → external → `@shared` → `@entities` → `@features` → `@widgets` → `@pages` → relative, blank line between groups. Custom groups use **glob** patterns (`@shared/**`), not regex.
+- **Tailwind class order** — `sortTailwindcss` in `.oxfmtrc.json`, pointed at `src/main.css` via `stylesheet`, with `attributes: [":class"]` so Vue bindings are covered too. Because it reads `main.css`, `@utility` definitions sort correctly. Two caveats: utilities whose body is only a nested rule (`shimmer`, `loading-animation`) sort as unknown and land at the front, and **if the `stylesheet` path is wrong oxfmt silently skips Tailwind sorting entirely** rather than erroring — so treat a sudden loss of class ordering as a bad path.
+
+oxlint covers correctness (its `correctness` category is on) plus the house rules `arrow-body-style`, `curly`, `no-console`. What was lost in the move, permanently until oxlint can parse Vue templates ([oxc#15761](https://github.com/oxc-project/oxc/issues/15761)):
+
+- All `eslint-plugin-vue` **template** rules (`require-v-for-key`, `no-mutating-props`, `valid-v-slot`, …). `vue-tsc` catches most real template breakage instead.
+- `better-tailwindcss`'s `no-conflicting-classes` and `no-unregistered-classes`. No oxlint plugin can restore these here: class names live in `<template>`, which oxlint cannot see, and the JS-side detection surface (`cn`/`clsx`/`cva`/`className`) is banned by section 4.
+- `padding-line-between-statements` (deprecated stylistic rule, no oxlint equivalent).
+- `no-unused-vars` does **not** apply to `.vue` files in oxlint. `noUnusedLocals`/`noUnusedParameters` in `tsconfig.app.json` cover it instead, and `vue-tsc` understands template usage, so this is better coverage than before.
 
 Run before committing:
 
@@ -165,4 +198,12 @@ bun run lint
 bun run type-check
 ```
 
-husky + lint-staged also run lint on commit. `bun run type-check` must not gain new errors from your change — check that any failures it reports were already there.
+husky + lint-staged gate every commit. The hook lives at the **repo root** (`.husky/pre-commit`, husky is a root devDependency — a subdir install cannot find `.git`); it invokes `lint-staged` once per package, with that package as the cwd so each picks up its own config. Frontend's task list is `frontend/lint-staged.config.mjs`: `oxlint --fix --max-warnings=0` then `oxfmt --write` on staged `.ts`/`.vue`, `oxfmt --write` on staged `.css`/`.json`/`.md`/`.html`/`.yml`.
+
+**Order matters — oxlint first, oxfmt last.** This is the reverse of the old prettier-then-eslint order. Class and import ordering are now formatter concerns, so the formatter must get the final word; the conflict that motivated the old ordering no longer exists.
+
+**Type-checking now runs in the hook.** It is the last entry in the `.ts`/`.vue` task list, written as a function so lint-staged calls it **once for the whole group** rather than per file — TypeScript needs whole-program context. It must be a function task for that reason; a plain glob entry would re-check the project once per staged file. Because it runs inside lint-staged, it sees the staged snapshot rather than your full working tree.
+
+Consequence: a type error **anywhere** blocks **any** commit, not just in the files you staged. That is intentional. A full forced rebuild is ~2s, so the cost is small.
+
+Anything auto-fixable is fixed and re-staged; anything left — an oxlint error **or warning**, or any type error — fails the hook, and lint-staged reverts the working tree to its pre-hook state.

@@ -1,3 +1,4 @@
-import Slider from './BaseSlider.vue';
+import Slider from './Slider.vue';
 
 export { Slider };
+export type { SliderProps } from './Slider.types';

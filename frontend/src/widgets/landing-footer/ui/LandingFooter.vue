@@ -1,17 +1,14 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
-  import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
-  const route = useRoute();
+const route = useRoute();
 
-  const shouldShowFooter = computed(() => {return route.name === 'home'});
+const shouldShowFooter = computed(() => {
+  return route.name === 'home';
+});
 </script>
 
 <template>
-  <footer
-    v-if="shouldShowFooter"
-    class="h-20"
-  >
-    footer
-  </footer>
+  <footer v-if="shouldShowFooter" class="h-20">footer</footer>
 </template>

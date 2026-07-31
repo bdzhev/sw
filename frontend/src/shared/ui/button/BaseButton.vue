@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 
-import type { ButtonProps } from './BaseButton.props';
 import {
   variantClasses,
   paddingClasses,
   roundClasses,
   textClasses,
+  widthClasses,
 } from './BaseButton.themes';
+import type { ButtonProps } from './BaseButton.types';
 
 const props = withDefaults(defineProps<ButtonProps>(), {
   type: 'button',
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<ButtonProps>(), {
   isLoading: false,
   isRound: false,
   equalPadding: false,
+  width: 'fit',
 });
 
 const buttonClasses = computed(() => {
@@ -32,9 +34,16 @@ const buttonClasses = computed(() => {
 
   const loadingClass = props.isLoading ? 'loading-animation' : '';
 
-  return [variantClass, textClass, roundClass, paddingClass, loadingClass].join(
-    ' ',
-  );
+  const widthClass = widthClasses[props.width];
+
+  return [
+    variantClass,
+    textClass,
+    roundClass,
+    paddingClass,
+    widthClass,
+    loadingClass,
+  ].join(' ');
 });
 </script>
 
@@ -43,12 +52,7 @@ const buttonClasses = computed(() => {
     :type="props.type"
     :disabled="props.isDisabled || props.isLoading"
     :class="[
-      `
-        flex w-fit cursor-pointer flex-row items-center justify-center
-        transition-all duration-200
-        disabled:cursor-not-allowed disabled:bg-fg disabled:text-bg-secondary
-        disabled:inset-ring-0
-      `,
+      `flex cursor-pointer flex-row items-center justify-center transition-all duration-200 disabled:cursor-not-allowed disabled:bg-fg disabled:text-bg-secondary disabled:inset-ring-0`,
       buttonClasses,
     ]"
   >

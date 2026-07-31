@@ -11,10 +11,7 @@ const props = withDefaults(defineProps<ImageProps>(), {
 });
 
 const src = computed(() => {
-  return assetsService.getImagePath(
-    props.folder,
-    `${props.name}.${props.format}`,
-  );
+  return assetsService.getImagePath(props.folder, `${props.name}.${props.format}`);
 });
 </script>
 

@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+
 import { characters, db } from '../../db';
 import { calculateStats } from './calculateStats';
 import { quizData as quizQuestions } from './quizData';

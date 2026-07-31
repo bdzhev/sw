@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 
+import { useBreakpoint } from '@shared/lib/ui';
+
 import { useCharacter } from '@entities/characters';
+
+import { MobileNavHeader } from '@widgets/sidebar-navigation';
+
+const { isMobile } = useBreakpoint();
 
 const route = useRoute();
 const id = route.params.id as string;
@@ -19,6 +25,8 @@ const STAT_LABELS: Record<string, string> = {
 </script>
 
 <template>
+  <MobileNavHeader v-if="isMobile" />
+
   <div v-if="isFetchingCharacter">
     <p>Loading...</p>
   </div>

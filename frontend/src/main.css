@@ -1,47 +1,100 @@
 @import 'tailwindcss';
 
 @theme {
+  /**
+   * Breakpoints. These are Tailwind's own defaults, restated explicitly so that
+   * retuning them later is a one-line change here instead of a hunt through
+   * components. Only sm/md/lg are used in the app — no arbitrary min-[...] variants.
+   *
+   * Twin of `breakpoints` in shared/lib/ui/breakpoints, which is the JS-side
+   * source for matchMedia and GSAP. Change both together.
+   */
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+
+  /**
+   * MobileNavHeader's height. A token because anything that has to sit below it —
+   * a second sticky row, a scroll-margin — needs the same number.
+   */
+  --spacing-mobile-bar: 3.5rem;
+
   --font-alegreya: 'Alegreya', sans-serif;
 
-  --color-bg-primary: var(--color-slate-950);
-  --color-bg-secondary: var(--color-slate-800);
-  --color-fg: var(--color-slate-500);
+  /**
+   * Enter/leave animations for reka-ui overlay primitives. They are driven by
+   * `data-[state=open]` / `data-[state=closed]` rather than a Vue <Transition>,
+   * because reka's Presence keeps the element mounted until the CSS animation
+   * ends — a transition would need forceMount and manual presence handling.
+   */
+  --animate-dialog-in: dialog-in 150ms ease-out;
+  --animate-dialog-out: dialog-out 120ms ease-in;
+  --animate-overlay-in: overlay-in 150ms ease-out;
+  --animate-overlay-out: overlay-out 120ms ease-in;
+  --animate-drawer-in-left: drawer-in-left 200ms ease-out;
+  --animate-drawer-out-left: drawer-out-left 150ms ease-in;
+  --animate-drawer-in-right: drawer-in-right 200ms ease-out;
+  --animate-drawer-out-right: drawer-out-right 150ms ease-in;
 
-  --color-border: var(--color-slate-600);
+  /**
+   * Values come from the shadcn preset `b1Lhw7mSAq`, `.dark` block only — the app
+   * has no light theme. The preset's own variable names are deliberately not
+   * introduced: these semantic names stay, so nothing downstream changes and
+   * there is no second vocabulary to collide with (rules §4).
+   *
+   * shadcn's `--primary` is a fill paired with `--primary-foreground`, while our
+   * `--color-accent-primary` is the outline/text colour of a transparent button.
+   * So the bright `--sidebar-primary` takes that slot and the darker `--primary`
+   * becomes the hover fill, which keeps the existing light-on-dark relationship.
+   */
+  --color-bg-primary: oklch(0.147 0.004 49.25); /* --background */
+  --color-bg-secondary: oklch(0.216 0.006 56.043); /* --card */
+  --color-fg: oklch(0.553 0.013 58.071); /* --ring */
 
-  --color-primary: var(--color-slate-50);
-  --color-secondary: var(--color-slate-300);
+  --color-border: oklch(1 0 0 / 10%); /* --border */
 
-  --color-accent-primary: var(--color-teal-300);
-  --color-accent-secondary: var(--color-teal-700);
+  --color-primary: oklch(0.985 0.001 106.423); /* --foreground */
+  --color-secondary: oklch(0.709 0.01 56.259); /* --muted-foreground */
 
-  --color-branding: var(--color-pink-400);
+  --color-accent-primary: oklch(0.696 0.17 162.48); /* --sidebar-primary */
+  --color-accent-secondary: oklch(0.432 0.095 166.913); /* --primary */
 
-  --color-danger: var(--color-red-500);
-  --color-warning: var(--color-yellow-500);
-  --color-success: var(--color-green-300);
-  --color-info: var(--color-cyan-200);
+  /* The preset has no brand hue; --chart-2 is the one that reads as distinct
+     from the green accent without inventing a colour. */
+  --color-branding: oklch(0.705 0.213 47.604); /* --chart-2 */
+
+  --color-danger: oklch(0.704 0.191 22.216); /* --destructive */
+  --color-warning: oklch(0.837 0.128 66.29); /* --chart-1 */
 
   /* remove the colors below in next iterations */
-  --color-primary-bg: var(--color-slate-950);
-  --color-primary-fg: var(--color-slate-800);
+  --color-primary-bg: oklch(0.147 0.004 49.25); /* --background */
+  --color-primary-fg: oklch(0.216 0.006 56.043); /* --popover */
 
-  --color-secondary-bg: var(--color-slate-900);
-  --color-secondary-fg: var(--color-slate-700);
+  --color-secondary-bg: oklch(0.274 0.006 286.033); /* --secondary */
+  --color-secondary-fg: oklch(0.268 0.007 34.298); /* --muted */
 
-  --color-primary-button: var(--color-slate-800);
-  --color-primary-button-bg: var(--color-teal-300);
-  --color-primary-button-hover-bg: var(--color-teal-500);
+  /* Was referenced by the loading-animation shimmer and never defined, so that
+     gradient ran transparent-to-transparent. */
+  --color-primary-muted: oklch(0.268 0.007 34.298); /* --muted */
 
-  --color-secondary-button: var(--color-slate-600);
-  --color-secondary-button-hover: var(--color-slate-500);
+  --color-primary-button: oklch(0.216 0.006 56.043); /* --card */
+  --color-primary-button-bg: oklch(0.696 0.17 162.48); /* --sidebar-primary */
+  --color-primary-button-hover-bg: oklch(0.432 0.095 166.913); /* --primary */
 
-  --color-button-disabled: var(--color-slate-700);
+  --color-secondary-button: oklch(0.274 0.006 286.033); /* --secondary */
+  /* The preset has no adjacent neutral step, so the hover is derived. */
+  --color-secondary-button-hover: color-mix(
+    in oklab,
+    oklch(0.274 0.006 286.033),
+    oklch(0.985 0.001 106.423) 12%
+  );
 
-  --color-accent: var(--color-pink-400);
-  --color-accent-muted: var(--color-pink-500);
+  --color-button-disabled: oklch(0.268 0.007 34.298); /* --muted */
 
-  --color-error: var(--color-red-500);
+  --color-accent: oklch(0.705 0.213 47.604); /* --chart-2 */
+  --color-accent-muted: oklch(0.646 0.222 41.116); /* --chart-3 */
+
+  --color-error: oklch(0.704 0.191 22.216); /* --destructive */
 }
 
 @utility loading-animation {
@@ -56,10 +109,12 @@
 
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg,
-        transparent,
-        var(--color-primary-muted),
-        transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-primary-muted),
+      transparent
+    );
     animation: loading-shimmer 1.25s infinite;
   }
 }
@@ -70,7 +125,6 @@
   }
 }
 
-
 @utility shimmer {
   &::after {
     content: '';
@@ -79,10 +133,12 @@
     left: -200%;
     height: 100%;
     width: 200%;
-    background: linear-gradient(90deg,
-        transparent,
-        var(--color-secondary-bg),
-        transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-secondary-bg),
+      transparent
+    );
     transform: translateX(0);
   }
 }
@@ -99,6 +155,96 @@
   }
 }
 
+/**
+ * These animate `transform` only. The dialog is centred with `-translate-1/2`,
+ * which in Tailwind v4 sets the separate `translate` property — so a keyframe
+ * that also translated would stack on top of the centring and the dialog would
+ * visibly slide in from the left before snapping back.
+ */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dialog-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes overlay-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-out-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes drawer-in-right {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes drawer-out-right {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @utility fade-bottom {
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
@@ -112,21 +258,32 @@
 }
 
 @utility fade-scroll-y {
-  mask-image: linear-gradient(to bottom,
-      transparent 0,
-      black 2rem,
-      black calc(100% - 2rem),
-      transparent 100%);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 2rem,
+    black calc(100% - 2rem),
+    transparent 100%
+  );
+}
+
+/**
+ * The single horizontal page gutter. Sections use this instead of their own
+ * px-* ladder, so the whole app's edge spacing is retuned in one place.
+ */
+@utility page-x {
+  @apply px-5 md:px-10 lg:px-22;
 }
 
 @utility bg-radial {
-  background-image: radial-gradient(circle at center,
-      var(--accent) 0%,
-      var(--secondary) 40%,
-      var(--primary-bg) 100%);
+  background-image: radial-gradient(
+    circle at center,
+    var(--accent) 0%,
+    var(--secondary) 40%,
+    var(--primary-bg) 100%
+  );
   background-size: 300% 300%;
   background-position: center;
-
 }
 
 [data-reka-scroll-area-viewport] {
@@ -157,21 +314,26 @@ body {
 }
 
 body {
-  min-height: 100vh;
+  /* svh, not vh: vh counts the collapsible mobile browser chrome. */
+  min-height: 100svh;
 }
 
+/**
+ * Headings scale with the viewport here, once, so a section only overrides the
+ * scale when its type is genuinely special (the landing hero, for instance).
+ */
 h1 {
-  @apply text-4xl font-extrabold;
+  @apply text-2xl font-extrabold md:text-3xl lg:text-4xl;
 }
 
 h2 {
-  @apply text-3xl font-bold;
+  @apply text-xl font-bold md:text-2xl lg:text-3xl;
 }
 
 h3 {
-  @apply text-2xl font-extrabold;
+  @apply text-lg font-extrabold md:text-xl lg:text-2xl;
 }
 
 h4 {
-  @apply text-xl font-bold;
+  @apply text-base font-bold md:text-lg lg:text-xl;
 }

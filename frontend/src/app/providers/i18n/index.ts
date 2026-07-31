@@ -20,10 +20,7 @@ export const i18n = createI18n({
 
 const loaded = new Set<string>();
 
-export const loadLocaleMessages = async (
-  locale: SupportedLocale,
-  pageName: string,
-) => {
+export const loadLocaleMessages = async (locale: SupportedLocale, pageName: string) => {
   const key = `${locale}-${pageName}`;
   if (loaded.has(key)) {
     return;

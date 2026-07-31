@@ -1,8 +1,4 @@
-import {
-  useMutation,
-  useQueryClient,
-  type InfiniteData,
-} from '@tanstack/vue-query';
+import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/vue-query';
 
 import {
   deleteCharacter as deleteCharacterRequest,
@@ -13,35 +9,36 @@ import {
 export const useDeleteCharacter = () => {
   const qc = useQueryClient();
 
-  const { mutate: deleteCharacter, isPending: isDeletingCharacter } =
-    useMutation({
-      mutationFn: deleteCharacterRequest,
-      onMutate: async (id: string) => {
-        await qc.cancelQueries({ queryKey: characterQueries.characters() });
+  const { mutate: deleteCharacter, isPending: isDeletingCharacter } = useMutation({
+    mutationFn: deleteCharacterRequest,
+    onMutate: async (id: string) => {
+      await qc.cancelQueries({ queryKey: characterQueries.characters() });
 
-        const previous = qc.getQueryData(characterQueries.characters());
+      const previous = qc.getQueryData(characterQueries.characters());
 
-        qc.setQueryData(
-          characterQueries.characters(),
-          (old: InfiniteData<CharacterData[]>) => {
-            if (!old) return old;
-            const pagesFiltered = old.pages.map((page) =>
-              {return page.filter((charInfo) => {return charInfo.id !== id})},
-            );
+      qc.setQueryData(
+        characterQueries.characters(),
+        (old: InfiniteData<CharacterData[]>) => {
+          if (!old) return old;
+          const pagesFiltered = old.pages.map((page) => {
+            return page.filter((charInfo) => {
+              return charInfo.id !== id;
+            });
+          });
 
-            return { ...old, pages: pagesFiltered };
-          },
-        );
+          return { ...old, pages: pagesFiltered };
+        },
+      );
 
-        return { previous };
-      },
+      return { previous };
+    },
 
-      onError: (_err, _id, context) => {
-        if (context?.previous) {
-          qc.setQueryData(characterQueries.characters(), context.previous);
-        }
-      },
-    });
+    onError: (_err, _id, context) => {
+      if (context?.previous) {
+        qc.setQueryData(characterQueries.characters(), context.previous);
+      }
+    },
+  });
 
   return { deleteCharacter, isDeletingCharacter };
 };

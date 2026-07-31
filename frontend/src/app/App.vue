@@ -2,11 +2,16 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { TooltipProvider } from '@shared/ui/tooltip';
+
 import { LandingFooter } from '@widgets/landing-footer';
 import { LandingHeader } from '@widgets/landing-header';
 import { SidebarNavigation } from '@widgets/sidebar-navigation';
 
 const route = useRoute();
+
+/** reka defaults to 700ms, which reads as "the tooltip is broken". */
+const TOOLTIP_DELAY_MS = 200;
 
 const layout = computed(() => {
   return route.meta.layout;
@@ -14,23 +19,25 @@ const layout = computed(() => {
 </script>
 
 <template>
-  <component :is="layout">
-    <template v-slot:header>
-      <LandingHeader />
-    </template>
+  <TooltipProvider :delay-duration="TOOLTIP_DELAY_MS">
+    <component :is="layout">
+      <template v-slot:header>
+        <LandingHeader />
+      </template>
 
-    <template v-slot:navigation>
-      <SidebarNavigation />
-    </template>
+      <template v-slot:navigation>
+        <SidebarNavigation />
+      </template>
 
-    <template v-slot:default>
-      <router-view />
-    </template>
+      <template v-slot:default>
+        <router-view />
+      </template>
 
-    <template v-slot:footer>
-      <LandingFooter />
-    </template>
-  </component>
+      <template v-slot:footer>
+        <LandingFooter />
+      </template>
+    </component>
+  </TooltipProvider>
 </template>
 
 <style>

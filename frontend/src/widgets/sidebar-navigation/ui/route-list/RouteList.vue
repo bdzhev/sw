@@ -1,0 +1,23 @@
+<script setup lang="ts">
+import { navRoutes } from '../../config/navRoutes';
+import { RouteButton } from './route-button';
+import type { RouteListProps } from './RouteList.types';
+
+const props = defineProps<RouteListProps>();
+</script>
+
+<template>
+  <nav class="w-full">
+    <ul class="flex w-full flex-col gap-2 text-primary/50">
+      <li v-for="route in navRoutes" :key="route.url" class="w-full">
+        <RouteButton
+          :is-expanded="props.isExpanded"
+          :label="route.label"
+          :url="route.url"
+          :icon="route.icon"
+          :name="route.name"
+        />
+      </li>
+    </ul>
+  </nav>
+</template>

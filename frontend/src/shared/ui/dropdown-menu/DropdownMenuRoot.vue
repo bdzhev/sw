@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { useScrollLock } from '@vueuse/core';
-import { ref, watch, provide } from 'vue';
+import { ref, provide } from 'vue';
 
 import { DROPDOWN_MENU_CTX_KEY } from './constants';
 import type { DropdownMenuContext } from './DropdownMenu.types';
@@ -18,12 +17,11 @@ const isOpen = ref(props.defaultOpen);
 const triggerEl = ref<HTMLElement | null>(null);
 const contentEl = ref<HTMLElement | null>(null);
 
-const isScrollLocked = useScrollLock(document.body);
-
-watch(isOpen, (open) => {
-  isScrollLocked.value = open;
-});
-
+/**
+ * No body scroll lock: it was a no-op while `main` was the only scroller, and
+ * once the document scrolls below md it froze the page behind a plain menu.
+ * The content is `position: fixed` instead, so it tracks the trigger on scroll.
+ */
 const toggleOpen = (val: boolean) => {
   isOpen.value = val;
 };

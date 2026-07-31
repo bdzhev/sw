@@ -11,8 +11,7 @@ import { Image } from '@shared/ui/image';
 import { useUser } from '@entities/user';
 
 import { useHeaderUiStore } from '../model/useHeaderUiStore';
-
-import { NavLink } from './components';
+import { NavLink } from './nav-link';
 
 const SCROLL_THRESHOLD = 300;
 
@@ -45,12 +44,8 @@ onUnmounted(() => {
           'bg-primary-bg/80 backdrop-blur-sm': uiStore.hasScrolled,
         },
         uiStore.hasScrolled
-          ? `
-            pl-8
-            sm:w-[80%]
-            lg:w-[30%]
-          `
-          : `w-full px-20`,
+          ? `w-[calc(100%-2rem)] pl-4 sm:w-[80%] sm:pl-8 lg:w-[30%]`
+          : `w-full page-x`,
       ]"
     >
       <NavLink :link="{ name: RouteName.HOME }">
@@ -58,11 +53,11 @@ onUnmounted(() => {
           :folder="ImageFolder.Base"
           name="goblin-fairy"
           alt="Flying goblin fairy"
-          class="h-12 w-12"
+          class="h-10 w-10 md:h-12 md:w-12"
         />
       </NavLink>
 
-      <div class="flex flex-row items-center gap-8">
+      <div class="flex flex-row items-center gap-3 md:gap-8">
         <NavLink
           v-if="!isLoggedIn"
           :link="{ name: RouteName.LOGIN }"
@@ -72,11 +67,7 @@ onUnmounted(() => {
         </NavLink>
 
         <RouterLink
-          :to="
-            isLoggedIn
-              ? { name: RouteName.APP_HOME }
-              : { name: RouteName.SIGNUP }
-          "
+          :to="isLoggedIn ? { name: RouteName.APP_HOME } : { name: RouteName.SIGNUP }"
           @click="handleLinkClick"
         >
           <Button :is-round="true" size="md">

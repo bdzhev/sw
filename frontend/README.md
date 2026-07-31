@@ -24,7 +24,8 @@ Short version:
 - **Bun only** — never npm/npx.
 - Every component is a kebab-case folder: `scroll-area/ScrollArea.vue` + `ScrollArea.types.ts` + `index.ts`, with sub-components in their own nested folder (`scroll-area/scroll-bar/`). No `components/` wrapper folders, no `Base` prefix, no `.props.ts` — all three are legacy patterns being removed branch by branch.
 - No `cva`/`cn`/`clsx`, no `shadcn-vue` — headless primitives come from `reka-ui`, variants are plain `:class` objects.
-- Tailwind config is CSS-side in `src/main.css`; `tailwind.config.js` is an empty stub.
+- Tailwind config is CSS-side in `src/main.css` — there is no `tailwind.config.js`.
+- Lint/format is **oxlint + oxfmt** (`.oxlintrc.json` / `.oxfmtrc.json`), not ESLint/Prettier. oxfmt owns import order and Tailwind class order.
 
 ## Project Setup
 
@@ -44,10 +45,11 @@ bun run dev
 bun run build
 ```
 
-### Lint
+### Lint and format
 
 ```sh
-bun run lint
+bun run lint     # oxlint --fix
+bun run format   # oxfmt --write .
 ```
 
 ## Environment

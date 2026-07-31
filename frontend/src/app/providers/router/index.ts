@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory } from 'vue-router';
 
-import { RouteName } from "@shared/lib/router";
+import { RouteName } from '@shared/lib/router';
 
-import { useUser } from "@entities/user";
+import { useUser } from '@entities/user';
 
-import { routes } from "./routes";
+import { routes } from './routes';
 
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -22,9 +22,7 @@ router.beforeEach(async (to) => {
     return record.meta?.requiresAuth;
   });
 
-  const isAuthPage = [RouteName.LOGIN, RouteName.SIGNUP].includes(
-    to.name as RouteName,
-  );
+  const isAuthPage = [RouteName.LOGIN, RouteName.SIGNUP].includes(to.name as RouteName);
 
   if (requiresAuth && !isLoggedIn.value) {
     return { name: RouteName.LOGIN };

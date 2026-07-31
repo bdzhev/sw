@@ -31,7 +31,11 @@ const handleCtaClick = () => {
 </script>
 
 <template>
-  <Button @click="handleCtaClick" :variant="isActive ? 'secondary' : 'primary'">
+  <Button
+    @click="handleCtaClick"
+    :variant="isActive ? 'secondary' : 'primary'"
+    class="min-h-11 md:min-h-0"
+  >
     <span v-if="isActive">{{ 'To character' }}</span>
 
     <span v-else-if="isPending">{{ 'Start building' }}</span>

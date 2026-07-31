@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
-import { characters, db } from '../../db';
+
+import { characters, db, isPgError, PG_ERROR } from '../../db';
 import type { AuthVariables } from '../../middlewares/auth';
 
 export const characterRoutes = new Hono<{ Variables: AuthVariables }>();
@@ -27,8 +28,8 @@ characterRoutes.post('/', async (c) => {
       .returning();
 
     return c.json(result[0], 201);
-  } catch (err: any) {
-    if (err?.code === '23503') {
+  } catch (err) {
+    if (isPgError(err, PG_ERROR.FOREIGN_KEY_VIOLATION)) {
       return c.json({ error: 'User not found' }, 404);
     }
     console.error(err);

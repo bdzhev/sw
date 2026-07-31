@@ -1,5 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+
 import { characters, db } from '../../db';
 import type { AuthVariables } from '../../middlewares/auth';
 

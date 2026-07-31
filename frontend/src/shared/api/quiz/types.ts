@@ -1,15 +1,15 @@
-import { LanguageCodes } from "@shared/config/locale";
+import { LanguageCodes } from '@shared/config/locale';
 
 enum Stats {
-  STR = "str",
-  DEX = "dex",
-  WIS = "wis",
-  INT = "int",
-  CHA = "cha",
-  CON = "con",
+  STR = 'str',
+  DEX = 'dex',
+  WIS = 'wis',
+  INT = 'int',
+  CHA = 'cha',
+  CON = 'con',
 }
 
-export const QUIZ_STATS = ["str", "dex", "wis", "int", "cha"] as const;
+export const QUIZ_STATS = ['str', 'dex', 'wis', 'int', 'cha'] as const;
 
 export type QuizCharacterStats = (typeof QUIZ_STATS)[number];
 

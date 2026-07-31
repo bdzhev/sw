@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+
 import { db, users } from '../../db';
 import type { AuthVariables } from '../../middlewares/auth';
 
@@ -9,7 +10,9 @@ userRoutes.get('/me', async (c) => {
   const userId = c.get('userId');
   try {
     const result = await db.select().from(users).where(eq(users.id, userId));
-    if (result.length === 0) return c.json({ error: 'User not found' }, 404);
+    if (result.length === 0) {
+      return c.json({ error: 'User not found' }, 404);
+    }
     const { id, username } = result[0];
     return c.json({ id, username });
   } catch (err) {

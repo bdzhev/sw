@@ -1,11 +1,7 @@
-import { useInfiniteQuery } from "@tanstack/vue-query";
-import { computed } from "vue";
+import { useInfiniteQuery } from '@tanstack/vue-query';
+import { computed } from 'vue';
 
-import {
-  getCharactersInfo,
-  characterQueries,
-  PAGE_SIZE,
-} from "@shared/api/characters";
+import { getCharactersInfo, characterQueries, PAGE_SIZE } from '@shared/api/characters';
 
 export const useCharactersInfo = () => {
   const { data, isLoading, isRefetching, fetchNextPage } = useInfiniteQuery({

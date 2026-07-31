@@ -10,7 +10,11 @@ const { meta } = ctx;
 </script>
 
 <template>
-  <Button type="submit" :is-disabled="!meta.dirty || !meta.valid">
+  <Button
+    type="submit"
+    :is-disabled="!meta.dirty || !meta.valid"
+    class="min-h-11 md:min-h-0"
+  >
     <slot />
   </Button>
 </template>

@@ -1,3 +1,1 @@
-import { SidebarNavigation } from './ui';
-
-export { SidebarNavigation };
+export { SidebarNavigation, MobileNavHeader } from './ui';

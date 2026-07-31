@@ -16,7 +16,7 @@ const isVisible = ref(false);
     <template #right>
       <button
         type="button"
-        class="mr-2 cursor-pointer text-secondary"
+        class="mr-2 flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-secondary md:min-h-0 md:min-w-0"
         @click="isVisible = !isVisible"
       >
         <EyeOff v-if="isVisible" class="size-4" />

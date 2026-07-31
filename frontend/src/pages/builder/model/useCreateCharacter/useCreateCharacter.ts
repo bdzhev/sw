@@ -11,7 +11,6 @@ import {
 } from '@shared/api/quiz';
 
 import { useBuilderProvider } from '../useBuilderProvider';
-
 import type { UseCreateCharacterOptions } from './useCreateCharacter.types';
 
 export const useCreateCharacter = (options?: UseCreateCharacterOptions) => {

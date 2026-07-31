@@ -4,7 +4,6 @@ import { inject } from 'vue';
 import { Text } from '@shared/ui/text';
 
 import type { CharCardContext } from '../CharCardRoot.types';
-
 import type { CoreInfoLineProps } from './CoreInfoLine.props';
 
 const ctx = inject<CharCardContext>('charCardCtx')!;

@@ -1,0 +1,11 @@
+set -e
+
+# Hooks run from the git root. Each package owns its own oxlint + oxfmt config,
+# so lint-staged has to run with that package as the cwd — it filters the
+# staged file list down to the cwd subtree, so an unrelated commit is a no-op.
+#
+# Type-checking runs inside lint-staged (see each package's
+# lint-staged.config.mjs), not as a step here, so it sees the staged snapshot
+# rather than the full working tree.
+(cd frontend && bunx lint-staged)
+(cd backend && bunx lint-staged)

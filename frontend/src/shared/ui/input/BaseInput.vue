@@ -40,8 +40,12 @@ const inputClasses = computed(() => {
   ];
 });
 
+/**
+ * `text-base` below md: iOS Safari auto-zooms the page on focusing an input
+ * whose font-size is under 16px.
+ */
 const innerInputClasses =
-  'm-0 flex-1 border-none bg-transparent bg-none px-2 py-2 text-sm text-inherit outline-none placeholder:text-secondary';
+  'm-0 flex-1 border-none bg-transparent bg-none px-2 py-3 text-base text-inherit outline-none placeholder:text-secondary md:py-2 md:text-sm';
 </script>
 
 <template>
@@ -50,9 +54,7 @@ const innerInputClasses =
       {{ props.label }}
     </label>
 
-    <div
-      :class="[inputClasses, 'mb-6 flex items-center gap-2 overflow-hidden']"
-    >
+    <div :class="[inputClasses, 'mb-6 flex items-center gap-2 overflow-hidden']">
       <slot name="left" />
 
       <input
@@ -69,10 +71,7 @@ const innerInputClasses =
 
       <slot name="right" />
     </div>
-    <p
-      v-if="errorMessage && props.showError"
-      class="absolute top-10 text-xs text-danger"
-    >
+    <p v-if="errorMessage && props.showError" class="absolute top-10 text-xs text-danger">
       {{ errorMessage }}
     </p>
   </div>

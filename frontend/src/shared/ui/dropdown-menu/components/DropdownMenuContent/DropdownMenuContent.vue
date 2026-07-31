@@ -16,6 +16,8 @@ onClickOutside(ctx.contentEl, () => {
 
 const { x, y, strategy, update } = useFloating(ctx.triggerEl, ctx.contentEl, {
   placement: ctx.placement,
+  /** Viewport-relative, so scrolling does not leave the menu a frame behind. */
+  strategy: 'fixed',
   middleware: [offset(4), flip(), shift()],
 });
 
@@ -29,12 +31,14 @@ onBeforeUnmount(() => {
   cleanup?.();
 });
 
-const styles = computed(() => {return {
-  position: strategy.value,
-  top: `${y.value}px`,
-  left: `${x.value}px`,
-  zIndex: 500,
-}});
+const styles = computed(() => {
+  return {
+    position: strategy.value,
+    top: `${y.value}px`,
+    left: `${x.value}px`,
+    zIndex: 500,
+  };
+});
 </script>
 
 <template>

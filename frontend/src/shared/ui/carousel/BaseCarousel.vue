@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useEventListener, useResizeObserver } from '@vueuse/core';
+import { useEventListener, usePointerSwipe, useResizeObserver } from '@vueuse/core';
 import { gsap } from 'gsap';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { onMounted, ref } from 'vue';
@@ -7,6 +7,9 @@ import { onMounted, ref } from 'vue';
 import { Button } from '@shared/ui/button';
 
 import type { BaseCarouselProps } from './BaseCarousel.types';
+
+/** How far a swipe travels before it counts as a slide change, in px. */
+const SWIPE_THRESHOLD = 50;
 
 const props = withDefaults(defineProps<BaseCarouselProps>(), {
   initialIndex: 0,
@@ -32,9 +35,7 @@ const applyAppearance = (index: number, duration: number) => {
 
     const vars = {
       scale: isActive ? 1 : 0.85,
-      filter: isActive
-        ? 'blur(0px) brightness(1)'
-        : 'blur(3px) brightness(0.55)',
+      filter: isActive ? 'blur(0px) brightness(1)' : 'blur(3px) brightness(0.55)',
       opacity: distance > 1 ? 0 : 1,
     };
 
@@ -109,7 +110,22 @@ const handleResize = () => {
   applyPosition(activeIndex.value, 0);
 };
 
+/** The listener is on window, so a field with focus must keep its arrow keys. */
+const isEditableTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return (
+    target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+  );
+};
+
 const handleKeydown = (event: KeyboardEvent) => {
+  if (isEditableTarget(event.target)) {
+    return;
+  }
+
   if (event.key === 'ArrowLeft') {
     prev();
   }
@@ -124,6 +140,25 @@ onMounted(handleMount);
 useResizeObserver([outerRef, trackRef], handleResize);
 
 useEventListener(window, 'keydown', handleKeydown);
+
+/**
+ * Touch and pen only — a mouse drag would fight text selection, and the pointer
+ * already has the arrows and the arrow keys. vueuse resolves `direction` from the
+ * dominant axis, so a vertical page scroll reports up/down and is ignored here.
+ */
+usePointerSwipe(outerRef, {
+  threshold: SWIPE_THRESHOLD,
+  pointerTypes: ['touch', 'pen'],
+  onSwipeEnd: (_event, direction) => {
+    if (direction === 'left') {
+      next();
+    }
+
+    if (direction === 'right') {
+      prev();
+    }
+  },
+});
 </script>
 
 <template>
@@ -142,11 +177,7 @@ useEventListener(window, 'keydown', handleKeydown);
     </div>
 
     <div
-      class="
-        pointer-events-none z-10 flex shrink-0 justify-center gap-4 pb-2
-        md:absolute md:inset-x-4 md:top-1/2 md:-translate-y-1/2
-        md:justify-between md:pb-0
-      "
+      class="pointer-events-none z-10 flex shrink-0 justify-center gap-4 pb-2 md:absolute md:inset-x-4 md:top-1/2 md:-translate-y-1/2 md:justify-between md:pb-0"
     >
       <Button
         :is-disabled="activeIndex === 0"
