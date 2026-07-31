@@ -2,6 +2,8 @@
 
 **Read this before writing or moving any file in `backend/`.** These rules override habit and override any framework's default scaffolding.
 
+**Agents: never run `git commit`, in any form, `--amend` included.** Finish the work, run the checks below, report what changed, and leave it in the working tree — commits are the maintainer's. Staging, `git mv` and branches are fine when asked for.
+
 Stack: Bun + Hono + Drizzle ORM (Bun's built-in `SQL` driver) + PostgreSQL + jose (JWT).
 
 ---

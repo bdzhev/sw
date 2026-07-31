@@ -2,6 +2,8 @@
 
 **Read this before writing or moving any file in `frontend/`.** These rules override habit, override what surrounding legacy code looks like, and override any framework's default scaffolding.
 
+**Agents: never run `git commit`, in any form, `--amend` included.** Finish the work, run the checks below, report what changed, and leave it in the working tree — commits are the maintainer's. Staging, `git mv` and branches are fine when asked for.
+
 Stack: Vue 3 (`<script setup>`) + Vite (rolldown-vite) + TypeScript + Tailwind v4 + Bun.
 
 ---
