@@ -1,64 +1,78 @@
 <script setup lang="ts">
+import { useTemplateRef } from 'vue';
+
+import { useVirtualGrid } from '@shared/lib/ui';
+
 import { useCharactersInfo } from '@entities/characters';
 
-import {
-  CharCardRoot,
-  CharCardHeader,
-  CharCardFooter,
-  CoreInfoLine,
-  CtaButton,
-  CharacterCardSkeleton,
-  DeleteActionItem,
-  DropdownActionsList,
-  EditActionItem,
-} from '@features/character-card';
+import { CharacterCardSkeleton } from '@features/character-card';
 
+import { CharacterCard } from './character-card';
 import { EmptyState } from './empty-state';
 
 const SKELETON_CARD_COUNT = 4;
 
-const { characters, isCharInfoLoading, isCharInfoRefetching } = useCharactersInfo();
+/** Card min-height plus the row gap; measureRow corrects it from the DOM. */
+const ESTIMATED_ROW_HEIGHT = 216;
+
+const ROW_CLASSES =
+  'grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8';
+
+const {
+  characters,
+  isCharInfoLoading,
+  isCharInfoRefetching,
+  isFetchingNextCharactersInfo,
+  hasMoreCharactersInfo,
+  loadNextCharactersInfo,
+} = useCharactersInfo();
+
+const listRef = useTemplateRef<HTMLElement>('list');
+
+const { columns, visibleRows, totalHeight, measureRow } = useVirtualGrid({
+  items: characters,
+  container: listRef,
+  estimatedRowHeight: ESTIMATED_ROW_HEIGHT,
+  onEndReached: () => {
+    if (hasMoreCharactersInfo.value && !isFetchingNextCharactersInfo.value) {
+      loadNextCharactersInfo();
+    }
+  },
+});
 </script>
 
 <template>
-  <div
-    v-if="isCharInfoLoading"
-    class="grid grid-cols-1 gap-4 page-x sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-  >
+  <div v-if="isCharInfoLoading" :class="[ROW_CLASSES, 'page-x']">
     <CharacterCardSkeleton class="min-h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
   </div>
 
-  <EmptyState v-else-if="!characters?.length" />
+  <EmptyState v-else-if="!characters.length" />
 
   <div
     v-else
-    class="grid grid-cols-1 gap-4 page-x transition-opacity sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
+    class="page-x transition-opacity"
     :class="{ 'opacity-60': isCharInfoRefetching }"
-    id="characterInfoList"
   >
-    <CharCardRoot
-      v-for="char in characters"
-      :key="char.id"
-      v-bind="char"
-      class="min-h-50"
+    <div
+      ref="list"
+      class="relative w-full"
+      :style="{ height: `${totalHeight}px` }"
+      id="characterInfoList"
     >
-      <CharCardHeader>
-        <CoreInfoLine label="Class" field="characterClass" />
+      <div
+        v-for="row in visibleRows"
+        :key="row.index"
+        :ref="measureRow"
+        :data-index="row.index"
+        :class="[ROW_CLASSES, 'absolute top-0 left-0 pb-4 lg:pb-8']"
+        :style="{ transform: `translateY(${row.offset}px)` }"
+      >
+        <CharacterCard v-for="char in row.items" :key="char.id" :character="char" />
+      </div>
+    </div>
 
-        <CoreInfoLine label="Race" field="race" />
-      </CharCardHeader>
-
-      <CharCardFooter class="mt-auto">
-        <div class="flex flex-row items-center justify-between">
-          <DropdownActionsList>
-            <DeleteActionItem />
-
-            <EditActionItem />
-          </DropdownActionsList>
-
-          <CtaButton />
-        </div>
-      </CharCardFooter>
-    </CharCardRoot>
+    <div v-if="isFetchingNextCharactersInfo" :class="ROW_CLASSES">
+      <CharacterCardSkeleton class="min-h-50" v-for="n in columns" :key="`next-${n}`" />
+    </div>
   </div>
 </template>

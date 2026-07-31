@@ -1,15 +1,19 @@
 import { http } from '@shared/lib/http';
 
 import type {
-  BaseCharacterData,
   CharacterData,
+  CharactersPage,
   AddCharacterPayload,
   UpdateCharacterPayload,
   RawCharacterData,
   RawBaseCharacterData,
+  RawCharactersPage,
 } from './types';
 
 export const PAGE_SIZE = 10;
+
+/** Mirrors MAX_CHARACTERS_PER_USER in the backend's characters.routes.ts. */
+export const MAX_CHARACTERS = 50;
 
 const mapBaseData = (raw: RawBaseCharacterData) => {
   const { class: characterClass, ...rest } = raw;
@@ -23,12 +27,12 @@ const mapFullData = (raw: RawCharacterData) => {
   return { ...rest, characterClass };
 };
 
-export const getCharactersInfo = async (offset: number): Promise<BaseCharacterData[]> => {
-  const data = await http.get<RawBaseCharacterData[]>(
+export const getCharactersInfo = async (offset: number): Promise<CharactersPage> => {
+  const data = await http.get<RawCharactersPage>(
     `/characters?offset=${offset}&limit=${PAGE_SIZE}`,
   );
 
-  return data.map(mapBaseData);
+  return { items: data.items.map(mapBaseData), total: data.total };
 };
 
 export const getCharacter = async (id: string): Promise<CharacterData> => {

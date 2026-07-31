@@ -32,11 +32,24 @@ const form = useForm({
   keepValuesOnUnmount: true,
 });
 
-const handleSubmit = form.handleSubmit((values) => {
-  addCharacter(values);
+/**
+ * Awaited on purpose: firing and closing immediately discards the rejection,
+ * so a rejected create looked identical to a successful one.
+ */
+const submitCharacter = form.handleSubmit(async (values) => {
+  try {
+    await addCharacter(values);
+  } catch {
+    return;
+  }
+
   form.resetForm();
   props.onSubmit?.();
 });
+
+const handleSubmit = (event?: Event) => {
+  void submitCharacter(event);
+};
 
 const { meta } = form;
 </script>

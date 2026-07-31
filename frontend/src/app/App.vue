@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { Toaster } from '@shared/ui/toast';
 import { TooltipProvider } from '@shared/ui/tooltip';
 
 import { LandingFooter } from '@widgets/landing-footer';
@@ -37,6 +38,8 @@ const layout = computed(() => {
         <LandingFooter />
       </template>
     </component>
+
+    <Toaster />
   </TooltipProvider>
 </template>
 

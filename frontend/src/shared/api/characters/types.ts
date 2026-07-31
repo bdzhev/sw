@@ -58,6 +58,16 @@ export type RawBaseCharacterData = Omit<BaseCharacterData, 'characterClass'> & {
   class: CharacterClass;
 };
 
+/** `total` is the user's full character count, not the page length. */
+export interface CharactersPage {
+  items: BaseCharacterData[];
+  total: number;
+}
+
+export type RawCharactersPage = Omit<CharactersPage, 'items'> & {
+  items: RawBaseCharacterData[];
+};
+
 export type RawCharacterData = RawBaseCharacterData & {
   stats: CharacterStats;
 };

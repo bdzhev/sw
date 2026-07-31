@@ -3,7 +3,7 @@
   "author": "bdzhev",
   "type": "module",
   "scripts": {
-    "dev": "bun run --env-file ../.env --watch src/index.ts",
+    "dev": "bun run --env-file ../.env --watch src/app/server.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write .",

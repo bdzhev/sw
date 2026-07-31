@@ -15,7 +15,7 @@ Bun only. Never `npm`, `npx`, `yarn`, or `pnpm` — not for installs, not for on
 ```sh
 bun install
 bun add <pkg>
-bun run dev          # bun --watch src/index.ts, env from ../.env
+bun run dev          # bun --watch src/app/server.ts, env from ../.env
 bun run lint         # oxlint
 bun run lint:fix     # oxlint --fix
 bun run format       # oxfmt --write .
@@ -30,33 +30,31 @@ For a one-off binary: `bunx <tool>`.
 
 Order matters — **oxlint first, oxfmt last**, so the formatter gets the final word on style. Type-checking is the last entry in the `.ts` task list, written as a **function** so lint-staged runs it once for the whole group rather than per file; TypeScript needs whole-program context. A type error anywhere blocks any commit, and an oxlint **warning** fails the hook too (`--max-warnings=0`).
 
-`src/drizzle/` (generated migrations) is excluded from both lint and format — see `ignorePatterns` in each config.
+`src/shared/db/migrations/` (generated migrations) is excluded from both lint and format — see `ignorePatterns` in each config.
 
 ---
 
 ## 2. Structure
 
-```
-src/
-  index.ts              app wiring: cors, static, middleware, route mounting
-  db/
-    db.ts               Bun SQL client + drizzle instance + migrate
-    schema.ts           pgTable / pgEnum definitions
-    types.ts            shared domain types
-    errors.ts           Postgres error codes + isPgError guard
-    index.ts            the module's public entry point
-  middlewares/
-    auth.ts             authMiddleware + AuthVariables
-  routes/
-    <name>/
-      <name>Route.ts    the Hono sub-app
-      index.ts          re-exports it, e.g. export { userRoutes } from './usersRoute';
-```
+Three layers, borrowed from the frontend's FSD setup so both halves of the repo read the same way:
 
-- **Every folder has an `index.ts`**, and it is what outsiders import. Import `../../db`, never `../../db/schema`.
-- Routes are mounted in `src/index.ts` with `app.route('/prefix', routes)`, and auth is applied by mounting `authMiddleware` on the path **before** the route: `app.use('/characters/*', authMiddleware)`.
+| layer   | path                  | holds                                                                         | may import from  |
+| ------- | --------------------- | ----------------------------------------------------------------------------- | ---------------- |
+| app     | `src/app/`            | the composition root — cors, static, middleware mounting, `app.route()` calls | modules, shared  |
+| modules | `src/modules/<name>/` | one folder per domain area: routers, services, validation                     | shared only      |
+| shared  | `src/shared/`         | `db/`, `middleware/`, and (as they appear) `lib/`, `config/`                  | nothing above it |
+
+**Imports point down only.** A module never imports another module, and nothing imports from `app/`. If two modules need the same thing, it moves to `shared/` — or it belongs in one module and the split was wrong.
+
+- **File naming is `<subject>.<role>.ts`**: `users.routes.ts`, `character.actions.service.ts`, `quiz.stats.ts`. Not camelCase, not bare `index`-plus-guesswork.
+- **Every module folder has an `index.ts`** and it is the module's only public surface. Import `@/modules/characters`, never `@/modules/characters/character.routes`. Same for `@/shared/db`.
+- **Imports use the `@/*` alias** (mapped to `src/*` in `tsconfig.json`) for anything crossing a folder boundary. Relative `./x` is only for siblings inside the same folder — a barrel re-exporting its own files, a module file importing its own service.
+- **A router symbol's name matches its mount path segment** + `Routes`: `charactersRoutes` → `/characters`, `characterRoutes` → `/character`. Both live in `modules/characters/` and the plural/singular split is deliberate (collection vs single resource), so this naming rule is the thing that stops a silent mis-mount — swapping them type-checks fine and breaks every route.
+- Routers are mounted in `src/app/server.ts` with `app.route('/prefix', routes)`, and auth is applied by mounting `authMiddleware` on the path **before** the route: `app.use('/characters/*', authMiddleware)`.
 - Protected handlers read the user via `c.get('userId')`, typed by `new Hono<{ Variables: AuthVariables }>()`.
-- Imports use **relative paths**. The `@/*` alias is configured in `tsconfig.json` but used in exactly one file (`routes/quiz/quizData.ts`) — do not spread it further without converting the rest.
+- **`authMiddleware` lives in `shared/middleware/`, not `app/`,** even though only `app/server.ts` mounts it: its `AuthVariables` type is imported by every protected module router, and `shared` is the only layer they're allowed to reach.
+- **No repository layer.** Drizzle's query builder _is_ the repository; handlers call it directly. Add a `.service.ts` only where there is real logic to hold — a multi-table transaction, a derivation shared by several handlers. A file that only forwards arguments is not a layer.
+- Sub-resources of one entity stay in that entity's module (`modules/characters/attacks.routes.ts`), mounted onto its router. They share its ownership check; a separate module would have to import it sideways.
 
 ---
 
@@ -71,10 +69,10 @@ So the thing you catch is a wrapper with no SQLSTATE on it at all, and the drive
 
 **Do not try to classify errors from the Drizzle layer.** Drizzle exports only `DrizzleError`, `DrizzleQueryError`, and `TransactionRollbackError`. There is no `UniqueViolationError`, no error category, no code field. `DrizzleQueryError` tells you _which query_ failed, never _why_. The "why" only exists as the Postgres SQLSTATE on `cause`.
 
-**Always go through the guard in `src/db/errors.ts`:**
+**Always go through the guard in `src/shared/db/errors.ts`:**
 
 ```ts
-import { db, characters, isPgError, PG_ERROR } from '../../db';
+import { db, characters, isPgError, PG_ERROR } from '@/shared/db';
 
 try {
   await db.insert(characters).values({ ... });
@@ -90,7 +88,7 @@ try {
 
 `isPgError` walks the `cause` chain (depth-capped), checks `instanceof SQL.PostgresError`, and compares `errno`. It is the single seam between Drizzle's wrapper and the driver's codes — so both quirks above are handled in exactly one place.
 
-**No magic numbers.** Add codes to `PG_ERROR` in `src/db/errors.ts`, named after the official condition name from [Appendix A of the Postgres manual](https://www.postgresql.org/docs/current/errcodes-appendix.html), with the number in a doc comment so it stays traceable:
+**No magic numbers.** Add codes to `PG_ERROR` in `src/shared/db/errors.ts`, named after the official condition name from [Appendix A of the Postgres manual](https://www.postgresql.org/docs/current/errcodes-appendix.html), with the number in a doc comment so it stays traceable:
 
 ```ts
 export const PG_ERROR = {
@@ -107,13 +105,25 @@ If you add a code, **verify the branch actually fires** against a real database.
 
 ## 4. Schema & migrations
 
-- Schema is defined in `src/db/schema.ts` with `pgTable` / `pgEnum`. Enums are declared once and reused; don't inline string unions in a column.
+- Schema is defined in `src/shared/db/schema.ts` with `pgTable` / `pgEnum`. Enums are declared once and reused; don't inline string unions in a column.
 - Change flow: edit `schema.ts` → `bun run db:generate` → review the generated SQL → `bun run db:migrate`.
-- **Never hand-edit anything in `src/drizzle/`.** It is generated, and it is excluded from lint and format.
+- **Never hand-edit anything in `src/shared/db/migrations/`.** It is generated, and it is excluded from lint and format.
+- **`bunx drizzle-kit check` before you generate.** It validates the snapshot chain and needs no database. It caught a real breakage once (see section 7) where `generate` refused to run and wrote nothing — the failure mode is an error about snapshots "pointing to a parent snapshot ... which is a collision", not anything about your schema edit.
+- The chain it checks: each `meta/NNNN_snapshot.json` carries its own `id` and its parent's `prevId`. `0000` is the only one whose `prevId` is all-zeros. Two snapshots sharing a `prevId` is the collision.
 
 ---
 
-## 5. Types & style
+## 5. Queries
+
+**A `LIMIT`/`OFFSET` query must carry a deterministic `ORDER BY`, ending in a unique column.** SQL guarantees no row order without one, so the planner is free to return page 1 as any ten rows it likes — which means a row can appear on two pages, another can never appear at all, and neither shows up as an error. This shipped: `GET /characters` paged without ordering, so from the eleventh character on, a newly created one was frequently absent from the list while the row sat in the table. There is no symptom to debug — the response is a valid 200 with ten valid rows.
+
+- The unique tail column is not decoration. `ORDER BY created_at DESC` alone reorders rows sharing a timestamp between two identical queries, which reproduces the bug at page boundaries. Use `ORDER BY created_at DESC, id DESC`.
+- List endpoints return `{ items, total }`, not a bare array. The client cannot derive "is there another page" from a page's length without guessing, and the guess is wrong as soon as the client mutates a cached page.
+- `db.$count(table, where)` is the count helper; run it alongside the page with `Promise.all`.
+
+---
+
+## 6. Types & style
 
 Enforced by `oxlint` (see `.oxlintrc.json`), so these are not suggestions:
 
@@ -131,9 +141,10 @@ Handlers return `c.json(...)` with an explicit status: `c.json({ error: 'User no
 
 ---
 
-## 6. Known cruft
+## 7. Known cruft
 
 Not rules, just things not to be confused by:
 
 - **`pg` is an unused dependency.** The driver is Bun's built-in `SQL` via `drizzle-orm/bun-sql`; nothing in `src/` imports `pg`. Do not reach for `pg`'s `DatabaseError` — those errors are never thrown here.
 - Several `catch (err)` blocks collapse every failure into a generic 500. Giving them specific SQLSTATE branches (e.g. `23505` unique_violation for a duplicate username on register) is welcome, following section 3.
+- **The `0000` migration metadata was hand-authored at some point** — `_journal.json`'s first entry has a suspiciously round `when` (1775000000000), and `0000_snapshot.json` carried an all-zeros `id` identical to its own `prevId`. That made `0000` and `0001` both claim the all-zeros parent, so `drizzle-kit generate` aborted with a collision and silently produced no migration. Repaired by giving `0000` a real uuid `id` and pointing `0001.prevId` at it; `drizzle-kit check` now passes. If you ever hand-edit migration metadata again, the chain is the invariant to preserve.

@@ -1,1 +1,0 @@
-export { characterRoutes } from './charactersRoute';

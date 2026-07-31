@@ -7,6 +7,7 @@ export {
   deleteCharacter,
   addCharacter,
   PAGE_SIZE,
+  MAX_CHARACTERS,
 } from './characters';
 
 export {
@@ -16,6 +17,7 @@ export {
   CharacterRace,
   type BaseCharacterData,
   type CharacterData,
+  type CharactersPage,
   type AddCharacterPayload,
   type UpdateCharacterPayload,
 } from './types';

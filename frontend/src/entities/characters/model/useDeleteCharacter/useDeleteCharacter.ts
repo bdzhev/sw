@@ -38,6 +38,15 @@ export const useDeleteCharacter = () => {
         qc.setQueryData(characterQueries.characters(), context.previous);
       }
     },
+
+    /**
+     * The optimistic removal leaves a short page behind and a stale `total`,
+     * which stalls pagination and keeps the create limit engaged after a
+     * delete. Refetching settles both.
+     */
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: characterQueries.characters() });
+    },
   });
 
   return { deleteCharacter, isDeletingCharacter };
