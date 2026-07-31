@@ -5,16 +5,23 @@ export interface UseVirtualGridOptions<T> {
   items: Ref<readonly T[]> | Readonly<Ref<readonly T[]>>;
   /** The positioned element the rows are absolutely placed inside. */
   container: Readonly<Ref<HTMLElement | null>>;
-  /** Starting guess per row; `measureRow` corrects it from the real DOM. */
-  estimatedRowHeight: number;
+  /**
+   * An empty element rendered *after* the grid. Intersecting it is what asks
+   * for the next page, so the request can only be triggered by scrolling
+   * towards the end — never by scrolling back up.
+   */
+  sentinel?: Readonly<Ref<HTMLElement | null>>;
+  /**
+   * Exact height of one row including its bottom gap, in px. A constant per
+   * layout, not an estimate: rows must be fixed-height (uniform cards), which
+   * is what lets this composable skip DOM measurement entirely.
+   */
+  rowHeight: MaybeRefOrGetter<number>;
   /** Defaults to the app's own 1 / 2 / 3 grid, by breakpoint. */
   columnCount?: MaybeRefOrGetter<number>;
   /** Rows rendered beyond the viewport on each side. */
   overscan?: number;
-  /**
-   * Called when the last row becomes visible. The caller owns the guards
-   * (has-more, already-fetching) — this only reports the position.
-   */
+  /** Called when the sentinel scrolls into view. The caller owns the guards. */
   onEndReached?: () => void;
 }
 

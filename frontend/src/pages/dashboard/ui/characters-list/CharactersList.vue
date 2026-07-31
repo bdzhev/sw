@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue';
 
-import { useVirtualGrid } from '@shared/lib/ui';
+import { useBreakpoint, useVirtualGrid } from '@shared/lib/ui';
 
 import { useCharactersInfo } from '@entities/characters';
 
@@ -12,8 +12,8 @@ import { EmptyState } from './empty-state';
 
 const SKELETON_CARD_COUNT = 4;
 
-/** Card min-height plus the row gap; measureRow corrects it from the DOM. */
-const ESTIMATED_ROW_HEIGHT = 216;
+const ROW_HEIGHT = 216;
+const ROW_HEIGHT_LG = 232;
 
 const ROW_CLASSES =
   'grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8';
@@ -27,12 +27,18 @@ const {
   loadNextCharactersInfo,
 } = useCharactersInfo();
 
-const listRef = useTemplateRef<HTMLElement>('list');
+const { isDesktop } = useBreakpoint();
 
-const { columns, visibleRows, totalHeight, measureRow } = useVirtualGrid({
+const listRef = useTemplateRef<HTMLElement>('list');
+const sentinelRef = useTemplateRef<HTMLElement>('sentinel');
+
+const { columns, visibleRows, totalHeight } = useVirtualGrid({
   items: characters,
   container: listRef,
-  estimatedRowHeight: ESTIMATED_ROW_HEIGHT,
+  sentinel: sentinelRef,
+  rowHeight: () => {
+    return isDesktop.value ? ROW_HEIGHT_LG : ROW_HEIGHT;
+  },
   onEndReached: () => {
     if (hasMoreCharactersInfo.value && !isFetchingNextCharactersInfo.value) {
       loadNextCharactersInfo();
@@ -43,7 +49,7 @@ const { columns, visibleRows, totalHeight, measureRow } = useVirtualGrid({
 
 <template>
   <div v-if="isCharInfoLoading" :class="[ROW_CLASSES, 'page-x']">
-    <CharacterCardSkeleton class="min-h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
+    <CharacterCardSkeleton class="h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
   </div>
 
   <EmptyState v-else-if="!characters.length" />
@@ -62,8 +68,6 @@ const { columns, visibleRows, totalHeight, measureRow } = useVirtualGrid({
       <div
         v-for="row in visibleRows"
         :key="row.index"
-        :ref="measureRow"
-        :data-index="row.index"
         :class="[ROW_CLASSES, 'absolute top-0 left-0 pb-4 lg:pb-8']"
         :style="{ transform: `translateY(${row.offset}px)` }"
       >
@@ -71,8 +75,10 @@ const { columns, visibleRows, totalHeight, measureRow } = useVirtualGrid({
       </div>
     </div>
 
+    <div ref="sentinel" aria-hidden="true" class="h-px w-full" />
+
     <div v-if="isFetchingNextCharactersInfo" :class="ROW_CLASSES">
-      <CharacterCardSkeleton class="min-h-50" v-for="n in columns" :key="`next-${n}`" />
+      <CharacterCardSkeleton class="h-50" v-for="n in columns" :key="`next-${n}`" />
     </div>
   </div>
 </template>

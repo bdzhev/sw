@@ -8,7 +8,9 @@ const ctx = inject<CharCardContext>('charCardCtx');
 
 <template>
   <header class="w-full bg-accent-secondary/50 p-4 md:px-6">
-    <h3 class="text-branding">
+    <!-- truncate keeps the card a fixed height — a wrapping name breaks the
+         dashboard's fixed-pitch virtual rows. -->
+    <h3 class="truncate text-branding">
       {{ ctx?.name }}
     </h3>
     <slot />

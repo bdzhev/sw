@@ -1,8 +1,8 @@
 <template>
-  <div id="layout" class="flex min-h-[100svh] w-full flex-col md:h-[100svh] md:flex-row">
+  <div id="layout" class="min-h-100svh flex w-full flex-col md:flex-row">
     <slot name="navigation" />
 
-    <main class="relative w-full min-w-0 flex-1 md:h-full md:overflow-y-scroll">
+    <main class="relative w-full min-w-0 flex-1">
       <slot />
     </main>
   </div>

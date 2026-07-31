@@ -16,7 +16,9 @@ const props = defineProps<CharacterCardProps>();
 </script>
 
 <template>
-  <CharCardRoot v-bind="props.character" class="min-h-50">
+  <!-- Fixed h-50, not min-h: the virtual grid positions rows at index × pitch,
+       so a card that grows would overlap the next row. -->
+  <CharCardRoot v-bind="props.character" class="h-50">
     <CharCardHeader>
       <CoreInfoLine label="Class" field="characterClass" />
 

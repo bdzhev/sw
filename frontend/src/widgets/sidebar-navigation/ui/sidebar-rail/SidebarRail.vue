@@ -9,7 +9,7 @@ const uiStore = useSidebarUi();
 <template>
   <aside
     :class="[
-      `flex h-[100svh] flex-col items-center justify-between border-r border-border bg-bg-secondary px-2 py-4 transition-all duration-200`,
+      `h-100svh sticky top-0 flex shrink-0 flex-col items-center justify-between border-r border-border bg-bg-secondary px-2 py-4 transition-all duration-200`,
       uiStore.isCollapsed ? 'w-16' : 'w-40',
     ]"
   >
