@@ -70,8 +70,6 @@ const errorMessage = computed(() => {
       autocomplete="new-password"
     />
 
-    <!-- `theme`, not a text-* class: Text sets its own colour, so the two would
-         race on stylesheet order. -->
     <Text v-if="errorMessage" theme="danger" size="sm" role="alert" class="mb-4">
       {{ errorMessage }}
     </Text>
