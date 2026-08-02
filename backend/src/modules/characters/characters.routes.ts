@@ -1,4 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
+import { desc, eq } from 'drizzle-orm';
+import { Hono } from 'hono';
+
 import {
   characters,
   characterSheets,
@@ -6,10 +9,8 @@ import {
   isPgError,
   PG_ERROR,
 } from '@shared/db';
-import type { AuthVariables } from '@shared/middleware/auth';
+import type { AuthVariables } from '@shared/middleware';
 import { errorHook } from '@shared/validation';
-import { desc, eq } from 'drizzle-orm';
-import { Hono } from 'hono';
 
 import { speedForRace } from './character.defaults';
 import {

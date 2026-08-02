@@ -1,0 +1,23 @@
+export {
+  TRAIT_NAME_MAX_LENGTH,
+  RESOURCE_NAME_MAX_LENGTH,
+  DESCRIPTION_MAX_LENGTH,
+} from './limits';
+
+export {
+  TRAIT_TAG_LABELS,
+  TRAIT_TAG_OPTIONS,
+  RESET_TRIGGER_LABELS,
+  RESET_TRIGGER_OPTIONS,
+} from './labels';
+
+export {
+  CUSTOM_RESOURCE_VALUE,
+  KNOWN_RESOURCES,
+  KNOWN_RESOURCE_LABELS,
+  KNOWN_RESET_TRIGGERS,
+  RESOURCE_OPTIONS,
+  RESOURCE_SUB_ABILITIES,
+} from './resources';
+
+export type { KnownResource, ResourceSubAbility } from './types';

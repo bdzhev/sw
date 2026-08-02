@@ -15,6 +15,8 @@ export const PG_ERROR = {
   INVALID_TEXT_REPRESENTATION: '22P02',
   /** 23505 unique_violation */
   UNIQUE_VIOLATION: '23505',
+  /** 23514 check_violation */
+  CHECK_VIOLATION: '23514',
 } as const;
 
 export type PgErrorCode = (typeof PG_ERROR)[keyof typeof PG_ERROR];

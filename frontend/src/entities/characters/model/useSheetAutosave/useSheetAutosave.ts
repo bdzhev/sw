@@ -62,7 +62,9 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
   });
 
   const cachedDetail = (): CharacterDetail | undefined => {
-    if (!characterId.value) return undefined;
+    if (!characterId.value) {
+      return;
+    }
 
     return qc.getQueryData<CharacterDetail>(
       characterQueries.character(characterId.value),
@@ -70,7 +72,9 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
   };
 
   const writeSheetThrough = (sheet: CharacterSheet) => {
-    if (!characterId.value) return;
+    if (!characterId.value) {
+      return;
+    }
 
     qc.setQueryData(
       characterQueries.character(characterId.value),
@@ -81,7 +85,9 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
   };
 
   const clearBuffer = () => {
-    if (!characterId.value) return;
+    if (!characterId.value) {
+      return;
+    }
 
     localStorage.removeItem(bufferKey(characterId.value));
   };
@@ -93,7 +99,9 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
   const writeBuffer = () => {
     const detail = cachedDetail();
 
-    if (!characterId.value || !detail || !pending.value.character) return;
+    if (!characterId.value || !detail || !pending.value.character) {
+      return;
+    }
 
     const buffered: BufferedPatch = {
       characterId: characterId.value,
@@ -105,8 +113,14 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
   };
 
   const clearTimers = () => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    if (maxWaitTimer) clearTimeout(maxWaitTimer);
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    if (maxWaitTimer) {
+      clearTimeout(maxWaitTimer);
+    }
+
     debounceTimer = null;
     maxWaitTimer = null;
   };
@@ -135,6 +149,7 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
     }
 
     inFlight.value = { ...inFlight.value, [target]: patch };
+
     const { [target]: _sent, ...rest } = pending.value;
     pending.value = rest;
     saveState.value = 'saving';
@@ -143,19 +158,23 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
       const sheet = await sendPatch(id, target, patch);
 
       writeSheetThrough(sheet);
+
       const { [target]: _done, ...stillInFlight } = inFlight.value;
       inFlight.value = stillInFlight;
 
-      if (!pending.value[target]) {
-        clearBuffer();
-        saveState.value = 'saved';
-        savedBadgeTimer = setTimeout(() => {
-          if (saveState.value === 'saved') saveState.value = 'idle';
-        }, SAVED_BADGE_MS);
-      } else {
-        // Edited again while in flight — send the newer working copy.
+      // Edited again while in flight — send the newer working copy.
+      if (pending.value[target]) {
         await flushTarget(target);
+
+        return;
       }
+
+      saveState.value = 'saved';
+      savedBadgeTimer = setTimeout(() => {
+        if (saveState.value === 'saved') {
+          saveState.value = 'idle';
+        }
+      }, SAVED_BADGE_MS);
     } catch (error) {
       const { [target]: _failed, ...stillInFlight } = inFlight.value;
       inFlight.value = stillInFlight;
@@ -327,6 +346,7 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
         const { [target]: _dropped, ...rest } = pending.value;
         pending.value = rest;
       }
+
       clearBuffer();
       writeSheetThrough(adopted.sheet);
       void qc.invalidateQueries({ queryKey: characterQueries.character(id) });
@@ -338,12 +358,15 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
       for (const target of targets) {
         next.delete(target);
       }
+
       frozen.value = next;
     }
   };
 
   const stopBadgeTimer = () => {
-    if (savedBadgeTimer) clearTimeout(savedBadgeTimer);
+    if (savedBadgeTimer) {
+      clearTimeout(savedBadgeTimer);
+    }
   };
 
   return {

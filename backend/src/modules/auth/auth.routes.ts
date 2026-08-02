@@ -1,10 +1,11 @@
 import { zValidator } from '@hono/zod-validator';
-import { db, isPgError, PG_ERROR, sessions, users } from '@shared/db';
-import { errorHook } from '@shared/validation';
 import { and, eq, gt } from 'drizzle-orm';
 import { Hono, type Context } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { SignJWT } from 'jose';
+
+import { db, isPgError, PG_ERROR, sessions, users } from '@shared/db';
+import { errorHook } from '@shared/validation';
 
 import { loginSchema, registerSchema } from './auth.schemas';
 

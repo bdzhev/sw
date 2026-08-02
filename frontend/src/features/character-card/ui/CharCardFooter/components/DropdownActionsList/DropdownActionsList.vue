@@ -3,13 +3,13 @@ import { EllipsisVertical, Pencil, Trash } from 'lucide-vue-next';
 import { provide, ref } from 'vue';
 
 import { useBreakpoint } from '@shared/lib/ui';
+import { Button } from '@shared/ui/button';
 import {
   DropdownMenuRoot,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuPortal,
 } from '@shared/ui/dropdown-menu';
-import { IconButton } from '@shared/ui/icon-button';
 
 import { DeleteCharacterModal, EditCharacterModal } from './components';
 import type { DropdownActionsContext } from './DropdownActionsList.types';
@@ -60,32 +60,38 @@ provide<DropdownActionsContext>('dropdownMenuActions', {
   <EditCharacterModal />
 
   <div v-if="isMobile" class="flex flex-row items-center gap-2">
-    <IconButton
+    <Button
+      variant="neutral"
+      is-icon-only
       :class="[ACTION_BUTTON_CLASSES, TOUCH_TARGET_CLASSES]"
       aria-label="Edit character"
       @click="toggleEditModal"
     >
       <Pencil :size="18" />
-    </IconButton>
+    </Button>
 
-    <IconButton
+    <Button
+      variant="neutral"
+      is-icon-only
       :class="[ACTION_BUTTON_CLASSES, TOUCH_TARGET_CLASSES]"
       aria-label="Delete character"
       @click="toggleDeleteModal"
     >
       <Trash :size="18" />
-    </IconButton>
+    </Button>
   </div>
 
   <DropdownMenuRoot v-else>
     <DropdownMenuTrigger as-child>
-      <IconButton
+      <Button
+        variant="neutral"
+        is-icon-only
         :class="ACTION_BUTTON_CLASSES"
         class="p-1"
         aria-label="Character actions"
       >
         <EllipsisVertical :size="18" />
-      </IconButton>
+      </Button>
     </DropdownMenuTrigger>
 
     <DropdownMenuPortal>

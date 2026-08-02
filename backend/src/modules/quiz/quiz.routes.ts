@@ -1,9 +1,10 @@
 import { zValidator } from '@hono/zod-validator';
-import { characters, characterSheets, db } from '@shared/db';
-import type { AuthVariables } from '@shared/middleware/auth';
-import { errorHook } from '@shared/validation';
 import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+
+import { characters, characterSheets, db } from '@shared/db';
+import type { AuthVariables } from '@shared/middleware';
+import { errorHook } from '@shared/validation';
 
 import { quizData as quizQuestions } from './quiz.data';
 import { generateStatsSchema } from './quiz.schemas';

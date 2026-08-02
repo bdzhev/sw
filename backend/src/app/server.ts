@@ -1,11 +1,13 @@
+import { Hono } from 'hono';
+import { serveStatic } from 'hono/bun';
+import { cors } from 'hono/cors';
+
+import { authMiddleware } from '@shared/middleware';
+
 import { authRoutes } from '@modules/auth';
 import { characterRoutes, charactersRoutes } from '@modules/characters';
 import { quizRoutes } from '@modules/quiz';
 import { userRoutes } from '@modules/users';
-import { authMiddleware } from '@shared/middleware/auth';
-import { Hono } from 'hono';
-import { serveStatic } from 'hono/bun';
-import { cors } from 'hono/cors';
 
 const app = new Hono();
 

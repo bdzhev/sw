@@ -70,35 +70,18 @@
   --color-danger: oklch(0.704 0.191 22.216); /* --destructive */
   --color-warning: oklch(0.837 0.128 66.29); /* --chart-1 */
 
-  /* remove the colors below in next iterations */
-  --color-primary-bg: oklch(0.147 0.004 49.25); /* --background */
-  --color-primary-fg: oklch(0.216 0.006 56.043); /* --popover */
-
-  --color-secondary-bg: oklch(0.274 0.006 286.033); /* --secondary */
-  --color-secondary-fg: oklch(0.268 0.007 34.298); /* --muted */
-
-  /* Was referenced by the loading-animation shimmer and never defined, so that
-     gradient ran transparent-to-transparent. */
-  --color-primary-muted: oklch(0.268 0.007 34.298); /* --muted */
-
-  --color-primary-button: oklch(0.216 0.006 56.043); /* --card */
-  --color-primary-button-bg: oklch(0.696 0.17 162.48); /* --sidebar-primary */
-  --color-primary-button-hover-bg: oklch(0.432 0.095 166.913); /* --primary */
-
-  --color-secondary-button: oklch(0.274 0.006 286.033); /* --secondary */
+  /* Raised neutral surface: the secondary button fill, a switch's off track,
+     the card overlay. Distinct from --color-bg-secondary, which is flatter. */
+  --color-bg-raised: oklch(0.274 0.006 286.033); /* --secondary */
   /* The preset has no adjacent neutral step, so the hover is derived. */
-  --color-secondary-button-hover: color-mix(
+  --color-bg-raised-hover: color-mix(
     in oklab,
     oklch(0.274 0.006 286.033),
     oklch(0.985 0.001 106.423) 12%
   );
 
-  --color-button-disabled: oklch(0.268 0.007 34.298); /* --muted */
-
-  --color-accent: oklch(0.705 0.213 47.604); /* --chart-2 */
-  --color-accent-muted: oklch(0.646 0.222 41.116); /* --chart-3 */
-
-  --color-error: oklch(0.704 0.191 22.216); /* --destructive */
+  /* Muted: disabled fills, the loading shimmer, dim-until-hover icons. */
+  --color-muted: oklch(0.268 0.007 34.298); /* --muted */
 }
 
 @utility loading-animation {
@@ -113,12 +96,7 @@
 
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-primary-muted),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, var(--color-muted), transparent);
     animation: loading-shimmer 1.25s infinite;
   }
 }
@@ -137,12 +115,7 @@
     left: -200%;
     height: 100%;
     width: 200%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-secondary-bg),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, var(--color-bg-raised), transparent);
     transform: translateX(0);
   }
 }
@@ -332,9 +305,9 @@
 @utility bg-radial {
   background-image: radial-gradient(
     circle at center,
-    var(--accent) 0%,
-    var(--secondary) 40%,
-    var(--primary-bg) 100%
+    var(--color-branding) 0%,
+    var(--color-secondary) 40%,
+    var(--color-bg-primary) 100%
   );
   background-size: 300% 300%;
   background-position: center;
@@ -346,6 +319,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 html,
 body {
   margin: 0;
@@ -355,7 +332,7 @@ body {
   font-style: normal;
   color: var(--color-primary);
 
-  background-color: var(--color-primary-bg);
+  background-color: var(--color-bg-primary);
 
   ::-webkit-scrollbar {
     display: none;
@@ -363,7 +340,7 @@ body {
 }
 
 #app {
-  background-color: var(--color-primary-bg);
+  background-color: var(--color-bg-primary);
   height: 100%;
 }
 

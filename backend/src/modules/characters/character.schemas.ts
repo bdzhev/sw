@@ -1,9 +1,10 @@
+import { z } from 'zod';
+
 import {
   characterClassEnum,
   characterRaceEnum,
   spellcastingProgressionEnum,
 } from '@shared/db';
-import { z } from 'zod';
 
 /**
  * Enum members come off the Drizzle `pgEnum`s rather than being retyped, so a

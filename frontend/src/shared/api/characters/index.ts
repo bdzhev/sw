@@ -1,6 +1,17 @@
 export { characterQueries } from './queries';
 
 export {
+  COLLECTION_SEGMENTS,
+  createCollectionRow,
+  updateCollectionRow,
+  deleteCollectionRow,
+  CollectionKey,
+  type CollectionRow,
+  type CollectionCreate,
+  type CollectionPatch,
+} from './collections';
+
+export {
   getCharacterSummaries,
   getCharacter,
   updateCharacter,

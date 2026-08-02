@@ -9,7 +9,7 @@ import { Skeleton } from '@shared/ui/skeleton';
     </div>
 
     <div
-      class="z-10 h-full max-h-180 w-80 bg-primary-bg sm:w-128 md:w-160 lg:w-200 xl:w-240"
+      class="z-10 h-full max-h-180 w-80 bg-bg-primary sm:w-128 md:w-160 lg:w-200 xl:w-240"
     >
       <Skeleton class="rounded-xl" />
     </div>

@@ -1,0 +1,1 @@
+export { useTraitsTab } from './useTraitsTab';

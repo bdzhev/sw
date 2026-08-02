@@ -41,8 +41,30 @@ Inside a slice, segment by purpose:
 model/    composables, stores, form state
 ui/       components
 lib/      pure helpers
+config/   static data — option lists, label maps, limits
 api/      queries, mutations, transport
 ```
+
+`config/` is a fifth segment, for static data — option lists, label maps, limits, and the local `types.ts` that describes them.
+
+**Segments are siblings. A segment never nests inside another segment.** There is no `ui/some-tab/model/`, no `ui/some-tab/config/`. If a slice is big enough that its composables need grouping, group them _inside_ the segment by area:
+
+```
+widgets/character-sheet/
+  index.ts
+  ui/       sheet-header/  main-tab/  skills-tab/  combat-tab/  traits-tab/
+  model/    sheet-tabs/  traits/  combat/
+  config/   main/  skills/  combat/  traits/
+  lib/      main/formatters.ts   combat/attack-math.ts
+```
+
+`model/traits/useTraitForm/` is right; `ui/traits-tab/model/useTraitForm/` is not. Inside a slice, cross-segment imports use the slice's own alias path (`@widgets/character-sheet/config/traits`) rather than climbing `../../../` — a deep relative breaks the moment anything moves.
+
+**Logic lives in `model/`, not in the `.vue`.** A component is a template plus a call into its composable or store.
+
+**A page slice that grows into a real surface becomes a widget.** `pages/character` is a six-line shell that renders `@widgets/character-sheet`; the sheet itself — seven tabs, a header, its own stores and rules data — is the widget. A page's job is routing and composition, not holding a feature.
+
+This is a rule because four tabs of the character sheet were written in parallel and produced four different answers — `constants.ts` + `lib.ts`, `constants.ts` + `types.ts`, a bare `<domain>-math.ts`, and a segment nested inside `ui/`. The last one was the most organised and still wrong.
 
 ---
 
@@ -137,8 +159,52 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   ```
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
+- **Every event handler is named `handle*`.** `handleClick`, `handleSubmit`, `handleSpendClick`, `handleToggleLanguage`. Not `onInput`, not `onBonusInput`, and not a bare verb like `toggle` / `submitTrait` / `openAdd`. The `handle` prefix is what makes a handler greppable and tells you at the binding site that you are looking at one.
+- **An `@event` is a bare handler reference. Never a call, never an expression.**
+
+  ```vue
+  <!-- no -->
+  <button @click="setRemaining(remaining - 1)">
+  <button @click="stepAmmo(-1)">
+  <button @click="emit('detail')">
+  <button @click="handleSelectLanguage(language)">
+
+  <!-- yes -->
+  <button @click="handleSpendClick">
+  ```
+
+  This has no exceptions, including emit forwarding, and including a `v-for`.
+  **If a handler needs to know which item was acted on, the item is a component
+  that emits it** — the parent then binds `@select="handleSelect"` and reads the
+  payload. A row that needs a callback is a row that wants to be a component;
+  passing the item down through the template is the shortcut that avoids
+  writing one, and it is what leaves list logic smeared across the parent.
+
+  The same applies to a group control: `ToggleChipGroup` emits the value that
+  changed, so its consumer binds a bare handler rather than closing over the
+  item in the template.
+
+- **A variant map lives in `<Component>.themes.ts` and is typed against its union.** An untyped map lets a variant be half-added — declared in the union, missing from the classes — and it still compiles:
+
+  ```ts
+  export const variantClasses: Record<ButtonVariant, string> = { ... };
+  ```
+
+- **Resolve a theme map inside a `computed`, never at setup scope.** `const theme = themes[props.variant]` runs once, so the class never updates when the prop changes. The old `icon-button/IconButton.vue` did exactly this.
 - **Do not comment templates.** No prose restating a class list, and no notes on what a change fixed — that belongs in the design docs, not the markup. The rare exception is a line someone would otherwise "simplify" and break: a browser or library behaviour the code cannot show. Keep it to one line.
 - Icons come from `lucide-vue-next`.
+- **Check `src/shared/ui/` before hand-rolling a control.** A raw `<button>` carrying `role="switch"`, `role="checkbox"` or `aria-pressed`, or a raw `<input type="number">`, means you are rebuilding one of these:
+
+  | want                              | use                                                                                       |
+  | --------------------------------- | ----------------------------------------------------------------------------------------- |
+  | two-state toggle                  | `@shared/ui/switch` (`v-model`) · `@shared/ui/form-switch` (vee-validate `name`)          |
+  | tick box                          | `@shared/ui/checkbox`                                                                     |
+  | number entry, with or without −/+ | `@shared/ui/number-field` — it owns clamping and parsing, so do not write another `clamp` |
+  | multi-select chips                | `@shared/ui/toggle-chip-group` — emits the value that changed                             |
+  | any button, including icon-only   | `@shared/ui/button` with `is-icon-only` (there is no separate `IconButton`)               |
+
+  A control that genuinely has no primitive is a signal to add one, not to hand-roll it in a page slice. `traits-tab/pin-field` was a correct switch trapped where no other tab could import it, so two other tabs each built their own — one of them redrawing the track and thumb from scratch.
+
 - Headless primitives come from `reka-ui`. **Overlays are already wrapped: `@shared/ui/dialog` (centred, with `DialogHeader`/`Body`/`Footer`/`CloseButton`), `@shared/ui/drawer` (off-canvas, swipe-to-close), `@shared/ui/select` (field-bound, portalled), `@shared/ui/slider`, `@shared/ui/tooltip` (needs one `TooltipProvider` at the app root, already in `App.vue`), `@shared/ui/confirm-dialog` on top of them.** **Any overlay must escape its container through a portal** — an ancestor with non-`visible` overflow clips an absolutely-positioned descendant, and `z-index` cannot undo that. This is what broke the old `shared/ui/select` inside a dialog. `@shared/ui/dropdown-menu` wraps reka's menu too — its root is **modal by default, and that is what locks body scroll**, so don't reach for `:modal="false"` to fix a positioning problem. Below `md` the character card skips the menu entirely and lays its two actions out as icon buttons: a menu costs a touch user an extra tap, and two actions do not need one. **Do not let a reka part derive displayed state from its children's mount lifecycle** — `SelectValue`'s label comes from a registry `SelectItemText` fills on mount, and closing the list remounts every item, so it blanks for a frame; derive that display from your own props instead (as `select/Select.vue` does). The hand-rolled `shared/ui/modal` they replaced is gone — do not rebuild that pattern: it had no focus trap, no Escape, no scroll lock, and positioned itself `absolute` inside `body`. Enter/leave animation for these is CSS keyframes keyed off `data-[state=open]`/`data-[state=closed]`, because reka's `Presence` holds the element mounted until the animation ends; a Vue `<Transition>` would need `forceMount` and manual presence. A dialog with no `DialogDescription` must pass `:aria-describedby="undefined"` — the JS value, not the string `"undefined"`, since reka reads the rendered attribute. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
 
 ---
@@ -150,6 +216,9 @@ All configuration is **CSS-side, in `src/main.css`**: `@theme` for design tokens
 There is **no `tailwind.config.js`** — it was an empty stub that existed only so the old ESLint plugin had something to point at, and it is gone. Do not recreate it. Tooling that needs to know the design system reads `src/main.css` directly (see `sortTailwindcss.stylesheet` in `.oxfmtrc.json`).
 
 - Use theme tokens — `bg-border`, `text-secondary`, `bg-accent-primary` — not raw palette values like `bg-slate-600`.
+- **There is one colour vocabulary, and this is all of it**: `bg-primary`, `bg-secondary`, `bg-raised`, `bg-raised-hover`, `fg`, `muted`, `border`, `primary`, `secondary`, `accent-primary`, `accent-secondary`, `branding`, `danger`, `warning`. A second, older set (`primary-bg`, `primary-fg`, `secondary-bg`, `secondary-fg`, `primary-muted`, `primary-button*`, `secondary-button*`, `button-disabled`, `accent`, `accent-muted`, `error`) was deleted — if you find one in a snippet or an old branch, map it onto the list above rather than reviving it.
+- **A multi-line value in `@theme` does not parse.** `--color-bg-raised-hover` was originally written as a `color-mix()` spread over four lines; Tailwind silently failed to register the token, so `hover:bg-secondary-button-hover` generated **no CSS at all** and the secondary button had no hover state for as long as it existed. Keep `@theme` values on one line.
+- **A class naming a token that does not exist generates nothing — silently.** There is no error, no warning, and no failed build; the element just renders unstyled. After renaming or deleting a token, build and grep the emitted stylesheet (`dist/assets/*.css`) for the classes you expect, because neither `vue-tsc` nor `oxlint` can see this.
 - Custom utilities already defined: `page-x`, `fade-bottom`, `fade-scroll-top`, `fade-scroll-bottom`, `fade-scroll-y`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
 - **Native scrollbars are hidden globally** by `::-webkit-scrollbar { display: none }` in `main.css`. Anything that needs a visible scroll affordance must render its own — use `@shared/ui/scroll-area`.
 - Scrolling inside a flex column needs `min-h-0` on the scrolling child, otherwise it stretches to content height and never scrolls. `overflow-hidden` on an ancestor (e.g. `Card`) clips instead of scrolling — put the scroll container inside it.

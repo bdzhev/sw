@@ -1,4 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
+import { and, asc, eq, sql } from 'drizzle-orm';
+import { Hono } from 'hono';
+
 import {
   assertOwnedCharacter,
   attacks,
@@ -11,12 +14,17 @@ import {
   spells,
   traits,
 } from '@shared/db';
-import type { AuthVariables } from '@shared/middleware/auth';
+import type { AuthVariables } from '@shared/middleware';
 import { errorHook } from '@shared/validation';
-import { and, asc, eq, sql } from 'drizzle-orm';
-import { Hono } from 'hono';
 
 import { updateCharacterSchema, updateSheetSchema } from './character.schemas';
+import {
+  attacksRoutes,
+  characterSpellsRoutes,
+  itemsRoutes,
+  resourcesRoutes,
+  traitsRoutes,
+} from './collections';
 
 export const characterRoutes = new Hono<{ Variables: AuthVariables }>();
 
@@ -192,6 +200,12 @@ characterRoutes.delete('/:id', async (c) => {
   }
 });
 
-// Wave-2 sub-collections (attacks, traits, resources, items, spells) mount onto
-// this router, not in app/server.ts: they are sub-resources of one character and
-// share its ownership check via assertOwnedCharacter.
+// Sub-collections mount here rather than in app/server.ts: they are
+// sub-resources of one character and share its ownership check. Each sub-app
+// applies `requireOwnedCharacter` itself, and Hono merges the parent `:id` into
+// the child, so handlers read the verified id off the context.
+characterRoutes.route('/:id/attacks', attacksRoutes);
+characterRoutes.route('/:id/traits', traitsRoutes);
+characterRoutes.route('/:id/resources', resourcesRoutes);
+characterRoutes.route('/:id/items', itemsRoutes);
+characterRoutes.route('/:id/spells', characterSpellsRoutes);

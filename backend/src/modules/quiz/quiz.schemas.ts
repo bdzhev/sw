@@ -1,5 +1,6 @@
-import { QuizAnswerStat } from '@shared/db/types';
 import { z } from 'zod';
+
+import { QuizAnswerStat } from '@shared/db/types';
 
 /**
  * An answer points at one of five stats. CON is absent on purpose — no question

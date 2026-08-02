@@ -1,0 +1,3 @@
+export const TRAIT_NAME_MAX_LENGTH = 60;
+export const RESOURCE_NAME_MAX_LENGTH = 40;
+export const DESCRIPTION_MAX_LENGTH = 2000;

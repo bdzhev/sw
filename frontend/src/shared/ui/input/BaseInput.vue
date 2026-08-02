@@ -35,7 +35,7 @@ const inputClasses = computed(() => {
     'ring-2 w-full rounded-sm text-base outline-none transition-all',
     props.disabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : '',
     errorMessage.value
-      ? 'ring-error/50 focus-within:ring-error'
+      ? 'ring-danger/50 focus-within:ring-danger'
       : 'ring-primary/50 focus-within:ring-primary',
   ];
 });

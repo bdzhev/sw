@@ -3,6 +3,7 @@ export { useCreateCharacter } from './model/useCreateCharacter';
 export { useDeleteCharacter } from './model/useDeleteCharacter';
 export { useUpdateCharacter } from './model/useUpdateCharacter';
 export { useCharacter } from './model/useCharacter';
+export { useCharacterCollection } from './model/useCharacterCollection';
 export { useSheetAutosave } from './model/useSheetAutosave';
 export type { AutosaveTarget, SaveState } from './model/useSheetAutosave';
 
@@ -37,6 +38,15 @@ export {
   type AbilityScores,
   type SlotMaxima,
 } from './lib/derived-stats';
+
+export {
+  ABILITIES,
+  ABILITY_LABELS,
+  ABILITY_SHORT_LABELS,
+  ABILITY_SHEET_FIELDS,
+  type AbilityDescriptor,
+  type AbilitySheetField,
+} from './lib/abilities';
 
 export {
   SKILLS,

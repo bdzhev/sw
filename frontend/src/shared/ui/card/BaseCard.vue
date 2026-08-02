@@ -19,8 +19,8 @@ const isOutline = variant === 'outline';
     :class="{
       'overflow-hidden': true,
       'backdrop-blur-xl': blur,
-      'bg-primary-bg/80': isPrimary,
-      'bg-secondary-bg/80': isSecondary,
+      'bg-bg-primary/80': isPrimary,
+      'bg-bg-raised/80': isSecondary,
       'ring-2 ring-border': !isOutline,
       'ring-2 ring-border/50': isOutline,
       'rounded-sm': size === 'sm',

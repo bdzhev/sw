@@ -21,7 +21,7 @@ const redirectLink = computed(() => {
 
     <RouterLink
       :to="redirectLink"
-      class="mt-4 inline-flex min-h-11 items-center justify-center text-accent md:min-h-0"
+      class="mt-4 inline-flex min-h-11 items-center justify-center text-branding md:min-h-0"
     >
       Go back home
     </RouterLink>

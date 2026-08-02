@@ -1,7 +1,8 @@
-import { db, users } from '@shared/db';
-import type { AuthVariables } from '@shared/middleware/auth';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
+
+import { db, users } from '@shared/db';
+import type { AuthVariables } from '@shared/middleware';
 
 export const userRoutes = new Hono<{ Variables: AuthVariables }>();
 
