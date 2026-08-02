@@ -1,7 +1,8 @@
+import type { AbilityDescriptor } from '@entities/characters';
+
 export interface AbilityScoreProps {
-  /** Three-letter form, e.g. `str` — displayed uppercase. */
-  abbr: string;
-  name: string;
+  /** Carries its own `field`, so the row emits an edit the parent can apply blind. */
+  ability: AbilityDescriptor;
   /** The stored raw score — the only editable half. */
   score: number;
   /** Raw score plus equipped-item bonuses; equals `score` when there are none. */

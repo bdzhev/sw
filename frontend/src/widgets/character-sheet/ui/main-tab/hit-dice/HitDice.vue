@@ -1,17 +1,14 @@
 <script setup lang="ts">
-import { Minus, Plus } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import type { SheetPatch } from '@shared/api/characters';
+import { NumberField } from '@shared/ui/number-field';
 import { Text } from '@shared/ui/text';
 
 import { HIT_DIE_BY_CLASS, hitDiceTotal } from '@entities/characters';
 
-import { clamp, readNumberInput } from '@widgets/character-sheet/lib/main/formatters';
-
 import type { HitDiceProps } from './HitDice.types';
 
-const INPUT_ID = 'hit-dice-remaining';
 const MIN_REMAINING = 0;
 
 const props = defineProps<HitDiceProps>();
@@ -27,18 +24,15 @@ const total = computed(() => {
   return hitDiceTotal(props.sheet);
 });
 
-const remaining = computed(() => {
-  return props.sheet.hitDiceRemaining;
-});
-
 /** A counter, so the debounced absolute write is self-healing on repeat taps. */
-const setRemaining = (value: number) => {
-  emit('patch', { hitDiceRemaining: clamp(value, MIN_REMAINING, total.value) });
-};
-
-const onInput = (event: Event) => {
-  setRemaining(readNumberInput(event, remaining.value));
-};
+const remaining = computed({
+  get: (): number => {
+    return props.sheet.hitDiceRemaining;
+  },
+  set: (value: number): void => {
+    emit('patch', { hitDiceRemaining: value });
+  },
+});
 </script>
 
 <template>
@@ -51,39 +45,14 @@ const onInput = (event: Event) => {
       <Text size="xs" theme="secondary">d{{ dieSize }} · {{ total }} total</Text>
     </div>
 
-    <label :for="INPUT_ID" class="text-xs text-secondary uppercase">Remaining</label>
-
-    <div class="flex items-center gap-2">
-      <button
-        type="button"
-        aria-label="Spend a hit die"
-        :disabled="remaining <= MIN_REMAINING"
-        class="flex min-h-11 min-w-11 items-center justify-center rounded-md border border-border text-primary transition-colors enabled:hover:border-accent-primary disabled:text-secondary"
-        @click="setRemaining(remaining - 1)"
-      >
-        <Minus :size="18" />
-      </button>
-
-      <input
-        :id="INPUT_ID"
-        type="number"
-        inputmode="numeric"
-        :value="remaining"
-        :min="MIN_REMAINING"
-        :max="total"
-        class="min-h-11 w-full min-w-0 rounded-md border border-border bg-bg-primary px-2 text-center text-xl font-semibold text-primary tabular-nums outline-none focus:border-accent-primary"
-        @input="onInput"
-      />
-
-      <button
-        type="button"
-        aria-label="Regain a hit die"
-        :disabled="remaining >= total"
-        class="flex min-h-11 min-w-11 items-center justify-center rounded-md border border-border text-primary transition-colors enabled:hover:border-accent-primary disabled:text-secondary"
-        @click="setRemaining(remaining + 1)"
-      >
-        <Plus :size="18" />
-      </button>
-    </div>
+    <NumberField
+      v-model="remaining"
+      label="Remaining"
+      has-stepper
+      :min="MIN_REMAINING"
+      :max="total"
+      decrement-label="Spend a hit die"
+      increment-label="Regain a hit die"
+    />
   </section>
 </template>

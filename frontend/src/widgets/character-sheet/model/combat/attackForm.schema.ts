@@ -8,7 +8,7 @@ import {
   AMMO_LIMIT,
   ATTACK_NAME_MAX_LENGTH,
   DAMAGE_DICE_MAX_LENGTH,
-} from '@widgets/character-sheet/config/combat/constants';
+} from '@widgets/character-sheet/config/combat';
 
 const WHOLE_NUMBER = /^-?\d*$/;
 const POSITIVE_WHOLE_NUMBER = /^\d*$/;

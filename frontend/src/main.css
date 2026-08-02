@@ -19,6 +19,9 @@
    */
   --spacing-mobile-bar: 3.5rem;
 
+  /* Below Tailwind's `xs`, for status chrome that must not compete with content. */
+  --text-xxs: 0.6875rem;
+
   --font-alegreya: 'Alegreya', sans-serif;
 
   /**

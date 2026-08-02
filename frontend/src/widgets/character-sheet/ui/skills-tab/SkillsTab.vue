@@ -16,11 +16,11 @@ import {
   useSheetAutosave,
 } from '@entities/characters';
 
-import { SKILL_ABILITY_ORDER } from '@widgets/character-sheet/config/skills/constants';
+import { SKILL_ABILITY_ORDER } from '@widgets/character-sheet/config/skills';
 import type {
   SkillGroupView,
   SkillProficiencyLevel,
-} from '@widgets/character-sheet/config/skills/types';
+} from '@widgets/character-sheet/config/skills';
 
 import { LanguagePicker } from './language-picker';
 import { SkillGroup } from './skill-group';
@@ -73,7 +73,7 @@ const languages = computed<Languages>(() => {
 });
 
 /** none → proficient → expertise → none. Absent means neither, never a stored 0. */
-const cycleProficiency = (skillKey: string) => {
+const handleCycleProficiency = (skillKey: string) => {
   const current = sheet.value;
 
   if (!current) return;
@@ -92,7 +92,7 @@ const cycleProficiency = (skillKey: string) => {
   autosave.patchSheet({ skillProficiencies: next }, true);
 };
 
-const updateLanguages = (value: Languages, immediate = false) => {
+const handleUpdateLanguages = (value: Languages, immediate = false) => {
   autosave.patchSheet({ languages: value }, immediate);
 };
 </script>
@@ -139,12 +139,12 @@ const updateLanguages = (value: Languages, immediate = false) => {
             v-for="group in groups"
             :key="group.ability"
             :group="group"
-            @cycle="cycleProficiency"
+            @cycle="handleCycleProficiency"
           />
         </table>
       </div>
 
-      <LanguagePicker :languages="languages" @update="updateLanguages" />
+      <LanguagePicker :languages="languages" @update="handleUpdateLanguages" />
     </template>
   </section>
 </template>

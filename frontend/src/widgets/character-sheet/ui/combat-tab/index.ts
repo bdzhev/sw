@@ -17,4 +17,4 @@ export type {
   AttackMathInput,
   AttackPropertyDefinition,
   AttackTotals,
-} from '@widgets/character-sheet/config/combat/types';
+} from '@widgets/character-sheet/config/combat';

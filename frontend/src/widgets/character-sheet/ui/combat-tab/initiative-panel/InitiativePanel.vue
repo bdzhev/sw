@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 
 import { CharacterStat } from '@shared/api/characters';
+import { NumberField } from '@shared/ui/number-field';
 import { Text } from '@shared/ui/text';
 
 import {
@@ -10,8 +11,8 @@ import {
   totalAbilityScores,
 } from '@entities/characters';
 
-import { INITIATIVE_BONUS_LIMIT } from '@widgets/character-sheet/config/combat/constants';
-import { formatSigned } from '@widgets/character-sheet/lib/combat/attack-math';
+import { INITIATIVE_BONUS_LIMIT } from '@widgets/character-sheet/config/combat';
+import { formatSigned } from '@widgets/character-sheet/lib/format';
 
 import type { InitiativePanelProps } from './InitiativePanel.types';
 
@@ -27,15 +28,14 @@ const dexModifier = computed(() => {
   return abilityModifier(totalAbilityScores(props.sheet, props.items)[CharacterStat.DEX]);
 });
 
-const onBonusInput = (event: Event) => {
-  const parsed = Number((event.target as HTMLInputElement).value);
-  const bonus = Number.isFinite(parsed) ? parsed : 0;
-
-  emit(
-    'update:bonus',
-    Math.min(INITIATIVE_BONUS_LIMIT, Math.max(-INITIATIVE_BONUS_LIMIT, bonus)),
-  );
-};
+const bonus = computed({
+  get: (): number => {
+    return props.sheet.initiativeBonus;
+  },
+  set: (value: number): void => {
+    emit('update:bonus', value);
+  },
+});
 </script>
 
 <template>
@@ -61,19 +61,13 @@ const onBonusInput = (event: Event) => {
         </p>
       </div>
 
-      <label class="col-span-2 flex min-w-0 flex-col gap-1 sm:col-span-1">
-        <span class="text-xs text-secondary">Misc bonus</span>
-
-        <input
-          type="number"
-          inputmode="numeric"
-          :value="props.sheet.initiativeBonus"
-          :min="-INITIATIVE_BONUS_LIMIT"
-          :max="INITIATIVE_BONUS_LIMIT"
-          class="min-h-11 w-full rounded-md border border-border bg-bg-primary px-3 text-xl font-semibold text-primary tabular-nums outline-none focus:border-accent-primary md:min-h-0 md:py-1"
-          @input="onBonusInput"
-        />
-      </label>
+      <NumberField
+        v-model="bonus"
+        label="Misc bonus"
+        class="col-span-2 sm:col-span-1"
+        :min="-INITIATIVE_BONUS_LIMIT"
+        :max="INITIATIVE_BONUS_LIMIT"
+      />
     </div>
 
     <Text size="xs" theme="secondary">

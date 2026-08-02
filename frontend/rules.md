@@ -93,6 +93,8 @@ Rules, stated individually so none of them get skimmed past:
 4. **Every folder has an `index.ts`**, and it is the only thing outsiders may import. Consumers write `@shared/ui/scroll-area` — never `@shared/ui/scroll-area/ScrollArea.vue`, never `@shared/ui/scroll-area/scroll-bar/ScrollBar.vue`.
 5. **Nesting is recursive.** A sub-component with its own sub-component repeats the same shape, one level deeper. There is no special case at any depth.
 6. **No top-level `src/shared/ui/index.ts` barrel.** Don't add one — it defeats code splitting and creates import cycles.
+7. **A segment is not a folder with an `index.ts`.** `ui/`, `model/`, `lib/` and `config/` never get one. The barrels live one level in, on the **group** folder — `lib/format/index.ts`, `config/combat/index.ts`, `model/traits/index.ts` — and that group path is what an importer writes: `@widgets/character-sheet/lib/format`, never `.../lib/format/numbers`. The slice's own root `index.ts` reaches for the component file directly (`export { default as CharacterSheet } from './ui/CharacterSheet.vue'`), because there is no `./ui` to import from.
+8. **Barrels re-export by name.** No `export *` — it hides what a folder publishes, and two files exporting the same name collide silently.
 
 `index.ts` shape — default-import the `.vue`, re-export named, re-export the sub-folder:
 
@@ -197,11 +199,16 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
 
   | want                              | use                                                                                       |
   | --------------------------------- | ----------------------------------------------------------------------------------------- |
+  | text entry                        | `@shared/ui/input` (`v-model`) · `@shared/ui/form-input` (vee-validate `name`)            |
   | two-state toggle                  | `@shared/ui/switch` (`v-model`) · `@shared/ui/form-switch` (vee-validate `name`)          |
   | tick box                          | `@shared/ui/checkbox`                                                                     |
   | number entry, with or without −/+ | `@shared/ui/number-field` — it owns clamping and parsing, so do not write another `clamp` |
   | multi-select chips                | `@shared/ui/toggle-chip-group` — emits the value that changed                             |
   | any button, including icon-only   | `@shared/ui/button` with `is-icon-only` (there is no separate `IconButton`)               |
+
+  **Anything Button already decides, pass as a prop — never as a `class`.** `variant`, `size`, `width`, `align` and `is-unpadded` exist because the thing they set is a plain utility: a consumer's `justify-start` loses to the base `justify-center`, and `px-0` loses to `px-4`, on stylesheet order rather than on the order you wrote them. That failure is silent. `class` is for layout the button does not own — `flex-1`, `shrink-0`, a margin.
+
+  **A control that a form binds and the sheet does not is two components, not one optional `name` prop** — `useField` cannot be called conditionally. The presentational half owns the look and a `v-model`; the `form-*` half wraps it with `useField`, the label, and the error line. `input`/`form-input` and `switch`/`form-switch` are the pattern; `select` and `textarea` are still field-only because nothing outside a form uses them yet. The autosaving sheet has no form, which is why every inline field there is the presentational half.
 
   A control that genuinely has no primitive is a signal to add one, not to hand-roll it in a page slice. `traits-tab/pin-field` was a correct switch trapped where no other tab could import it, so two other tabs each built their own — one of them redrawing the track and thumb from scratch.
 

@@ -16,7 +16,7 @@ import {
   useSheetAutosave,
 } from '@entities/characters';
 
-import type { AttackBody } from '@widgets/character-sheet/config/combat/types';
+import type { AttackBody } from '@widgets/character-sheet/config/combat';
 
 import { AttackDetailDialog } from './attack-detail-dialog';
 import { AttackDialog } from './attack-dialog';
@@ -52,31 +52,31 @@ const isDetailOpen = ref(false);
 const isDeleteOpen = ref(false);
 const selected = ref<Attack | null>(null);
 
-const onInitiativeBonus = (bonus: number) => {
+const handleInitiativeBonus = (bonus: number): void => {
   autosave.patchSheet({ initiativeBonus: bonus });
 };
 
-const openAdd = () => {
+const handleAddClick = (): void => {
   selected.value = null;
   isFormOpen.value = true;
 };
 
-const openDetail = (attack: Attack) => {
+const handleDetail = (attack: Attack): void => {
   selected.value = attack;
   isDetailOpen.value = true;
 };
 
-const openEdit = () => {
+const handleEdit = (): void => {
   isDetailOpen.value = false;
   isFormOpen.value = true;
 };
 
-const openDelete = () => {
+const handleRemove = (): void => {
   isDetailOpen.value = false;
   isDeleteOpen.value = true;
 };
 
-const submitAttack = async (body: AttackBody) => {
+const handleSubmitAttack = async (body: AttackBody): Promise<void> => {
   const editing = selected.value;
 
   try {
@@ -93,7 +93,7 @@ const submitAttack = async (body: AttackBody) => {
   selected.value = null;
 };
 
-const confirmDelete = async () => {
+const handleConfirmDelete = async (): Promise<void> => {
   const target = selected.value;
 
   if (!target) return;
@@ -112,7 +112,7 @@ const confirmDelete = async () => {
  * The pin the quick-access overlay reads. Only the flag is written here — the
  * overlay owns `pinOrder`.
  */
-const togglePin = async (attack: Attack) => {
+const handleTogglePin = async (attack: Attack): Promise<void> => {
   try {
     await attacks.updateRow({
       rowId: attack.id,
@@ -123,7 +123,7 @@ const togglePin = async (attack: Attack) => {
   }
 };
 
-const setAmmo = async (attack: Attack, value: number) => {
+const handleUpdateAmmo = async (attack: Attack, value: number): Promise<void> => {
   try {
     await attacks.updateRow({ rowId: attack.id, patch: { ammoRemaining: value } });
   } catch {
@@ -134,12 +134,16 @@ const setAmmo = async (attack: Attack, value: number) => {
 
 <template>
   <section v-if="sheet" class="flex flex-col gap-4 py-6">
-    <InitiativePanel :sheet="sheet" :items="items" @update:bonus="onInitiativeBonus" />
+    <InitiativePanel
+      :sheet="sheet"
+      :items="items"
+      @update:bonus="handleInitiativeBonus"
+    />
 
     <div class="flex items-center justify-between gap-3">
       <h2 class="text-base font-semibold text-primary">Attacks</h2>
 
-      <Button size="sm" @click="openAdd">
+      <Button size="sm" @click="handleAddClick">
         <Plus :size="16" class="mr-1" aria-hidden="true" />
 
         Add attack
@@ -158,9 +162,9 @@ const setAmmo = async (attack: Attack, value: number) => {
         :sheet="sheet"
         :items="items"
         :is-busy="isWriting"
-        @detail="openDetail(attack)"
-        @toggle-pin="togglePin(attack)"
-        @update-ammo="setAmmo(attack, $event)"
+        @detail="handleDetail"
+        @toggle-pin="handleTogglePin"
+        @update-ammo="handleUpdateAmmo"
       />
     </ul>
 
@@ -170,7 +174,7 @@ const setAmmo = async (attack: Attack, value: number) => {
       :sheet="sheet"
       :items="items"
       :is-saving="isWriting"
-      @submit="submitAttack"
+      @submit="handleSubmitAttack"
     />
 
     <AttackDetailDialog
@@ -178,8 +182,8 @@ const setAmmo = async (attack: Attack, value: number) => {
       :attack="selected"
       :sheet="sheet"
       :items="items"
-      @edit="openEdit"
-      @remove="openDelete"
+      @edit="handleEdit"
+      @remove="handleRemove"
     />
 
     <DialogRoot v-model:open="isDeleteOpen">
@@ -189,7 +193,7 @@ const setAmmo = async (attack: Attack, value: number) => {
         dialog-description="The attack is removed from this sheet. This cannot be undone."
         confirm-button-text="Delete"
         :is-loading="attacks.isDeleting.value"
-        :on-confirm="confirmDelete"
+        :on-confirm="handleConfirmDelete"
       />
     </DialogRoot>
   </section>

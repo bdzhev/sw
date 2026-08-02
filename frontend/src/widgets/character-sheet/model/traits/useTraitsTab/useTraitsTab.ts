@@ -7,12 +7,6 @@ import type { ClassResource, Trait } from '@shared/api/characters';
 
 import { useCharacter, useCharacterCollection } from '@entities/characters';
 
-import {
-  KNOWN_RESOURCE_LABELS,
-  RESET_TRIGGER_LABELS,
-  TRAIT_TAG_LABELS,
-} from '@widgets/character-sheet/config/traits';
-
 import type { ResourceSubmitValues } from '../useResourceForm';
 import type { TraitSubmitValues } from '../useTraitForm';
 import { useTraitsUi } from '../useTraitsUi';
@@ -93,38 +87,6 @@ export const useTraitsTab = () => {
       resources.isDeleting.value
     );
   });
-
-  const resourceLabel = (resource: ClassResource): string => {
-    return KNOWN_RESOURCE_LABELS[resource.resourceKey] ?? resource.resourceKey;
-  };
-
-  const openTraitDetail = (trait: Trait) => {
-    ui.openDetail({
-      title: trait.name,
-      description: trait.description,
-      meta: TRAIT_TAG_LABELS[trait.tag],
-    });
-  };
-
-  const openResourceDetail = (resource: ClassResource) => {
-    ui.openDetail({
-      title: resourceLabel(resource),
-      description: resource.description,
-      meta: `Resets on ${RESET_TRIGGER_LABELS[resource.resetTrigger].toLowerCase()}`,
-    });
-  };
-
-  const askDeleteTrait = (trait: Trait) => {
-    ui.askDelete({ kind: 'trait', rowId: trait.id, name: trait.name });
-  };
-
-  const askDeleteResource = (resource: ClassResource) => {
-    ui.askDelete({
-      kind: 'resource',
-      rowId: resource.id,
-      name: resourceLabel(resource),
-    });
-  };
 
   const confirmDelete = async () => {
     const { kind, rowId } = ui.pendingDelete;
@@ -224,12 +186,6 @@ export const useTraitsTab = () => {
     detail,
     isDeleteOpen,
     pendingDelete,
-    openTraitDialog: ui.openTraitDialog,
-    openResourceDialog: ui.openResourceDialog,
-    openTraitDetail,
-    openResourceDetail,
-    askDeleteTrait,
-    askDeleteResource,
     confirmDelete,
     submitTrait,
     submitResource,

@@ -22,6 +22,7 @@ import type { Component } from 'vue';
 
 import { AttackAbility, AttackDelivery, CharacterStat } from '@shared/api/characters';
 import type { SelectOption } from '@shared/ui/select';
+import type { ToggleChipOption } from '@shared/ui/toggle-chip-group';
 
 import type { AttackPropertyDefinition } from './types';
 
@@ -134,3 +135,10 @@ export const ATTACK_PROPERTIES: AttackPropertyDefinition[] = [
     icon: Grab,
   },
 ];
+
+/** The same list as chips — `ToggleChipGroup` keys on `value`, not `key`. */
+export const ATTACK_PROPERTY_OPTIONS: ToggleChipOption[] = ATTACK_PROPERTIES.map(
+  (property) => {
+    return { value: property.key, label: property.label, icon: property.icon };
+  },
+);

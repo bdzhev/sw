@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Pin } from 'lucide-vue-next';
+
 import { Button } from '@shared/ui/button';
 import {
   DialogBody,
@@ -12,7 +14,8 @@ import {
   DialogRoot,
   DialogTitle,
 } from '@shared/ui/dialog';
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
+import { FormSwitch } from '@shared/ui/form-switch';
 import { Select } from '@shared/ui/select';
 import { Textarea } from '@shared/ui/textarea';
 
@@ -20,9 +23,8 @@ import { TRAIT_TAG_OPTIONS } from '@widgets/character-sheet/config/traits';
 import {
   useTraitForm,
   type TraitSubmitValues,
-} from '@widgets/character-sheet/model/traits/useTraitForm';
+} from '@widgets/character-sheet/model/traits';
 
-import { PinField } from '../pin-field';
 import type { TraitDialogProps } from './TraitDialog.types';
 
 const props = withDefaults(defineProps<TraitDialogProps>(), { isSaving: false });
@@ -43,17 +45,14 @@ const { title, handleSubmit } = useTraitForm({
     emit('submit', values);
   },
 });
+
+const handleOpenChange = (isOpen: boolean): void => {
+  emit('update:open', isOpen);
+};
 </script>
 
 <template>
-  <DialogRoot
-    :open="props.open"
-    @update:open="
-      (isOpen) => {
-        return emit('update:open', isOpen);
-      }
-    "
-  >
+  <DialogRoot :open="props.open" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay />
 
@@ -70,7 +69,7 @@ const { title, handleSubmit } = useTraitForm({
 
           <DialogBody>
             <div class="flex flex-col gap-2">
-              <Input name="name" placeholder="Trait name" />
+              <FormInput name="name" placeholder="Trait name" />
 
               <Select
                 name="tag"
@@ -85,7 +84,11 @@ const { title, handleSubmit } = useTraitForm({
                 placeholder="Whatever you need to remember, in your own words."
               />
 
-              <PinField name="quickReference" />
+              <FormSwitch name="quickReference" label="Pin to quick reference">
+                <template #icon>
+                  <Pin :size="16" aria-hidden="true" />
+                </template>
+              </FormSwitch>
             </div>
           </DialogBody>
 

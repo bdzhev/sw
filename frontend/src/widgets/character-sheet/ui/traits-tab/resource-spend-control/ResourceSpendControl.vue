@@ -4,7 +4,7 @@ import { ref } from 'vue';
 
 import { Button } from '@shared/ui/button';
 
-import { useResourceMeta } from '@widgets/character-sheet/model/traits/useResourceMeta';
+import { useResourceMeta } from '@widgets/character-sheet/model/traits';
 
 import type { ResourceSpendControlProps } from './ResourceSpendControl.types';
 import { SpendDialog } from './spend-dialog';

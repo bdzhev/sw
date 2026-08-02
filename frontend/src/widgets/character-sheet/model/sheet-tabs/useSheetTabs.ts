@@ -1,9 +1,13 @@
-import { computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, type ComputedRef } from 'vue';
+import { useRoute } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
 
-import { SheetTab, type SheetTabDefinition } from './useSheetTabs.types';
+import {
+  SheetTab,
+  type SheetTabDefinition,
+  type SheetTabLink,
+} from './useSheetTabs.types';
 
 export const SHEET_TABS: readonly SheetTabDefinition[] = [
   { id: SheetTab.MAIN, label: 'Main' },
@@ -19,15 +23,22 @@ const isSheetTab = (value: string): value is SheetTab => {
   });
 };
 
+interface UseSheetTabs {
+  activeTab: ComputedRef<SheetTab>;
+  tabs: ComputedRef<SheetTabLink[]>;
+}
+
 /**
  * Tab state lives in the route, not in a ref: the sheet has to survive the
  * mid-combat refresh the save strategy is built around, the back button has to
  * work, and a tab has to be linkable. An unknown or missing `:tab` falls back
  * to main rather than rendering nothing.
+ *
+ * Each tab carries its own target, so the nav is `RouterLink`s rather than
+ * buttons that ask the router to do what a link already does.
  */
-export const useSheetTabs = (characterId: string) => {
+export const useSheetTabs = (characterId: string): UseSheetTabs => {
   const route = useRoute();
-  const router = useRouter();
 
   const activeTab = computed<SheetTab>(() => {
     const raw = route.params.tab;
@@ -36,14 +47,17 @@ export const useSheetTabs = (characterId: string) => {
     return value && isSheetTab(value) ? value : SheetTab.MAIN;
   });
 
-  const selectTab = (tab: SheetTab) => {
-    if (tab === activeTab.value) return;
-
-    void router.replace({
-      name: RouteName.APP_CHARACTER,
-      params: { id: characterId, tab },
+  const tabs = computed<SheetTabLink[]>(() => {
+    return SHEET_TABS.map((tab) => {
+      return {
+        ...tab,
+        to: {
+          name: RouteName.APP_CHARACTER,
+          params: { id: characterId, tab: tab.id },
+        },
+      };
     });
-  };
+  });
 
-  return { activeTab, selectTab, tabs: SHEET_TABS };
+  return { activeTab, tabs };
 };

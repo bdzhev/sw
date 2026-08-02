@@ -27,7 +27,7 @@ const totals = computed(() => {
 });
 
 /** Typing a score is a repeated edit, so it rides the debounce. */
-const onScore = (field: AbilitySheetField, score: number) => {
+const handleScoreChange = (field: AbilitySheetField, score: number): void => {
   const patch: Partial<Record<AbilitySheetField, number>> = { [field]: score };
 
   emit('patch', patch);
@@ -44,12 +44,11 @@ const onScore = (field: AbilitySheetField, score: number) => {
       <AbilityScore
         v-for="ability in ABILITIES"
         :key="ability.stat"
-        :abbr="ability.abbr"
-        :name="ability.name"
+        :ability="ability"
         :score="raw[ability.stat]"
         :total="totals[ability.stat]"
         :modifier="abilityModifier(totals[ability.stat])"
-        @update:score="onScore(ability.field, $event)"
+        @change="handleScoreChange"
       />
     </div>
   </section>

@@ -16,17 +16,14 @@ import type { DetailDialogProps } from './DetailDialog.types';
 const props = defineProps<DetailDialogProps>();
 
 const emit = defineEmits<{ 'update:open': [open: boolean] }>();
+
+const handleOpenChange = (isOpen: boolean): void => {
+  emit('update:open', isOpen);
+};
 </script>
 
 <template>
-  <DialogRoot
-    :open="props.open"
-    @update:open="
-      (isOpen) => {
-        return emit('update:open', isOpen);
-      }
-    "
-  >
+  <DialogRoot :open="props.open" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay />
 

@@ -1,4 +1,9 @@
-import type { ButtonSize, ButtonVariant, ButtonWidth } from './Button.types';
+import type { ButtonAlign, ButtonSize, ButtonVariant, ButtonWidth } from './Button.types';
+
+export const alignClasses: Record<ButtonAlign, string> = {
+  center: 'justify-center',
+  start: 'justify-start',
+};
 
 export const textClasses: Record<ButtonSize, string> = {
   xs: 'text-xs',

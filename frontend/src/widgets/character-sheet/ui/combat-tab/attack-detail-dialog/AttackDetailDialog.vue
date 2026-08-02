@@ -22,14 +22,14 @@ import {
   ATTACK_PROPERTIES,
   DELIVERY_LABELS,
   STAT_LABELS,
-} from '@widgets/character-sheet/config/combat/constants';
+} from '@widgets/character-sheet/config/combat';
 import {
   attackBreakdown,
   attackTotals,
   formatDamage,
-  formatSigned,
   tracksAmmo,
-} from '@widgets/character-sheet/lib/combat/attack-math';
+} from '@widgets/character-sheet/lib/combat';
+import { formatSigned } from '@widgets/character-sheet/lib/format';
 
 import type { AttackDetailDialogProps } from './AttackDetailDialog.types';
 
@@ -88,17 +88,22 @@ const propertyDetails = computed(() => {
     };
   });
 });
+
+const handleOpenChange = (next: boolean): void => {
+  emit('update:open', next);
+};
+
+const handleEditClick = (): void => {
+  emit('edit');
+};
+
+const handleRemoveClick = (): void => {
+  emit('remove');
+};
 </script>
 
 <template>
-  <DialogRoot
-    :open="props.open"
-    @update:open="
-      (next) => {
-        return emit('update:open', next);
-      }
-    "
-  >
+  <DialogRoot :open="props.open" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay />
 
@@ -209,13 +214,13 @@ const propertyDetails = computed(() => {
 
         <DialogFooter>
           <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <Button variant="danger" width="fullOnMobile" @click="emit('remove')">
+            <Button variant="danger" width="fullOnMobile" @click="handleRemoveClick">
               <Trash2 :size="16" class="mr-1" aria-hidden="true" />
 
               Delete
             </Button>
 
-            <Button width="fullOnMobile" @click="emit('edit')">
+            <Button width="fullOnMobile" @click="handleEditClick">
               <Pencil :size="16" class="mr-1" aria-hidden="true" />
 
               Edit

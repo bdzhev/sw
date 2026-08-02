@@ -1,4 +1,4 @@
-import Input from './BaseInput.vue';
-export type { InputProps } from './BaseInput.props';
+import Input from './Input.vue';
 
 export { Input };
+export type { InputProps } from './Input.types';

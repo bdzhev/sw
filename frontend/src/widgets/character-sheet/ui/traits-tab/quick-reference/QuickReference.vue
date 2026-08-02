@@ -12,13 +12,7 @@ import type { QuickReferenceProps } from './QuickReference.types';
 const props = withDefaults(defineProps<QuickReferenceProps>(), { isSaving: false });
 
 const emit = defineEmits<{
-  traitInfo: [trait: Trait];
-  traitEdit: [trait: Trait];
-  traitRemove: [trait: Trait];
   traitTogglePin: [trait: Trait];
-  resourceInfo: [resource: ClassResource];
-  resourceEdit: [resource: ClassResource];
-  resourceRemove: [resource: ClassResource];
   resourceTogglePin: [resource: ClassResource];
   spend: [resource: ClassResource, amount: number];
 }>();
@@ -26,6 +20,18 @@ const emit = defineEmits<{
 const isEmpty = computed(() => {
   return props.traits.length === 0 && props.resources.length === 0;
 });
+
+const handleTraitTogglePin = (trait: Trait): void => {
+  emit('traitTogglePin', trait);
+};
+
+const handleResourceTogglePin = (resource: ClassResource): void => {
+  emit('resourceTogglePin', resource);
+};
+
+const handleSpend = (resource: ClassResource, amount: number): void => {
+  emit('spend', resource, amount);
+};
 </script>
 
 <template>
@@ -48,15 +54,8 @@ const isEmpty = computed(() => {
         :key="resource.id"
         :resource="resource"
         :is-saving="props.isSaving"
-        @info="emit('resourceInfo', resource)"
-        @edit="emit('resourceEdit', resource)"
-        @remove="emit('resourceRemove', resource)"
-        @toggle-pin="emit('resourceTogglePin', resource)"
-        @spend="
-          (amount) => {
-            return emit('spend', resource, amount);
-          }
-        "
+        @toggle-pin="handleResourceTogglePin"
+        @spend="handleSpend"
       />
 
       <TraitRow
@@ -64,10 +63,7 @@ const isEmpty = computed(() => {
         :key="trait.id"
         :trait="trait"
         :is-saving="props.isSaving"
-        @info="emit('traitInfo', trait)"
-        @edit="emit('traitEdit', trait)"
-        @remove="emit('traitRemove', trait)"
-        @toggle-pin="emit('traitTogglePin', trait)"
+        @toggle-pin="handleTraitTogglePin"
       />
     </ul>
   </section>

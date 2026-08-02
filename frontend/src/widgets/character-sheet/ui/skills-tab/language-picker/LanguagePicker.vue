@@ -1,20 +1,21 @@
 <script setup lang="ts">
+import { Label } from 'reka-ui';
 import { computed, ref, watch } from 'vue';
 
 import type { Languages } from '@shared/api/characters';
+import { Input } from '@shared/ui/input';
 import { Text } from '@shared/ui/text';
+import { ToggleChipGroup } from '@shared/ui/toggle-chip-group';
 
-import { STANDARD_LANGUAGES } from '@entities/characters';
+import { STANDARD_LANGUAGE_OPTIONS } from '@widgets/character-sheet/config/skills';
 
 import type { LanguagePickerProps } from './LanguagePicker.types';
+
+const OTHER_INPUT_ID = 'languages-other';
 
 const props = defineProps<LanguagePickerProps>();
 
 const emit = defineEmits<{ update: [languages: Languages, immediate?: boolean] }>();
-
-const selected = computed(() => {
-  return new Set(props.languages.standard);
-});
 
 const otherDraft = ref(props.languages.other);
 const isEditingOther = ref(false);
@@ -30,23 +31,27 @@ watch(
   },
 );
 
-const toggleLanguage = (language: string) => {
-  const next = props.languages.standard.filter((entry) => {
-    return entry !== language;
-  });
+/** Picking a language is a single-shot edit, so it skips the debounce. */
+const standard = computed({
+  get: (): string[] => {
+    return [...props.languages.standard];
+  },
+  set: (value: string[]): void => {
+    emit('update', { standard: value, other: otherDraft.value }, true);
+  },
+});
 
-  if (next.length === props.languages.standard.length) next.push(language);
-
-  emit('update', { standard: next, other: otherDraft.value }, true);
+const handleOtherFocus = (): void => {
+  isEditingOther.value = true;
 };
 
-const onOtherInput = (event: Event) => {
-  otherDraft.value = (event.target as HTMLInputElement).value;
+const handleOtherInput = (value: string | number): void => {
+  otherDraft.value = String(value);
 
   emit('update', { standard: [...props.languages.standard], other: otherDraft.value });
 };
 
-const onOtherBlur = () => {
+const handleOtherBlur = (): void => {
   isEditingOther.value = false;
 
   if (otherDraft.value === props.languages.other) return;
@@ -65,42 +70,24 @@ const onOtherBlur = () => {
   >
     <h2 class="text-sm font-semibold text-primary">Languages</h2>
 
-    <fieldset class="flex flex-col gap-2">
-      <legend class="sr-only">Standard languages</legend>
-
-      <div class="flex flex-wrap gap-2">
-        <button
-          v-for="language in STANDARD_LANGUAGES"
-          :key="language"
-          type="button"
-          :aria-pressed="selected.has(language)"
-          class="min-h-11 rounded-full border px-3 text-sm transition-colors md:min-h-9"
-          :class="
-            selected.has(language)
-              ? 'border-accent-primary bg-accent-primary/15 text-primary'
-              : 'border-border text-secondary hover:text-primary'
-          "
-          @click="toggleLanguage(language)"
-        >
-          {{ language }}
-        </button>
-      </div>
-    </fieldset>
+    <ToggleChipGroup
+      v-model="standard"
+      :options="STANDARD_LANGUAGE_OPTIONS"
+      legend="Standard languages"
+    />
 
     <div class="flex flex-col gap-1">
-      <label for="languages-other" class="text-xs text-secondary uppercase">
+      <Label :for="OTHER_INPUT_ID" class="text-xs text-secondary uppercase">
         Other languages
-      </label>
+      </Label>
 
-      <input
-        id="languages-other"
-        type="text"
-        :value="otherDraft"
+      <Input
+        :id="OTHER_INPUT_ID"
+        :model-value="otherDraft"
         placeholder="Thieves' cant, homebrew tongues…"
-        class="w-full rounded-md border border-border bg-bg-primary px-3 py-2 text-base text-primary outline-none placeholder:text-secondary focus:border-accent-primary md:text-sm"
-        @focus="isEditingOther = true"
-        @input="onOtherInput"
-        @blur="onOtherBlur"
+        @update:model-value="handleOtherInput"
+        @focus="handleOtherFocus"
+        @blur="handleOtherBlur"
       />
 
       <Text size="xs" theme="secondary">Free text — anything not on the list above.</Text>

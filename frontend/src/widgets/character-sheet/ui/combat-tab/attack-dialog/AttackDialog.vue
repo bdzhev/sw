@@ -14,29 +14,31 @@ import {
   DialogRoot,
   DialogTitle,
 } from '@shared/ui/dialog';
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
+import { FormSwitch } from '@shared/ui/form-switch';
 import { Select } from '@shared/ui/select';
 import { Text } from '@shared/ui/text';
+import { ToggleChipGroup } from '@shared/ui/toggle-chip-group';
 
 import {
   ABILITY_OPTIONS,
-  ATTACK_PROPERTIES,
+  ATTACK_PROPERTY_OPTIONS,
   DAMAGE_TYPE_OPTIONS,
   DELIVERY_OPTIONS,
-} from '@widgets/character-sheet/config/combat/constants';
+} from '@widgets/character-sheet/config/combat';
 import type {
   AttackBody,
   AttackFormValues,
-} from '@widgets/character-sheet/config/combat/types';
+} from '@widgets/character-sheet/config/combat';
 import {
   attackBreakdown,
   attackTotals,
   formatDamage,
-  formatSigned,
   parseBonus,
   tracksAmmo,
-} from '@widgets/character-sheet/lib/combat/attack-math';
-import { attackFormSchema } from '@widgets/character-sheet/model/combat/attackForm.schema';
+} from '@widgets/character-sheet/lib/combat';
+import { formatSigned } from '@widgets/character-sheet/lib/format';
+import { attackFormSchema } from '@widgets/character-sheet/model/combat';
 
 import { AttackField } from './attack-field';
 import type { AttackDialogProps } from './AttackDialog.types';
@@ -111,26 +113,19 @@ const canSubmit = computed(() => {
   return meta.value.valid && Boolean(values.name?.trim());
 });
 
-const isPropertyOn = (key: string): boolean => {
-  return (values.properties ?? []).includes(key);
-};
+const proficientLabel = computed(() => {
+  return isProficient.value ? 'Proficient' : 'Not proficient';
+});
 
-const toggleProperty = (key: string) => {
-  const current = values.properties ?? [];
-
-  form.setFieldValue(
-    'properties',
-    isPropertyOn(key)
-      ? current.filter((entry) => {
-          return entry !== key;
-        })
-      : [...current, key],
-  );
-};
-
-const toggleProficient = () => {
-  form.setFieldValue('proficient', !values.proficient);
-};
+/** The chips write straight into the vee-validate field the form submits. */
+const properties = computed({
+  get: (): string[] => {
+    return [...(values.properties ?? [])];
+  },
+  set: (value: string[]): void => {
+    form.setFieldValue('properties', value);
+  },
+});
 
 const submitAttack = form.handleSubmit((values) => {
   const ammo = values.ammoRemaining === '' ? null : Number(values.ammoRemaining);
@@ -148,20 +143,21 @@ const submitAttack = form.handleSubmit((values) => {
   });
 });
 
-const onSubmit = (event?: Event) => {
+const handleSubmit = (event?: Event): void => {
   void submitAttack(event);
+};
+
+const handleOpenChange = (next: boolean): void => {
+  emit('update:open', next);
+};
+
+const handleCancelClick = (): void => {
+  emit('update:open', false);
 };
 </script>
 
 <template>
-  <DialogRoot
-    :open="props.open"
-    @update:open="
-      (next) => {
-        return emit('update:open', next);
-      }
-    "
-  >
+  <DialogRoot :open="props.open" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay />
 
@@ -173,11 +169,11 @@ const onSubmit = (event?: Event) => {
           <DialogTitle>{{ props.attack ? 'Edit attack' : 'Add attack' }}</DialogTitle>
         </DialogHeader>
 
-        <form class="flex min-h-0 flex-col" @submit.prevent="onSubmit">
+        <form class="flex min-h-0 flex-col" @submit.prevent="handleSubmit">
           <DialogBody>
             <div class="flex flex-col">
               <AttackField label="Name">
-                <Input name="name" placeholder="Longsword, claws, unarmed strike…" />
+                <FormInput name="name" placeholder="Longsword, claws, unarmed strike…" />
               </AttackField>
 
               <AttackField label="Ability">
@@ -196,31 +192,11 @@ const onSubmit = (event?: Event) => {
               <div class="flex flex-col gap-1 pb-6">
                 <span class="text-xs text-secondary uppercase">Proficient</span>
 
-                <button
-                  type="button"
-                  role="switch"
-                  :aria-checked="isProficient"
-                  class="flex min-h-11 w-fit cursor-pointer items-center gap-2 md:min-h-0"
-                  @click="toggleProficient"
-                >
-                  <span
-                    class="flex h-6 w-11 shrink-0 items-center rounded-full transition-all"
-                    :class="isProficient ? 'bg-accent-primary' : 'bg-fg'"
-                  >
-                    <span
-                      class="ml-1 block h-4 w-4 rounded-full bg-primary transition-all"
-                      :class="{ 'translate-x-5': isProficient }"
-                    />
-                  </span>
-
-                  <span class="text-sm text-primary">
-                    {{ isProficient ? 'Proficient' : 'Not proficient' }}
-                  </span>
-                </button>
+                <FormSwitch name="proficient" :label="proficientLabel" />
               </div>
 
               <AttackField label="Damage dice">
-                <Input name="damageDice" placeholder="1d8" />
+                <FormInput name="damageDice" placeholder="1d8" />
               </AttackField>
 
               <AttackField label="Damage type">
@@ -233,7 +209,7 @@ const onSubmit = (event?: Event) => {
               </AttackField>
 
               <AttackField label="Additional bonus">
-                <Input
+                <FormInput
                   name="additionalBonus"
                   type="number"
                   placeholder="Magic weapon bonus, etc."
@@ -269,31 +245,17 @@ const onSubmit = (event?: Event) => {
               </div>
 
               <AttackField v-if="showsAmmo" label="Ammo remaining">
-                <Input name="ammoRemaining" type="number" placeholder="0" />
+                <FormInput name="ammoRemaining" type="number" placeholder="0" />
               </AttackField>
 
               <div class="flex flex-col gap-2 pb-2">
                 <span class="text-xs text-secondary uppercase">Properties</span>
 
-                <div class="flex flex-wrap gap-2">
-                  <button
-                    v-for="property in ATTACK_PROPERTIES"
-                    :key="property.key"
-                    type="button"
-                    :aria-pressed="isPropertyOn(property.key)"
-                    class="flex min-h-11 cursor-pointer items-center gap-1 rounded-full border px-3 text-sm md:min-h-0 md:py-1"
-                    :class="
-                      isPropertyOn(property.key)
-                        ? 'border-accent-primary bg-accent-primary/15 text-primary'
-                        : 'border-border text-secondary'
-                    "
-                    @click="toggleProperty(property.key)"
-                  >
-                    <component :is="property.icon" :size="14" aria-hidden="true" />
-
-                    {{ property.label }}
-                  </button>
-                </div>
+                <ToggleChipGroup
+                  v-model="properties"
+                  :options="ATTACK_PROPERTY_OPTIONS"
+                  legend="Attack properties"
+                />
               </div>
             </div>
           </DialogBody>
@@ -305,7 +267,7 @@ const onSubmit = (event?: Event) => {
                 variant="secondary"
                 width="fullOnMobile"
                 :is-disabled="props.isSaving"
-                @click="emit('update:open', false)"
+                @click="handleCancelClick"
               >
                 Cancel
               </Button>

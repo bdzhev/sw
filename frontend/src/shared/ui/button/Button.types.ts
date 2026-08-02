@@ -18,6 +18,8 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
  */
 export type ButtonWidth = 'fit' | 'full' | 'fullOnMobile';
 
+export type ButtonAlign = 'center' | 'start';
+
 export interface ButtonProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -34,6 +36,14 @@ export interface ButtonProps {
    * An icon-only button has no text, so it needs an `aria-label` — pass one.
    */
   isIconOnly?: boolean;
+  /**
+   * Content alignment. Both of these live here rather than in a consumer
+   * `class` because `justify-center` and the padding scale are plain utilities
+   * — a consumer's `justify-start` or `px-0` loses on stylesheet order, silently.
+   */
+  align?: ButtonAlign;
+  /** Drop the padding entirely — for a button that is a whole row of content. */
+  isUnpadded?: boolean;
   type?: 'submit' | 'button' | 'reset';
   /**
    * Render as something else — `as="a"`, or `:as="RouterLink"` for a

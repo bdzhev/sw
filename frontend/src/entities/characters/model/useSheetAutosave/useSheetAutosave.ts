@@ -84,6 +84,28 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
     );
   };
 
+  /**
+   * Echo the edit into the cache the moment it is queued. The cached sheet *is*
+   * the working copy every field renders from, so without this a controlled
+   * input re-reads the pre-edit server value on blur and appears to throw away
+   * what was typed until the ack lands up to `DEBOUNCE_MS` later.
+   *
+   * `lastWriteSeq` is deliberately not touched: the server owns it, and the
+   * localStorage buffer records it as the base for its staleness check.
+   */
+  const applyOptimistically = (patch: TargetPatch) => {
+    if (!characterId.value) {
+      return;
+    }
+
+    qc.setQueryData(
+      characterQueries.character(characterId.value),
+      (old: CharacterDetail | undefined) => {
+        return old ? { ...old, sheet: { ...old.sheet, ...patch } } : old;
+      },
+    );
+  };
+
   const clearBuffer = () => {
     if (!characterId.value) {
       return;
@@ -240,6 +262,7 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
       ...pending.value,
       character: { ...pending.value.character, ...patch },
     };
+    applyOptimistically(patch);
     writeBuffer();
 
     if (immediate) {

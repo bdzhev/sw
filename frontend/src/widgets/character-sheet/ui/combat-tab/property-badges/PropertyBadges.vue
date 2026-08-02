@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { ATTACK_PROPERTIES } from '@widgets/character-sheet/config/combat/constants';
+import { ATTACK_PROPERTIES } from '@widgets/character-sheet/config/combat';
 
 import type { PropertyBadgesProps } from './PropertyBadges.types';
 

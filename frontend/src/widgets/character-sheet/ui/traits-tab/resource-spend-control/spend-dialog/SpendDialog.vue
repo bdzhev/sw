@@ -11,10 +11,11 @@ import {
   DialogRoot,
   DialogTitle,
 } from '@shared/ui/dialog';
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
 import { Text } from '@shared/ui/text';
 
-import { useResourceSpend } from '@widgets/character-sheet/model/traits/useResourceSpend';
+import type { ResourceSubAbility } from '@widgets/character-sheet/config/traits';
+import { useResourceSpend } from '@widgets/character-sheet/model/traits';
 
 import type { SpendDialogProps } from './SpendDialog.types';
 import { SubAbilityOption } from './sub-ability-option';
@@ -53,17 +54,22 @@ const {
     emit('update:open', false);
   },
 });
+
+const handleOpenChange = (isOpen: boolean): void => {
+  emit('update:open', isOpen);
+};
+
+const handleSelectAbility = (ability: ResourceSubAbility): void => {
+  selectAbility(ability);
+};
+
+const handleUseOneClick = (): void => {
+  spend(FLAT_COST);
+};
 </script>
 
 <template>
-  <DialogRoot
-    :open="props.open"
-    @update:open="
-      (isOpen) => {
-        return emit('update:open', isOpen);
-      }
-    "
-  >
+  <DialogRoot :open="props.open" @update:open="handleOpenChange">
     <DialogPortal>
       <DialogOverlay />
 
@@ -91,7 +97,7 @@ const {
               :ability="ability"
               :is-selected="selectedAbilityName === ability.name"
               :is-disabled="props.isSaving || isAbilityDisabled(ability)"
-              @select="selectAbility(ability)"
+              @select="handleSelectAbility"
             />
           </ul>
 
@@ -100,7 +106,7 @@ const {
 
             <div class="flex items-start gap-2">
               <div class="min-w-0 flex-1">
-                <Input name="amount" type="number" placeholder="0" />
+                <FormInput name="amount" type="number" placeholder="0" />
               </div>
 
               <Button
@@ -120,7 +126,7 @@ const {
             width="full"
             class="min-h-11"
             :is-disabled="isExhausted || props.isSaving"
-            @click="spend(FLAT_COST)"
+            @click="handleUseOneClick"
           >
             Use one
           </Button>

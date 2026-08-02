@@ -28,7 +28,7 @@ const items = computed(() => {
   return character.value?.inventoryItems ?? [];
 });
 
-const onPatch = (patch: SheetPatch, immediate = false) => {
+const handlePatch = (patch: SheetPatch, immediate = false) => {
   autosave.patchSheet(patch, immediate);
 };
 </script>
@@ -37,18 +37,18 @@ const onPatch = (patch: SheetPatch, immediate = false) => {
   <Skeleton v-if="!sheet || !character" class="h-96 w-full rounded-lg" />
 
   <div v-else class="flex flex-col gap-4">
-    <AbilityScores :sheet="sheet" :items="items" @patch="onPatch" />
+    <AbilityScores :sheet="sheet" :items="items" @patch="handlePatch" />
 
-    <SavingThrows :sheet="sheet" :items="items" @patch="onPatch" />
+    <SavingThrows :sheet="sheet" :items="items" @patch="handlePatch" />
 
     <div class="grid gap-4 md:grid-cols-2">
       <HitDice
         :sheet="sheet"
         :character-class="character.character.characterClass"
-        @patch="onPatch"
+        @patch="handlePatch"
       />
 
-      <Inspiration :inspiration="sheet.inspiration" @patch="onPatch" />
+      <Inspiration :inspiration="sheet.inspiration" @patch="handlePatch" />
     </div>
 
     <SheetActions />

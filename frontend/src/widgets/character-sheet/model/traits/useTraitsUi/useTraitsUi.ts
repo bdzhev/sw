@@ -3,6 +3,12 @@ import { ref } from 'vue';
 
 import type { ClassResource, Trait } from '@shared/api/characters';
 
+import {
+  RESET_TRIGGER_LABELS,
+  TRAIT_TAG_LABELS,
+} from '@widgets/character-sheet/config/traits';
+import { resourceLabel } from '@widgets/character-sheet/lib/traits';
+
 import type { DetailPayload, PendingDelete } from './useTraitsUi.types';
 
 /**
@@ -58,9 +64,38 @@ export const useTraitsUi = defineStore('traitsUi', () => {
     isDetailOpen.value = true;
   };
 
+  /**
+   * The per-kind openers live here rather than in `useTraitsTab` so a row can
+   * call them without four layers of `emit` forwarding. They read config only —
+   * no server state — which is what keeps them out of the data half.
+   */
+  const openTraitDetail = (trait: Trait) => {
+    openDetail({
+      title: trait.name,
+      description: trait.description,
+      meta: TRAIT_TAG_LABELS[trait.tag],
+    });
+  };
+
+  const openResourceDetail = (resource: ClassResource) => {
+    openDetail({
+      title: resourceLabel(resource),
+      description: resource.description,
+      meta: `Resets on ${RESET_TRIGGER_LABELS[resource.resetTrigger].toLowerCase()}`,
+    });
+  };
+
   const askDelete = (target: PendingDelete) => {
     pendingDelete.value = target;
     isDeleteOpen.value = true;
+  };
+
+  const askDeleteTrait = (trait: Trait) => {
+    askDelete({ kind: 'trait', rowId: trait.id, name: trait.name });
+  };
+
+  const askDeleteResource = (resource: ClassResource) => {
+    askDelete({ kind: 'resource', rowId: resource.id, name: resourceLabel(resource) });
   };
 
   const closeDelete = () => {
@@ -81,7 +116,11 @@ export const useTraitsUi = defineStore('traitsUi', () => {
     closeTraitDialog,
     closeResourceDialog,
     openDetail,
+    openTraitDetail,
+    openResourceDetail,
     askDelete,
+    askDeleteTrait,
+    askDeleteResource,
     closeDelete,
   };
 });

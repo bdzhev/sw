@@ -5,6 +5,10 @@ import type { SkillGroupProps } from './SkillGroup.types';
 const props = defineProps<SkillGroupProps>();
 
 const emit = defineEmits<{ cycle: [skillKey: string] }>();
+
+const handleCycle = (skillKey: string): void => {
+  emit('cycle', skillKey);
+};
 </script>
 
 <template>
@@ -23,7 +27,7 @@ const emit = defineEmits<{ cycle: [skillKey: string] }>();
       v-for="skill in props.group.skills"
       :key="skill.key"
       :skill="skill"
-      @cycle="emit('cycle', $event)"
+      @cycle="handleCycle"
     />
   </tbody>
 </template>

@@ -2,7 +2,7 @@
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
 
-import { useTraitsTab } from '@widgets/character-sheet/model/traits/useTraitsTab';
+import { useTraitsTab } from '@widgets/character-sheet/model/traits';
 
 import { DetailDialog } from './detail-dialog';
 import { QuickReference } from './quick-reference';
@@ -11,6 +11,10 @@ import { ResourcesList } from './resources-list';
 import { TraitDialog } from './trait-dialog';
 import { TraitsList } from './traits-list';
 
+/**
+ * Only writes are wired from here. Which dialog is open — and about what — is
+ * the rows' business with `useTraitsUi`, so those events do not travel.
+ */
 const {
   pinnedTraits,
   pinnedResources,
@@ -26,18 +30,12 @@ const {
   detail,
   isDeleteOpen,
   pendingDelete,
-  openTraitDialog,
-  openResourceDialog,
-  openTraitDetail,
-  openResourceDetail,
-  askDeleteTrait,
-  askDeleteResource,
   confirmDelete,
-  submitTrait,
-  submitResource,
-  toggleTraitPin,
-  toggleResourcePin,
-  spendResource,
+  submitTrait: handleSubmitTrait,
+  submitResource: handleSubmitResource,
+  toggleTraitPin: handleTraitTogglePin,
+  toggleResourcePin: handleResourceTogglePin,
+  spendResource: handleSpend,
 } = useTraitsTab();
 </script>
 
@@ -47,50 +45,36 @@ const {
       :traits="pinnedTraits"
       :resources="pinnedResources"
       :is-saving="isSavingTrait || isSavingResource"
-      @trait-info="openTraitDetail"
-      @trait-edit="openTraitDialog"
-      @trait-remove="askDeleteTrait"
-      @trait-toggle-pin="toggleTraitPin"
-      @resource-info="openResourceDetail"
-      @resource-edit="openResourceDialog"
-      @resource-remove="askDeleteResource"
-      @resource-toggle-pin="toggleResourcePin"
-      @spend="spendResource"
+      @trait-toggle-pin="handleTraitTogglePin"
+      @resource-toggle-pin="handleResourceTogglePin"
+      @spend="handleSpend"
     />
 
     <TraitsList
       :traits="listedTraits"
       :is-saving="isSavingTrait"
-      @add="openTraitDialog(null)"
-      @info="openTraitDetail"
-      @edit="openTraitDialog"
-      @remove="askDeleteTrait"
-      @toggle-pin="toggleTraitPin"
+      @toggle-pin="handleTraitTogglePin"
     />
 
     <ResourcesList
       :resources="listedResources"
       :is-saving="isSavingResource"
-      @add="openResourceDialog(null)"
-      @info="openResourceDetail"
-      @edit="openResourceDialog"
-      @remove="askDeleteResource"
-      @toggle-pin="toggleResourcePin"
-      @spend="spendResource"
+      @toggle-pin="handleResourceTogglePin"
+      @spend="handleSpend"
     />
 
     <TraitDialog
       v-model:open="isTraitDialogOpen"
       :trait="editedTrait"
       :is-saving="isSavingTrait"
-      @submit="submitTrait"
+      @submit="handleSubmitTrait"
     />
 
     <ResourceDialog
       v-model:open="isResourceDialogOpen"
       :resource="editedResource"
       :is-saving="isSavingResource"
-      @submit="submitResource"
+      @submit="handleSubmitResource"
     />
 
     <DetailDialog

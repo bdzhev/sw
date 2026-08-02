@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
 
 import type { CfInputProps } from './CfInput.props';
 
@@ -7,5 +7,5 @@ const props = defineProps<CfInputProps>();
 </script>
 
 <template>
-  <Input :name="props.name" />
+  <FormInput :name="props.name" />
 </template>

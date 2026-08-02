@@ -1,27 +1,55 @@
 <script setup lang="ts">
 import { Info, Pencil, Pin, PinOff, Trash2 } from 'lucide-vue-next';
+import { computed } from 'vue';
 
+import type { ClassResource } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import { Text } from '@shared/ui/text';
 
-import { useResourceMeta } from '@widgets/character-sheet/model/traits/useResourceMeta';
+import { useResourceMeta, useTraitsUi } from '@widgets/character-sheet/model/traits';
 
 import { ResourceSpendControl } from '../resource-spend-control';
 import type { ResourceRowProps } from './ResourceRow.types';
 
 const props = withDefaults(defineProps<ResourceRowProps>(), { isSaving: false });
 
+/** Writes leave the row; dialogs are opened on the store directly. */
 const emit = defineEmits<{
-  info: [];
-  edit: [];
-  remove: [];
-  togglePin: [];
-  spend: [amount: number];
+  togglePin: [resource: ClassResource];
+  spend: [resource: ClassResource, amount: number];
 }>();
+
+const ui = useTraitsUi();
 
 const { label, pool, resetLabel, isMaxUnknown } = useResourceMeta(() => {
   return props.resource;
 });
+
+const pinLabel = computed(() => {
+  return props.resource.quickReference
+    ? 'Unpin from quick reference'
+    : 'Pin to quick reference';
+});
+
+const handleInfoClick = (): void => {
+  ui.openResourceDetail(props.resource);
+};
+
+const handleEditClick = (): void => {
+  ui.openResourceDialog(props.resource);
+};
+
+const handleRemoveClick = (): void => {
+  ui.askDeleteResource(props.resource);
+};
+
+const handleTogglePinClick = (): void => {
+  emit('togglePin', props.resource);
+};
+
+const handleSpend = (amount: number): void => {
+  emit('spend', props.resource, amount);
+};
 </script>
 
 <template>
@@ -49,7 +77,7 @@ const { label, pool, resetLabel, isMaxUnknown } = useResourceMeta(() => {
           variant="neutral"
           is-icon-only
           aria-label="View description"
-          @click="emit('info')"
+          @click="handleInfoClick"
         >
           <Info :size="18" />
         </Button>
@@ -58,13 +86,9 @@ const { label, pool, resetLabel, isMaxUnknown } = useResourceMeta(() => {
           variant="neutral"
           is-icon-only
           :aria-pressed="props.resource.quickReference"
-          :aria-label="
-            props.resource.quickReference
-              ? 'Unpin from quick reference'
-              : 'Pin to quick reference'
-          "
-          :disabled="props.isSaving"
-          @click="emit('togglePin')"
+          :aria-label="pinLabel"
+          :is-disabled="props.isSaving"
+          @click="handleTogglePinClick"
         >
           <Pin v-if="!props.resource.quickReference" :size="18" />
 
@@ -75,7 +99,7 @@ const { label, pool, resetLabel, isMaxUnknown } = useResourceMeta(() => {
           variant="neutral"
           is-icon-only
           aria-label="Edit resource"
-          @click="emit('edit')"
+          @click="handleEditClick"
         >
           <Pencil :size="18" />
         </Button>
@@ -84,7 +108,7 @@ const { label, pool, resetLabel, isMaxUnknown } = useResourceMeta(() => {
           variant="neutral"
           is-icon-only
           aria-label="Delete resource"
-          @click="emit('remove')"
+          @click="handleRemoveClick"
         >
           <Trash2 :size="18" />
         </Button>
@@ -94,15 +118,11 @@ const { label, pool, resetLabel, isMaxUnknown } = useResourceMeta(() => {
     <ResourceSpendControl
       :resource="props.resource"
       :is-saving="props.isSaving"
-      @spend="
-        (amount) => {
-          return emit('spend', amount);
-        }
-      "
+      @spend="handleSpend"
     />
 
     <div v-if="isMaxUnknown" class="flex flex-col items-start gap-1">
-      <Button variant="transparent" size="xs" class="min-h-11" @click="emit('edit')">
+      <Button variant="transparent" size="xs" class="min-h-11" @click="handleEditClick">
         Max unknown — set it manually
       </Button>
 

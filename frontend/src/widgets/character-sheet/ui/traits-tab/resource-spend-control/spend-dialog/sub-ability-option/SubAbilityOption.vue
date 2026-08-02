@@ -3,6 +3,8 @@ import { computed } from 'vue';
 
 import { Button } from '@shared/ui/button';
 
+import type { ResourceSubAbility } from '@widgets/character-sheet/config/traits';
+
 import type { SubAbilityOptionProps } from './SubAbilityOption.types';
 
 const props = withDefaults(defineProps<SubAbilityOptionProps>(), {
@@ -10,7 +12,12 @@ const props = withDefaults(defineProps<SubAbilityOptionProps>(), {
   isDisabled: false,
 });
 
-const emit = defineEmits<{ select: [] }>();
+/** Carries its own ability, so the list binds a bare handler. */
+const emit = defineEmits<{ select: [ability: ResourceSubAbility] }>();
+
+const handleSelectClick = (): void => {
+  emit('select', props.ability);
+};
 
 const costLabel = computed(() => {
   return props.ability.cost === null ? 'varies' : String(props.ability.cost);
@@ -30,7 +37,7 @@ const variant = computed(() => {
       size="sm"
       class="min-h-11"
       :is-disabled="props.isDisabled"
-      @click="emit('select')"
+      @click="handleSelectClick"
     >
       <span class="flex w-full items-center justify-between gap-3">
         <span class="flex min-w-0 flex-col text-left">

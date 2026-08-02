@@ -12,11 +12,13 @@ import {
   totalAbilityScores,
 } from '@entities/characters';
 
-import { STAT_LABELS } from '@widgets/character-sheet/config/combat/constants';
+import { STAT_LABELS } from '@widgets/character-sheet/config/combat';
 import type {
   AttackMathInput,
   AttackTotals,
-} from '@widgets/character-sheet/config/combat/types';
+} from '@widgets/character-sheet/config/combat';
+
+import { formatSigned } from '../format/numbers';
 
 /**
  * Weapon math, composed from the entity's derived-stat helpers. It lives here
@@ -75,10 +77,6 @@ export const attackTotals = (
     attackBonus: modifier + proficiency + input.additionalBonus,
     damageBonus: modifier + input.additionalBonus,
   };
-};
-
-export const formatSigned = (value: number): string => {
-  return value < 0 ? String(value) : `+${value}`;
 };
 
 /** `Str +3 · proficiency +2 · bonus +1` — only the terms that are non-zero. */

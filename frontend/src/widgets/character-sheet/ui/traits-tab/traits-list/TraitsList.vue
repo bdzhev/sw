@@ -5,18 +5,25 @@ import type { Trait } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import { Text } from '@shared/ui/text';
 
+import { useTraitsUi } from '@widgets/character-sheet/model/traits';
+
 import { TraitRow } from '../trait-row';
 import type { TraitsListProps } from './TraitsList.types';
 
 const props = withDefaults(defineProps<TraitsListProps>(), { isSaving: false });
 
-const emit = defineEmits<{
-  add: [];
-  info: [trait: Trait];
-  edit: [trait: Trait];
-  remove: [trait: Trait];
-  togglePin: [trait: Trait];
-}>();
+const emit = defineEmits<{ togglePin: [trait: Trait] }>();
+
+const ui = useTraitsUi();
+
+/** `null` is the store's "add", as opposed to editing an existing row. */
+const handleAddClick = (): void => {
+  ui.openTraitDialog(null);
+};
+
+const handleTogglePin = (trait: Trait): void => {
+  emit('togglePin', trait);
+};
 </script>
 
 <template>
@@ -24,7 +31,7 @@ const emit = defineEmits<{
     <div class="flex items-center justify-between gap-3">
       <h4 class="text-primary">Traits &amp; features</h4>
 
-      <Button size="xs" class="min-h-11" @click="emit('add')">
+      <Button size="xs" class="min-h-11" @click="handleAddClick">
         <span class="flex items-center gap-1">
           <Plus :size="16" />
           Add
@@ -42,10 +49,7 @@ const emit = defineEmits<{
         :key="trait.id"
         :trait="trait"
         :is-saving="props.isSaving"
-        @info="emit('info', trait)"
-        @edit="emit('edit', trait)"
-        @remove="emit('remove', trait)"
-        @toggle-pin="emit('togglePin', trait)"
+        @toggle-pin="handleTogglePin"
       />
     </ul>
   </section>

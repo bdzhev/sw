@@ -11,4 +11,4 @@ export type {
   SkillGroupView,
   SkillProficiencyLevel,
   SkillRowView,
-} from '@widgets/character-sheet/config/skills/types';
+} from '@widgets/character-sheet/config/skills';

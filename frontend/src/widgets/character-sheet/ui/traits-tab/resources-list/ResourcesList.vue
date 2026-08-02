@@ -5,19 +5,31 @@ import type { ClassResource } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import { Text } from '@shared/ui/text';
 
+import { useTraitsUi } from '@widgets/character-sheet/model/traits';
+
 import { ResourceRow } from '../resource-row';
 import type { ResourcesListProps } from './ResourcesList.types';
 
 const props = withDefaults(defineProps<ResourcesListProps>(), { isSaving: false });
 
 const emit = defineEmits<{
-  add: [];
-  info: [resource: ClassResource];
-  edit: [resource: ClassResource];
-  remove: [resource: ClassResource];
   togglePin: [resource: ClassResource];
   spend: [resource: ClassResource, amount: number];
 }>();
+
+const ui = useTraitsUi();
+
+const handleAddClick = (): void => {
+  ui.openResourceDialog(null);
+};
+
+const handleTogglePin = (resource: ClassResource): void => {
+  emit('togglePin', resource);
+};
+
+const handleSpend = (resource: ClassResource, amount: number): void => {
+  emit('spend', resource, amount);
+};
 </script>
 
 <template>
@@ -25,7 +37,7 @@ const emit = defineEmits<{
     <div class="flex items-center justify-between gap-3">
       <h4 class="text-primary">Class resources</h4>
 
-      <Button size="xs" class="min-h-11" @click="emit('add')">
+      <Button size="xs" class="min-h-11" @click="handleAddClick">
         <span class="flex items-center gap-1">
           <Plus :size="16" />
           Add
@@ -43,15 +55,8 @@ const emit = defineEmits<{
         :key="resource.id"
         :resource="resource"
         :is-saving="props.isSaving"
-        @info="emit('info', resource)"
-        @edit="emit('edit', resource)"
-        @remove="emit('remove', resource)"
-        @toggle-pin="emit('togglePin', resource)"
-        @spend="
-          (amount) => {
-            return emit('spend', resource, amount);
-          }
-        "
+        @toggle-pin="handleTogglePin"
+        @spend="handleSpend"
       />
     </ul>
   </section>

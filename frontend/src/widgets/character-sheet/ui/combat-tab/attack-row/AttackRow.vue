@@ -1,28 +1,38 @@
 <script setup lang="ts">
-import { ChevronRight, Minus, Pin, Plus } from 'lucide-vue-next';
+import { ChevronRight, Pin } from 'lucide-vue-next';
 import { computed } from 'vue';
+
+import type { Attack } from '@shared/api/characters';
+import { Button } from '@shared/ui/button';
+import { NumberField } from '@shared/ui/number-field';
 
 import {
   AMMO_LIMIT,
   DAMAGE_TYPE_ICONS,
   DELIVERY_LABELS,
-} from '@widgets/character-sheet/config/combat/constants';
+} from '@widgets/character-sheet/config/combat';
 import {
   attackTotals,
   formatDamage,
-  formatSigned,
   tracksAmmo,
-} from '@widgets/character-sheet/lib/combat/attack-math';
+} from '@widgets/character-sheet/lib/combat';
+import { formatSigned } from '@widgets/character-sheet/lib/format';
 
 import { PropertyBadges } from '../property-badges';
 import type { AttackRowProps } from './AttackRow.types';
 
+const MIN_AMMO = 0;
+
 const props = withDefaults(defineProps<AttackRowProps>(), { isBusy: false });
 
+/**
+ * Each event carries the row's own attack, so the list can bind a bare handler
+ * instead of closing over the `v-for` item.
+ */
 const emit = defineEmits<{
-  detail: [];
-  'toggle-pin': [];
-  'update-ammo': [value: number];
+  detail: [attack: Attack];
+  'toggle-pin': [attack: Attack];
+  'update-ammo': [attack: Attack, value: number];
 }>();
 
 const totals = computed(() => {
@@ -49,45 +59,58 @@ const showsAmmo = computed(() => {
   return tracksAmmo(props.attack.delivery);
 });
 
-const ammo = computed(() => {
-  return props.attack.ammoRemaining ?? 0;
+const ammo = computed({
+  get: (): number => {
+    return props.attack.ammoRemaining ?? MIN_AMMO;
+  },
+  set: (value: number): void => {
+    emit('update-ammo', props.attack, value);
+  },
 });
 
-const stepAmmo = (delta: number) => {
-  emit('update-ammo', Math.min(AMMO_LIMIT, Math.max(0, ammo.value + delta)));
+const pinLabel = computed(() => {
+  return props.attack.quickReference ? 'Unpin from quick access' : 'Pin to quick access';
+});
+
+const pinClasses = computed(() => {
+  return props.attack.quickReference ? 'text-accent-primary' : '';
+});
+
+const handleDetailClick = (): void => {
+  emit('detail', props.attack);
+};
+
+const handleTogglePinClick = (): void => {
+  emit('toggle-pin', props.attack);
 };
 </script>
 
 <template>
   <li class="flex flex-col gap-2 rounded-lg border border-border bg-bg-secondary p-3">
     <div class="flex items-center gap-2">
-      <button
-        type="button"
-        class="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-1 text-left md:min-h-0"
-        @click="emit('detail')"
+      <Button
+        variant="transparent"
+        align="start"
+        is-unpadded
+        class="min-h-11 min-w-0 flex-1 gap-1 md:min-h-0"
+        @click="handleDetailClick"
       >
         <span class="truncate font-semibold text-primary">{{ props.attack.name }}</span>
 
-        <ChevronRight :size="16" class="shrink-0 text-secondary" aria-hidden="true" />
-      </button>
+        <ChevronRight :size="16" class="shrink-0" aria-hidden="true" />
+      </Button>
 
-      <button
-        type="button"
+      <Button
+        variant="transparent"
+        is-icon-only
+        class="shrink-0"
         :aria-pressed="props.attack.quickReference"
-        :aria-label="
-          props.attack.quickReference ? 'Unpin from quick access' : 'Pin to quick access'
-        "
-        :disabled="props.isBusy"
-        class="flex min-h-11 min-w-11 shrink-0 cursor-pointer items-center justify-center rounded-md disabled:cursor-not-allowed disabled:opacity-50"
-        :class="
-          props.attack.quickReference
-            ? 'text-accent-primary'
-            : 'text-secondary hover:text-primary'
-        "
-        @click="emit('toggle-pin')"
+        :aria-label="pinLabel"
+        :is-disabled="props.isBusy"
+        @click="handleTogglePinClick"
       >
-        <Pin :size="18" aria-hidden="true" />
-      </button>
+        <Pin :size="18" :class="pinClasses" aria-hidden="true" />
+      </Button>
     </div>
 
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
@@ -121,31 +144,18 @@ const stepAmmo = (delta: number) => {
     >
       <span class="text-xs text-secondary uppercase">Ammo</span>
 
-      <div class="flex items-center gap-1">
-        <button
-          type="button"
-          aria-label="Spend one"
-          :disabled="props.isBusy || ammo === 0"
-          class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-md border border-border text-secondary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
-          @click="stepAmmo(-1)"
-        >
-          <Minus :size="16" aria-hidden="true" />
-        </button>
-
-        <span class="min-w-10 text-center font-semibold text-primary tabular-nums">
-          {{ ammo }}
-        </span>
-
-        <button
-          type="button"
-          aria-label="Recover one"
-          :disabled="props.isBusy || ammo >= AMMO_LIMIT"
-          class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-md border border-border text-secondary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
-          @click="stepAmmo(1)"
-        >
-          <Plus :size="16" aria-hidden="true" />
-        </button>
-      </div>
+      <NumberField
+        v-model="ammo"
+        label="Ammo remaining"
+        is-label-hidden
+        has-stepper
+        class="w-40"
+        :min="MIN_AMMO"
+        :max="AMMO_LIMIT"
+        :is-disabled="props.isBusy"
+        decrement-label="Spend one"
+        increment-label="Recover one"
+      />
     </div>
   </li>
 </template>

@@ -1,51 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { NumberField } from '@shared/ui/number-field';
 
 import type { StatFieldProps } from './StatField.types';
 
 const props = withDefaults(defineProps<StatFieldProps>(), {
-  readonly: false,
+  isReadonly: false,
   min: 0,
   max: 999,
 });
 
-const emit = defineEmits<{ 'update:modelValue': [value: number] }>();
-
-const clamped = (raw: number): number => {
-  return Math.min(props.max, Math.max(props.min, raw));
-};
-
-const onInput = (event: Event) => {
-  const parsed = Number((event.target as HTMLInputElement).value);
-
-  emit('update:modelValue', clamped(Number.isNaN(parsed) ? props.min : parsed));
-};
-
-const inputId = computed(() => {
-  return `stat-${props.label.toLowerCase().replace(/\s+/g, '-')}`;
-});
+/**
+ * Clamping and the empty box belong to the primitive. The hand-rolled version
+ * read a cleared input as 0 and clamped to `min`, so wiping the HP box to retype
+ * it wrote 0 HP first.
+ */
+const value = defineModel<number>({ required: true });
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-1">
-    <label :for="inputId" class="truncate text-xs text-secondary uppercase">
-      {{ props.label }}
-    </label>
+  <div v-if="props.isReadonly" class="flex min-w-0 flex-col gap-1">
+    <span class="truncate text-xs text-secondary uppercase">{{ props.label }}</span>
 
-    <p v-if="props.readonly" class="text-xl font-semibold text-primary tabular-nums">
-      {{ props.modelValue }}
-    </p>
-
-    <input
-      v-else
-      :id="inputId"
-      type="number"
-      inputmode="numeric"
-      :value="props.modelValue"
-      :min="props.min"
-      :max="props.max"
-      class="w-full rounded-md border border-border bg-bg-primary px-2 py-1 text-xl font-semibold text-primary tabular-nums outline-none focus:border-accent-primary"
-      @input="onInput"
-    />
+    <p class="text-xl font-semibold text-primary tabular-nums">{{ value }}</p>
   </div>
+
+  <NumberField
+    v-else
+    v-model="value"
+    :label="props.label"
+    :min="props.min"
+    :max="props.max"
+  />
 </template>

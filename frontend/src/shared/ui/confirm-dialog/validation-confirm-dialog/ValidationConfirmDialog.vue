@@ -14,7 +14,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from '@shared/ui/dialog';
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
 
 import type { ValidationConfirmDialogProps } from '../ConfirmDialog.types';
 import { getValidationSchema } from './schema';
@@ -45,16 +45,12 @@ const { meta } = useForm({
             {{ props.dialogDescription }}
           </DialogDescription>
 
-          <div>
-            <label for="confirmationText">{{ props.confirmationLabel }}</label>
-
-            <Input
-              class="pt-2"
-              name="confirmationText"
-              :clean-errors-on-focus="false"
-              :show-error="false"
-            />
-          </div>
+          <FormInput
+            name="confirmationText"
+            :label="props.confirmationLabel"
+            :clean-errors-on-focus="false"
+            :show-error="false"
+          />
         </div>
       </DialogBody>
 

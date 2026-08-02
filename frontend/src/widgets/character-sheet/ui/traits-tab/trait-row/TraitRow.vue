@@ -2,24 +2,49 @@
 import { Info, Pencil, Pin, PinOff, Trash2 } from 'lucide-vue-next';
 import { computed } from 'vue';
 
+import type { Trait } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 
 import { TRAIT_TAG_LABELS } from '@widgets/character-sheet/config/traits';
+import { useTraitsUi } from '@widgets/character-sheet/model/traits';
 
 import type { TraitRowProps } from './TraitRow.types';
 
 const props = withDefaults(defineProps<TraitRowProps>(), { isSaving: false });
 
-const emit = defineEmits<{
-  info: [];
-  edit: [];
-  remove: [];
-  togglePin: [];
-}>();
+/**
+ * Only the write leaves the row. Opening a dialog goes straight to the store,
+ * rather than up through the list and the tab to come back down again.
+ */
+const emit = defineEmits<{ togglePin: [trait: Trait] }>();
+
+const ui = useTraitsUi();
 
 const tagLabel = computed(() => {
   return TRAIT_TAG_LABELS[props.trait.tag];
 });
+
+const pinLabel = computed(() => {
+  return props.trait.quickReference
+    ? 'Unpin from quick reference'
+    : 'Pin to quick reference';
+});
+
+const handleInfoClick = (): void => {
+  ui.openTraitDetail(props.trait);
+};
+
+const handleEditClick = (): void => {
+  ui.openTraitDialog(props.trait);
+};
+
+const handleRemoveClick = (): void => {
+  ui.askDeleteTrait(props.trait);
+};
+
+const handleTogglePinClick = (): void => {
+  emit('togglePin', props.trait);
+};
 </script>
 
 <template>
@@ -52,7 +77,7 @@ const tagLabel = computed(() => {
         variant="neutral"
         is-icon-only
         aria-label="View description"
-        @click="emit('info')"
+        @click="handleInfoClick"
       >
         <Info :size="18" />
       </Button>
@@ -61,13 +86,9 @@ const tagLabel = computed(() => {
         variant="neutral"
         is-icon-only
         :aria-pressed="props.trait.quickReference"
-        :aria-label="
-          props.trait.quickReference
-            ? 'Unpin from quick reference'
-            : 'Pin to quick reference'
-        "
-        :disabled="props.isSaving"
-        @click="emit('togglePin')"
+        :aria-label="pinLabel"
+        :is-disabled="props.isSaving"
+        @click="handleTogglePinClick"
       >
         <Pin v-if="!props.trait.quickReference" :size="18" />
 
@@ -78,7 +99,7 @@ const tagLabel = computed(() => {
         variant="neutral"
         is-icon-only
         aria-label="Edit trait"
-        @click="emit('edit')"
+        @click="handleEditClick"
       >
         <Pencil :size="18" />
       </Button>
@@ -87,7 +108,7 @@ const tagLabel = computed(() => {
         variant="neutral"
         is-icon-only
         aria-label="Delete trait"
-        @click="emit('remove')"
+        @click="handleRemoveClick"
       >
         <Trash2 :size="18" />
       </Button>

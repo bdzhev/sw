@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, type WritableComputedRef } from 'vue';
 
 import type { SheetPatch } from '@shared/api/characters';
 import { Text } from '@shared/ui/text';
 
-import type { SheetHeaderProps } from './SheetHeader.types';
+import type { SheetHeaderProps, SheetStatField } from './SheetHeader.types';
 import { StatField } from './stat-field';
+
+const MAX_STAT = 999;
 
 const props = defineProps<SheetHeaderProps>();
 
@@ -15,6 +17,33 @@ const subtitle = computed(() => {
   const { race, characterClass } = props.character;
 
   return `${race} ${characterClass} · level ${props.sheet.level}`;
+});
+
+/** One writable per field, so each `StatField` is a plain `v-model`. */
+const statModel = (field: SheetStatField): WritableComputedRef<number> => {
+  return computed({
+    get: (): number => {
+      return props.sheet[field];
+    },
+    set: (value: number): void => {
+      emit('patch', { [field]: value });
+    },
+  });
+};
+
+const hpCurrent = statModel('hpCurrent');
+const hpMax = statModel('hpMax');
+const tempHp = statModel('tempHp');
+const ac = statModel('ac');
+const speed = statModel('speed');
+
+const level = computed(() => {
+  return props.sheet.level;
+});
+
+/** Current HP cannot exceed a maximum that has not been entered yet. */
+const hpCeiling = computed(() => {
+  return props.sheet.hpMax || MAX_STAT;
 });
 </script>
 
@@ -31,33 +60,17 @@ const subtitle = computed(() => {
     </div>
 
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-      <StatField
-        label="HP"
-        :model-value="props.sheet.hpCurrent"
-        :max="props.sheet.hpMax || 999"
-        @update:model-value="emit('patch', { hpCurrent: $event })"
-      />
-      <StatField
-        label="HP max"
-        :model-value="props.sheet.hpMax"
-        @update:model-value="emit('patch', { hpMax: $event })"
-      />
-      <StatField
-        label="Temp HP"
-        :model-value="props.sheet.tempHp"
-        @update:model-value="emit('patch', { tempHp: $event })"
-      />
-      <StatField
-        label="AC"
-        :model-value="props.sheet.ac"
-        @update:model-value="emit('patch', { ac: $event })"
-      />
-      <StatField
-        label="Speed"
-        :model-value="props.sheet.speed"
-        @update:model-value="emit('patch', { speed: $event })"
-      />
-      <StatField label="Level" :model-value="props.sheet.level" readonly />
+      <StatField v-model="hpCurrent" label="HP" :max="hpCeiling" />
+
+      <StatField v-model="hpMax" label="HP max" />
+
+      <StatField v-model="tempHp" label="Temp HP" />
+
+      <StatField v-model="ac" label="AC" />
+
+      <StatField v-model="speed" label="Speed" />
+
+      <StatField :model-value="level" label="Level" is-readonly />
     </div>
 
     <div v-if="props.sheet.conditions.length" class="flex flex-wrap items-center gap-2">

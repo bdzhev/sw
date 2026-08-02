@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import type { SheetTab } from '@widgets/character-sheet/model/sheet-tabs';
+import { RouterLink } from 'vue-router';
 
 import type { SheetTabsProps } from './SheetTabs.types';
 
 const props = defineProps<SheetTabsProps>();
-
-const emit = defineEmits<{ select: [tab: SheetTab] }>();
 </script>
 
 <template>
@@ -15,19 +13,19 @@ const emit = defineEmits<{ select: [tab: SheetTab] }>();
   >
     <ul class="flex min-w-max gap-1 md:min-w-0">
       <li v-for="tab in props.tabs" :key="tab.id">
-        <button
-          type="button"
+        <RouterLink
+          :to="tab.to"
+          replace
           :aria-current="tab.id === props.activeTab ? 'page' : undefined"
-          class="border-b-2 px-3 py-3 text-sm whitespace-nowrap transition-colors md:px-4"
+          class="flex min-h-11 items-center border-b-2 px-3 text-sm whitespace-nowrap transition-colors md:px-4"
           :class="
             tab.id === props.activeTab
               ? 'border-accent-primary text-primary'
               : 'border-transparent text-secondary hover:text-primary'
           "
-          @click="emit('select', tab.id)"
         >
           {{ tab.label }}
-        </button>
+        </RouterLink>
       </li>
     </ul>
   </nav>
