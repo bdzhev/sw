@@ -61,8 +61,6 @@ export default defineConfig({
               return 'zod';
             case id.includes('tanstack'):
               return 'tanstack';
-            case id.includes('supabase'):
-              return 'supabase';
             case id.includes('node_modules'):
               return 'vendor';
             default:

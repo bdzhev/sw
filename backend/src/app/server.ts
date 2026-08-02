@@ -11,10 +11,44 @@ import { userRoutes } from '@modules/users';
 
 const app = new Hono();
 
+/**
+ * Loopback and the three private IPv4 ranges, on any port.
+ *
+ * Players at the table open the sheet by LAN address, so their `Origin` is
+ * never `localhost` — and `credentials: true` forbids the `*` wildcard, so each
+ * origin has to be reflected back individually. The port is left open because
+ * the frontend answers on 5173 under `make dev` and 8080 under `make prod`.
+ *
+ * This is deliberately permissive: the app is designed to be run on a laptop
+ * for the people in the room. `ALLOWED_ORIGINS` turns it off.
+ */
+const PRIVATE_ORIGIN =
+  /^https?:\/\/(?:localhost|127\.0\.0\.1|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(?::\d+)?$/;
+
+/**
+ * `ALLOWED_ORIGINS` (comma-separated) pins CORS for a real deployment. Note it
+ * is *not* `FRONTEND_URL`: that one is set to `http://localhost:5173` in every
+ * checkout, and treating it as the allow-list locked every phone out.
+ */
+const allowList = (process.env.ALLOWED_ORIGINS ?? '')
+  .split(',')
+  .map((entry) => {
+    return entry.trim();
+  })
+  .filter(Boolean);
+
+const resolveOrigin = (origin: string): string | null => {
+  if (allowList.length > 0) {
+    return allowList.includes(origin) ? origin : null;
+  }
+
+  return PRIVATE_ORIGIN.test(origin) ? origin : null;
+};
+
 app.use(
   '*',
   cors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+    origin: resolveOrigin,
     credentials: true,
   })
 );
