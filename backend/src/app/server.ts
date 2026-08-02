@@ -1,12 +1,11 @@
+import { authRoutes } from '@modules/auth';
+import { characterRoutes, charactersRoutes } from '@modules/characters';
+import { quizRoutes } from '@modules/quiz';
+import { userRoutes } from '@modules/users';
+import { authMiddleware } from '@shared/middleware/auth';
 import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { cors } from 'hono/cors';
-
-import { authRoutes } from '@/modules/auth';
-import { characterRoutes, charactersRoutes } from '@/modules/characters';
-import { quizRoutes } from '@/modules/quiz';
-import { userRoutes } from '@/modules/users';
-import { authMiddleware } from '@/shared/middleware/auth';
 
 const app = new Hono();
 
@@ -33,7 +32,10 @@ app.get('/', (c) => {
 });
 
 app.route('/auth', authRoutes);
-app.use('/users/me', authMiddleware);
+// Wildcard, not the exact path `/users/me`: mounting on one literal path leaves
+// every future /users route unauthenticated by default, which is how `GET /users`
+// came to be reachable without a session.
+app.use('/users/*', authMiddleware);
 app.route('/users', userRoutes);
 
 // The plural/singular split is deliberate, not a typo: /characters is the

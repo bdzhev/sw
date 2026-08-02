@@ -1,7 +1,4 @@
 import { zValidator } from '@hono/zod-validator';
-import { and, asc, eq, sql } from 'drizzle-orm';
-import { Hono } from 'hono';
-
 import {
   assertOwnedCharacter,
   attacks,
@@ -13,9 +10,11 @@ import {
   inventoryItems,
   spells,
   traits,
-} from '@/shared/db';
-import type { AuthVariables } from '@/shared/middleware/auth';
-import { errorHook } from '@/shared/validation';
+} from '@shared/db';
+import type { AuthVariables } from '@shared/middleware/auth';
+import { errorHook } from '@shared/validation';
+import { and, asc, eq, sql } from 'drizzle-orm';
+import { Hono } from 'hono';
 
 import { updateCharacterSchema, updateSheetSchema } from './character.schemas';
 

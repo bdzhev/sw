@@ -1,4 +1,4 @@
-import { QuizAnswerStat } from '@/shared/db/types';
+import { QuizAnswerStat } from '@shared/db';
 
 export const quizData = [
   {

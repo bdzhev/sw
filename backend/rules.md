@@ -177,5 +177,16 @@ Handlers return `c.json(...)` with an explicit status: `c.json({ error: 'User no
 Not rules, just things not to be confused by:
 
 - **`pg` is an unused dependency.** The driver is Bun's built-in `SQL` via `drizzle-orm/bun-sql`; nothing in `src/` imports `pg`. Do not reach for `pg`'s `DatabaseError` — those errors are never thrown here.
-- Several `catch (err)` blocks collapse every failure into a generic 500. Giving them specific SQLSTATE branches (e.g. `23505` unique_violation for a duplicate username on register) is welcome, following section 4.
+- Several `catch (err)` blocks still collapse every failure into a generic 500. Giving them specific SQLSTATE branches is welcome, following section 4. Done so far: `23503` on character create, `22P02` on a bad enum, `23505` on a duplicate username at register.
 - **The `0000` migration metadata was hand-authored at some point** — `_journal.json`'s first entry has a suspiciously round `when` (1775000000000), and `0000_snapshot.json` carried an all-zeros `id` identical to its own `prevId`. That made `0000` and `0001` both claim the all-zeros parent, so `drizzle-kit generate` aborted with a collision and silently produced no migration. Repaired by giving `0000` a real uuid `id` and pointing `0001.prevId` at it; `drizzle-kit check` now passes. If you ever hand-edit migration metadata again, the chain is the invariant to preserve.
+
+---
+
+## 9. Auth
+
+- **Passwords are hashed with `Bun.password.hash` / `.verify`** (argon2id, built into the runtime). No `bcrypt`, no `argon2` npm package — neither is installed and neither is needed. The salt and parameters live inside the returned `$argon2id$…` string, so there is no second column to manage.
+- **Never compare a password with `===`.** The rows used to hold plaintext and login compared directly; both are fixed, and a comparison operator anywhere near a password field is the sign it has regressed.
+- **Login answers one message for both "no such user" and "wrong password".** Register's `409` does disclose that a username is taken — it has to, that is the point of the response — so the login path is where enumeration is worth denying.
+- **Uniqueness is decided by the unique index, not a preceding `SELECT`.** Check-then-insert leaves a window where two simultaneous registrations both pass the check and the loser 500s. Branch on `23505` instead (§4).
+- **Mount auth middleware with a wildcard**: `app.use('/users/*', authMiddleware)`, never a single literal path. `app.use('/users/me', …)` protected exactly one route and left `GET /users` — which returned every row including the password column — reachable with no session at all. A literal mount means every route added later is public by default.
+- **Project columns on any query against `users`.** `select()` pulls the password hash into the handler for no reason; `select({ id, username })` is the default posture.

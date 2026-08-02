@@ -1,4 +1,4 @@
-import type { characterRaceEnum } from '@/shared/db';
+import type { characterRaceEnum } from '@shared/db';
 
 type CharacterRace = (typeof characterRaceEnum.enumValues)[number];
 

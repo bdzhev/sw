@@ -1,5 +1,9 @@
-import type { characterClassEnum, characterRaceEnum } from '@/shared/db';
-import { QuizAnswerStat, type QuizResults } from '@/shared/db/types';
+import {
+  type characterClassEnum,
+  type characterRaceEnum,
+  type QuizResults,
+  QuizAnswerStat,
+} from '@shared/db';
 
 type CharacterClass = (typeof characterClassEnum.enumValues)[number];
 type CharacterRace = (typeof characterRaceEnum.enumValues)[number];

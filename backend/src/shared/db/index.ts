@@ -1,6 +1,9 @@
 export { db } from './db';
+
 export { PG_ERROR, isPgError, type PgErrorCode } from './errors';
+
 export { assertOwnedCharacter } from './ownership';
+
 export {
   users,
   characters,
@@ -22,3 +25,5 @@ export {
   spells,
   characterSpells,
 } from './schema';
+
+export { QuizAnswerStat, type QuizResults } from './types';

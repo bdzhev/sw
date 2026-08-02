@@ -1,11 +1,10 @@
 import { zValidator } from '@hono/zod-validator';
+import { db, isPgError, PG_ERROR, sessions, users } from '@shared/db';
+import { errorHook } from '@shared/validation';
 import { and, eq, gt } from 'drizzle-orm';
 import { Hono, type Context } from 'hono';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { SignJWT } from 'jose';
-
-import { db, sessions, users } from '@/shared/db';
-import { errorHook } from '@/shared/validation';
 
 import { loginSchema, registerSchema } from './auth.schemas';
 
@@ -74,28 +73,35 @@ authRoutes.post(
   async (c) => {
     const { username, password } = c.req.valid('json');
 
-    const existing = await db
-      .select()
-      .from(users)
-      .where(eq(users.username, username));
+    // Argon2id via Bun's runtime — no dependency, and the salt lives inside the
+    // returned string, so there is no second column to manage.
+    const passwordHash = await Bun.password.hash(password);
 
-    if (existing.length > 0) {
-      return c.json({ error: 'Username already taken' }, 409);
+    try {
+      const created = await db
+        .insert(users)
+        .values({ username, password: passwordHash })
+        .returning();
+      const user = created[0];
+
+      const refreshToken = await createSession(user.id);
+      const accessToken = await signAccessToken(user.id);
+
+      setRefreshCookie(c, refreshToken);
+      setAccessCookie(c, accessToken);
+
+      return c.json({ id: user.id, username: user.username }, 201);
+    } catch (err) {
+      // The unique index is what actually decides this, not a preceding SELECT:
+      // check-then-insert leaves a window where two simultaneous registrations
+      // both pass the check and the second one 500s on the constraint.
+      if (isPgError(err, PG_ERROR.UNIQUE_VIOLATION)) {
+        return c.json({ error: 'Username already taken' }, 409);
+      }
+      console.error(err);
+
+      return c.json({ error: 'Failed to register' }, 500);
     }
-
-    const created = await db
-      .insert(users)
-      .values({ username, password })
-      .returning();
-    const user = created[0];
-
-    const refreshToken = await createSession(user.id);
-    const accessToken = await signAccessToken(user.id);
-
-    setRefreshCookie(c, refreshToken);
-    setAccessCookie(c, accessToken);
-
-    return c.json({ id: user.id, username: user.username }, 201);
   }
 );
 
@@ -112,11 +118,19 @@ authRoutes.post(
       .from(users)
       .where(eq(users.username, username));
 
-    if (result.length === 0 || result[0].password !== password) {
+    // One message for both "no such user" and "wrong password", so a caller
+    // cannot probe which usernames exist. (Register's 409 discloses that on
+    // purpose — it has to, to tell you the name is taken.)
+    if (result.length === 0) {
       return c.json({ error: 'Invalid username or password' }, 401);
     }
 
     const user = result[0];
+
+    if (!(await Bun.password.verify(password, user.password))) {
+      return c.json({ error: 'Invalid username or password' }, 401);
+    }
+
     const refreshToken = await createSession(user.id);
     const accessToken = await signAccessToken(user.id);
 
