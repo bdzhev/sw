@@ -1,0 +1,11 @@
+# Installed inside the image — copying the host's would defeat the install layer
+# and drop macOS binaries into a linux image.
+node_modules
+
+# Built inside the image by `bun run build-only`.
+dist
+
+.git
+.env*
+*.log
+stats.html
