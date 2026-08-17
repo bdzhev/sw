@@ -12,7 +12,6 @@ import { HorizontalScrollSection } from './horizontal-scroll-section';
  */
 useHorizontalScrollAnimation({
   wrapperSelector: '#horizontalWrapper',
-  rowSelector: '#painSectionScroll',
   childrenSelector: '#painSectionScroll article',
 });
 

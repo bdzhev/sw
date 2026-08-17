@@ -16,7 +16,6 @@ import { SheetActions } from './sheet-actions';
 const route = useRoute();
 const id = route.params.id as string;
 
-// Cache hit: the page has already fetched this character.
 const { character } = useCharacter({ id });
 const autosave = useSheetAutosave();
 

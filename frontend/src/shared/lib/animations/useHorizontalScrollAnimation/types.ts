@@ -1,7 +1,11 @@
 export interface UseHorizontalScrollAnimationOptions {
   wrapperSelector: string;
-  rowSelector: string;
   childrenSelector: string;
+  /**
+   * How strongly panel positions resist being scrolled past, 0–1. 0 is uniform
+   * travel; near 1 the row all but stops at each panel.
+   */
+  stickiness?: number;
   /**
    * Media query the pinned horizontal scroll is restricted to. Defaults to md
    * and up — below it the consumer is expected to lay its panels out as a plain

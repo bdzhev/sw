@@ -26,7 +26,9 @@ const totals = computed(() => {
   return totalAbilityScores(props.sheet, props.items);
 });
 
-/** Typing a score is a repeated edit, so it rides the debounce. */
+/**
+ * Typing a score is a repeated edit, so it rides the debounce.
+ */
 const handleScoreChange = (field: AbilitySheetField, score: number): void => {
   const patch: Partial<Record<AbilitySheetField, number>> = { [field]: score };
 
