@@ -2,9 +2,9 @@ import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
+// import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig, type Plugin } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
-// import { visualizer } from 'rollup-plugin-visualizer';
 
 const skipConfigJsInDev = (): Plugin => {
   return {
