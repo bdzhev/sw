@@ -2,4 +2,5 @@ import SheetHeader from './SheetHeader.vue';
 
 export { SheetHeader };
 export type { SheetHeaderProps } from './SheetHeader.types';
-export { StatField } from './stat-field';
+export { StatFields } from './stat-fields';
+export type { StatFieldsProps } from './stat-fields';

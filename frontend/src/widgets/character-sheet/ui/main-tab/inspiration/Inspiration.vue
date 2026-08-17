@@ -5,6 +5,8 @@ import { computed } from 'vue';
 import type { SheetPatch } from '@shared/api/characters';
 import { Switch } from '@shared/ui/switch';
 
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
+
 import type { InspirationProps } from './Inspiration.types';
 
 const props = defineProps<InspirationProps>();
@@ -23,15 +25,11 @@ const isInspired = computed({
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <h2 class="text-sm font-semibold text-primary uppercase">Inspiration</h2>
-
+  <SheetSection title="Inspiration" variant="plain" :heading-level="3">
     <Switch v-model="isInspired" label="Inspired">
       <template #icon>
         <Sparkles :size="18" aria-hidden="true" />
       </template>
     </Switch>
-  </section>
+  </SheetSection>
 </template>

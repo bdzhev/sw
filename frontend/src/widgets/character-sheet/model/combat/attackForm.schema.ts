@@ -14,9 +14,11 @@ const WHOLE_NUMBER = /^-?\d*$/;
 const POSITIVE_WHOLE_NUMBER = /^\d*$/;
 
 /**
- * The two numeric fields stay strings in form state: they are bound to shared
- * `Input`, whose `v-model` on a number input hands back a string anyway, and an
- * empty string is the "not set" the row stores as 0 / null.
+ * The two numeric fields stay strings in form state, so both are **text** inputs:
+ * `v-model` casts to a number whenever the element's type is `number`, and an
+ * empty string is the "not set" the row stores as 0 / null. `additionalBonus`
+ * also needs the in-progress `-` a number input throws away, which is why it
+ * takes no `input-mode` and keeps the full keyboard.
  */
 const attackSchema = z.object({
   name: z

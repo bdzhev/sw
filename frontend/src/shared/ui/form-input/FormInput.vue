@@ -62,6 +62,7 @@ const handleFocus = (): void => {
       :model-value="value"
       :name="props.name"
       :type="props.type"
+      :input-mode="props.inputMode"
       :placeholder="props.placeholder"
       :autocomplete="props.autocomplete"
       :is-disabled="props.isDisabled"

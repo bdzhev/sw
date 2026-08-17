@@ -47,7 +47,11 @@ export const useTraitsTab = () => {
     return character.value?.classResources ?? [];
   });
 
-  /** A pinned row lives in the strip instead of the list below, never in both. */
+  /**
+   * Pinning promotes a row into the quick-reference strip; it does not move it
+   * out of its own list, so a pinned row shows in both. The list below stays the
+   * complete inventory of what the character has.
+   */
   const pinnedTraits = computed(() => {
     return byPinOrder(
       allTraits.value.filter((trait) => {
@@ -62,18 +66,6 @@ export const useTraitsTab = () => {
         return resource.quickReference;
       }),
     );
-  });
-
-  const listedTraits = computed(() => {
-    return allTraits.value.filter((trait) => {
-      return !trait.quickReference;
-    });
-  });
-
-  const listedResources = computed(() => {
-    return allResources.value.filter((resource) => {
-      return !resource.quickReference;
-    });
   });
 
   const isSavingTrait = computed(() => {
@@ -174,8 +166,8 @@ export const useTraitsTab = () => {
   return {
     pinnedTraits,
     pinnedResources,
-    listedTraits,
-    listedResources,
+    allTraits,
+    allResources,
     isSavingTrait,
     isSavingResource,
     isTraitDialogOpen,

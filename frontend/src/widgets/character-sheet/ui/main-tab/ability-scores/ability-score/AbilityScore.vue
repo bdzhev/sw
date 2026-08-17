@@ -32,16 +32,15 @@ const score = computed({
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-col gap-2 rounded-md border border-border p-3">
-    <div class="flex min-w-0 items-baseline justify-between gap-2">
-      <span class="truncate text-xs text-secondary uppercase">
-        {{ props.ability.abbr }}
-      </span>
+  <li
+    class="flex items-center gap-3 border-t border-border py-2 first:border-t-0 first:pt-0"
+  >
+    <div class="flex min-w-0 flex-1 flex-col">
+      <span class="text-xs text-secondary uppercase">{{ props.ability.abbr }}</span>
 
-      <output class="shrink-0 text-lg font-semibold text-accent-primary tabular-nums">
-        {{ formatSigned(props.modifier) }}
-        <span class="sr-only">{{ props.ability.name }} modifier</span>
-      </output>
+      <span v-if="hasItemBonus" class="text-xxs text-secondary">
+        {{ props.total }} with gear
+      </span>
     </div>
 
     <NumberField
@@ -50,10 +49,14 @@ const score = computed({
       is-label-hidden
       :min="MIN_ABILITY_SCORE"
       :max="MAX_ABILITY_SCORE"
+      class="w-16 shrink-0"
     />
 
-    <p v-if="hasItemBonus" class="text-xs text-secondary">
-      {{ props.total }} with equipped gear
-    </p>
-  </div>
+    <output
+      class="w-10 shrink-0 text-right text-lg font-semibold text-accent-primary tabular-nums"
+    >
+      {{ formatSigned(props.modifier) }}
+      <span class="sr-only">{{ props.ability.name }} modifier</span>
+    </output>
+  </li>
 </template>

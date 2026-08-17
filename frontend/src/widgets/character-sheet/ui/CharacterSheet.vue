@@ -94,10 +94,9 @@ onBeforeRouteLeave(() => {
 </script>
 
 <template>
-  <MobileNavHeader v-if="isMobile" />
+  <MobileNavHeader v-if="isMobile" class="page-x-escape" />
 
-  <!-- Tall enough that the status bar sticks to the viewport, not to short content. -->
-  <div class="flex min-h-[calc(100svh-var(--spacing-mobile-bar))] flex-col md:min-h-svh">
+  <div class="flex flex-1 flex-col">
     <div class="flex flex-1 flex-col gap-4 pb-6">
       <template v-if="isFetchingCharacter && !character">
         <Skeleton class="h-48 w-full rounded-lg" />

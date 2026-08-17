@@ -8,10 +8,20 @@ import {
   CUSTOM_RESOURCE_VALUE,
   DESCRIPTION_MAX_LENGTH,
   RESOURCE_NAME_MAX_LENGTH,
+  RESOURCE_VALUE_LIMIT,
 } from '@widgets/character-sheet/config/traits';
 
-/** Number inputs hand back strings, and "" is the meaningful "unknown max". */
-const wholeNumberText = z.string().trim().regex(/^\d*$/, 'Whole numbers only');
+/**
+ * `undefined` is a blank box, and blank means "unknown max" — not zero, which is
+ * a real pool that happens to be empty. `NumberField` parses and clamps, so
+ * there is nothing to validate here beyond the range.
+ */
+const wholePoolNumber = z
+  .number()
+  .int('Whole numbers only')
+  .min(0, 'Cannot be negative')
+  .max(RESOURCE_VALUE_LIMIT, `At most ${RESOURCE_VALUE_LIMIT}`)
+  .optional();
 
 const schema = z
   .object({
@@ -22,8 +32,8 @@ const schema = z
       .max(RESOURCE_NAME_MAX_LENGTH, `At most ${RESOURCE_NAME_MAX_LENGTH} characters`)
       .regex(NO_CONTROL_CHARS, 'No line breaks or control characters')
       .or(z.literal('')),
-    maxValue: wholeNumberText,
-    current: wholeNumberText,
+    maxValue: wholePoolNumber,
+    current: wholePoolNumber,
     resetTrigger: z.nativeEnum(ResetTrigger, { required_error: 'Please pick a trigger' }),
     description: z.string().max(DESCRIPTION_MAX_LENGTH, 'That is too long'),
     quickReference: z.boolean(),
@@ -40,7 +50,8 @@ const schema = z
     }
 
     // A homebrew pool has no table to fall back on, so its max is mandatory.
-    if (!values.maxValue) {
+    // `undefined` only — 0 is a deliberate answer, even if a useless pool.
+    if (values.maxValue === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['maxValue'],

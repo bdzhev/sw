@@ -6,3 +6,4 @@ export { LandingLayout } from './landing-layout';
 export { DefaultLayout } from './default-layout';
 export { ResultLayout } from './result-layout';
 export { AuthLayout } from './auth-layout';
+export { SheetLayout } from './sheet-layout';

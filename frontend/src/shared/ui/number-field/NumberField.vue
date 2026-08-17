@@ -27,8 +27,12 @@ const props = withDefaults(defineProps<NumberFieldProps>(), {
  * hand-written `clamp`s existed before this, and "what does an empty box mean"
  * had three different answers — one of which set the value to 0, so clearing
  * the HP field zeroed your HP.
+ *
+ * `undefined` is the empty box, which is reka's own answer and has to be in the
+ * type: it emits `undefined` when the input cannot be parsed, and renders an
+ * empty string back for it.
  */
-const value = defineModel<number>({ default: 0 });
+const value = defineModel<number | undefined>();
 
 const fieldId = useId();
 
@@ -64,7 +68,7 @@ const STEP_BUTTON_CLASSES =
 
       <NumberFieldInput
         inputmode="numeric"
-        class="min-h-11 w-full min-w-0 rounded-md border border-border bg-bg-primary px-2 text-center text-xl font-semibold text-primary tabular-nums outline-none focus:border-accent-primary disabled:cursor-not-allowed disabled:text-secondary md:min-h-9"
+        class="min-h-11 w-full min-w-0 rounded-md border border-border bg-bg-raised px-2 text-center text-xl font-semibold text-primary tabular-nums outline-none focus:border-accent-primary disabled:cursor-not-allowed disabled:bg-muted disabled:text-secondary md:min-h-9"
       />
 
       <NumberFieldIncrement

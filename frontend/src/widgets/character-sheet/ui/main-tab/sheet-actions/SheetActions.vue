@@ -9,22 +9,20 @@ import {
   TooltipTrigger,
 } from '@shared/ui/tooltip';
 
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
+
 const REST_HINT = 'Short and long rests arrive in a later update.';
 const LEVEL_UP_HINT = 'Levelling up arrives in a later update.';
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <h2 class="text-sm font-semibold text-primary uppercase">Actions</h2>
-
+  <SheetSection title="Actions" variant="plain" :heading-level="3">
     <div class="flex flex-col gap-2 sm:flex-row">
       <TooltipRoot>
         <!-- A disabled button swallows pointer events, so the span is the trigger. -->
         <TooltipTrigger as="span" tabindex="0" class="inline-flex w-full sm:w-fit">
           <Button is-disabled width="full" class="min-h-11">
-            <BedDouble :size="18" class="mr-2" />
+            <BedDouble :size="18" class="mr-1" />
             Rest
           </Button>
         </TooltipTrigger>
@@ -37,7 +35,7 @@ const LEVEL_UP_HINT = 'Levelling up arrives in a later update.';
       <TooltipRoot>
         <TooltipTrigger as="span" tabindex="0" class="inline-flex w-full sm:w-fit">
           <Button is-disabled variant="secondary" width="full" class="min-h-11">
-            <ChevronsUp :size="18" class="mr-2" />
+            <ChevronsUp :size="18" class="mr-1" />
             Level up
           </Button>
         </TooltipTrigger>
@@ -47,5 +45,5 @@ const LEVEL_UP_HINT = 'Levelling up arrives in a later update.';
         </TooltipPortal>
       </TooltipRoot>
     </div>
-  </section>
+  </SheetSection>
 </template>

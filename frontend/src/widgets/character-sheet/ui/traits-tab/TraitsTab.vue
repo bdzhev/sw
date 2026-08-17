@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
+import { Separator } from '@shared/ui/separator';
 
 import { useTraitsTab } from '@widgets/character-sheet/model/traits';
 
@@ -18,8 +19,8 @@ import { TraitsList } from './traits-list';
 const {
   pinnedTraits,
   pinnedResources,
-  listedTraits,
-  listedResources,
+  allTraits,
+  allResources,
   isSavingTrait,
   isSavingResource,
   isTraitDialogOpen,
@@ -40,7 +41,7 @@ const {
 </script>
 
 <template>
-  <section class="flex flex-col gap-6 py-6">
+  <section class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <QuickReference
       :traits="pinnedTraits"
       :resources="pinnedResources"
@@ -51,13 +52,15 @@ const {
     />
 
     <TraitsList
-      :traits="listedTraits"
+      :traits="allTraits"
       :is-saving="isSavingTrait"
       @toggle-pin="handleTraitTogglePin"
     />
 
+    <Separator />
+
     <ResourcesList
-      :resources="listedResources"
+      :resources="allResources"
       :is-saving="isSavingResource"
       @toggle-pin="handleResourceTogglePin"
       @spend="handleSpend"

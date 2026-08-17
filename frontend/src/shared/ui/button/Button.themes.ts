@@ -44,8 +44,12 @@ export const variantClasses: Record<ButtonVariant, string> = {
     'bg-none text-accent-primary inset-ring-2 ring-accent-primary hover:bg-accent-secondary hover:inset-ring-0',
   secondary: 'bg-bg-raised hover:bg-bg-raised-hover text-primary',
   transparent: 'bg-transparent text-secondary hover:text-primary hover:bg-primary/10',
-  /** Dim until hovered — the old icon-button default, now a colour like any other. */
-  neutral: 'bg-transparent text-muted hover:text-primary hover:bg-primary/10',
+  /**
+   * Dim until hovered — the old icon-button default, now a colour like any other.
+   * `secondary`, not `muted`: muted is a *surface* token a shade off the card it
+   * sits on, so as a text colour it was invisible until the hover fired.
+   */
+  neutral: 'bg-transparent text-secondary hover:text-primary hover:bg-primary/10',
   accent: 'bg-transparent text-branding hover:bg-branding/10',
   warning: 'bg-transparent text-warning hover:bg-warning/10',
   danger:

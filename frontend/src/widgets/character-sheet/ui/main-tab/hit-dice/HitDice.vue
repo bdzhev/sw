@@ -7,6 +7,8 @@ import { Text } from '@shared/ui/text';
 
 import { HIT_DIE_BY_CLASS, hitDiceTotal } from '@entities/characters';
 
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
+
 import type { HitDiceProps } from './HitDice.types';
 
 const MIN_REMAINING = 0;
@@ -36,14 +38,10 @@ const remaining = computed({
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <div class="flex flex-wrap items-baseline justify-between gap-2">
-      <h2 class="text-sm font-semibold text-primary uppercase">Hit dice</h2>
-
+  <SheetSection title="Hit dice" variant="plain" :heading-level="3">
+    <template #actions>
       <Text size="xs" theme="secondary">d{{ dieSize }} · {{ total }} total</Text>
-    </div>
+    </template>
 
     <NumberField
       v-model="remaining"
@@ -54,5 +52,5 @@ const remaining = computed({
       decrement-label="Spend a hit die"
       increment-label="Regain a hit die"
     />
-  </section>
+  </SheetSection>
 </template>

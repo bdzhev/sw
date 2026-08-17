@@ -23,10 +23,11 @@ const checkboxId = useId();
       :id="checkboxId"
       v-model="checked"
       :disabled="props.isDisabled"
-      class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 md:min-h-9 md:min-w-9"
+      class="group flex min-h-11 min-w-11 cursor-pointer items-center justify-center disabled:cursor-not-allowed disabled:opacity-50 md:min-h-9 md:min-w-9"
     >
+      <!-- reka sets data-state on the root, so the box reads it through `group`. -->
       <span
-        class="flex size-5 items-center justify-center rounded-sm border border-border transition-colors data-[state=checked]:border-accent-primary data-[state=checked]:bg-accent-primary"
+        class="flex size-5 items-center justify-center rounded-sm border border-border transition-colors group-data-[state=checked]:border-accent-primary group-data-[state=checked]:bg-accent-primary"
       >
         <CheckboxIndicator>
           <Check :size="14" class="text-bg-secondary" aria-hidden="true" />

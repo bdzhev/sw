@@ -30,8 +30,8 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
     validationSchema: resourceFormSchema,
     initialValues: {
       customName: '',
-      maxValue: '',
-      current: '',
+      maxValue: undefined,
+      current: undefined,
       description: '',
       quickReference: false,
     },
@@ -74,9 +74,9 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
 
   const submit = form.handleSubmit((values) => {
     const isCustomName = values.resource === CUSTOM_RESOURCE_VALUE;
-    const maxValue = values.maxValue === '' ? null : Number(values.maxValue);
+    const maxValue = values.maxValue ?? null;
 
-    const entered = values.current === '' ? 0 : Number(values.current);
+    const entered = values.current ?? 0;
     const nextCurrent = isEditing.value ? entered : (maxValue ?? 0);
 
     onSubmit({
@@ -115,8 +115,8 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
       values: {
         resource: row ? (isKnown ? row.resourceKey : CUSTOM_RESOURCE_VALUE) : undefined,
         customName: row && !isKnown ? row.resourceKey : '',
-        maxValue: row === null || row.maxValue === null ? '' : String(row.maxValue),
-        current: row ? String(row.current) : '',
+        maxValue: row?.maxValue ?? undefined,
+        current: row?.current,
         resetTrigger: row?.resetTrigger,
         description: row?.description ?? '',
         quickReference: row?.quickReference ?? false,

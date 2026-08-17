@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@shared/ui/dialog';
 import { FormInput } from '@shared/ui/form-input';
+import { FormNumberField } from '@shared/ui/form-number-field';
 import { FormSwitch } from '@shared/ui/form-switch';
 import { Select } from '@shared/ui/select';
 import { Text } from '@shared/ui/text';
@@ -23,6 +24,7 @@ import { Textarea } from '@shared/ui/textarea';
 import {
   RESET_TRIGGER_OPTIONS,
   RESOURCE_OPTIONS,
+  RESOURCE_VALUE_LIMIT,
 } from '@widgets/character-sheet/config/traits';
 import {
   useResourceForm,
@@ -87,16 +89,28 @@ const handleOpenChange = (isOpen: boolean): void => {
               />
 
               <div class="flex flex-col">
-                <FormInput name="maxValue" type="number" placeholder="Max" />
+                <FormNumberField
+                  name="maxValue"
+                  label="Max"
+                  has-stepper
+                  :min="0"
+                  :max="RESOURCE_VALUE_LIMIT"
+                  decrement-label="Lower the max"
+                  increment-label="Raise the max"
+                />
 
                 <Text size="xs" theme="secondary" class="pb-2">{{ maxHint }}</Text>
               </div>
 
-              <FormInput
+              <FormNumberField
                 v-if="isEditing"
                 name="current"
-                type="number"
-                placeholder="Current"
+                label="Current"
+                has-stepper
+                :min="0"
+                :max="RESOURCE_VALUE_LIMIT"
+                decrement-label="Spend one"
+                increment-label="Regain one"
               />
 
               <div class="flex flex-col">

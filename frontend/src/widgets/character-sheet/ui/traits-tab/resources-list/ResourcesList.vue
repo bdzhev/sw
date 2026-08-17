@@ -3,9 +3,11 @@ import { Plus } from 'lucide-vue-next';
 
 import type { ClassResource } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
+import { Separator } from '@shared/ui/separator';
 import { Text } from '@shared/ui/text';
 
 import { useTraitsUi } from '@widgets/character-sheet/model/traits';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { ResourceRow } from '../resource-row';
 import type { ResourcesListProps } from './ResourcesList.types';
@@ -33,17 +35,17 @@ const handleSpend = (resource: ClassResource, amount: number): void => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-3">
-    <div class="flex items-center justify-between gap-3">
-      <h4 class="text-primary">Class resources</h4>
-
+  <SheetSection title="Class resources" variant="plain">
+    <template #actions>
       <Button size="xs" class="min-h-11" @click="handleAddClick">
         <span class="flex items-center gap-1">
           <Plus :size="16" />
           Add
         </span>
       </Button>
-    </div>
+    </template>
+
+    <Separator />
 
     <Text v-if="!props.resources.length" size="sm" theme="secondary">
       No pools tracked. Add rage, ki, channel divinity — or anything homebrew.
@@ -59,5 +61,5 @@ const handleSpend = (resource: ClassResource, amount: number): void => {
         @spend="handleSpend"
       />
     </ul>
-  </section>
+  </SheetSection>
 </template>

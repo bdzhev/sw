@@ -3,9 +3,11 @@ import { Plus } from 'lucide-vue-next';
 
 import type { Trait } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
+import { Separator } from '@shared/ui/separator';
 import { Text } from '@shared/ui/text';
 
 import { useTraitsUi } from '@widgets/character-sheet/model/traits';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { TraitRow } from '../trait-row';
 import type { TraitsListProps } from './TraitsList.types';
@@ -27,17 +29,17 @@ const handleTogglePin = (trait: Trait): void => {
 </script>
 
 <template>
-  <section class="flex flex-col gap-3">
-    <div class="flex items-center justify-between gap-3">
-      <h4 class="text-primary">Traits &amp; features</h4>
-
+  <SheetSection title="Traits &amp; features" variant="plain">
+    <template #actions>
       <Button size="xs" class="min-h-11" @click="handleAddClick">
         <span class="flex items-center gap-1">
           <Plus :size="16" />
           Add
         </span>
       </Button>
-    </div>
+    </template>
+
+    <Separator />
 
     <Text v-if="!props.traits.length" size="sm" theme="secondary">
       Nothing here yet. Add racial abilities, class features and feats as you learn them.
@@ -52,5 +54,5 @@ const handleTogglePin = (trait: Trait): void => {
         @toggle-pin="handleTogglePin"
       />
     </ul>
-  </section>
+  </SheetSection>
 </template>

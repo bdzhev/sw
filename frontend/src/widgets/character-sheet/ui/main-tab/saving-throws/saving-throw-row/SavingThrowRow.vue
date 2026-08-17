@@ -25,7 +25,7 @@ const isChecked = computed({
 
 <template>
   <tr class="border-t border-border">
-    <td class="pr-3">
+    <td class="w-11 py-2">
       <Checkbox
         v-model="isChecked"
         :label="`${props.ability.name} saving throw proficiency`"
@@ -33,9 +33,9 @@ const isChecked = computed({
       />
     </td>
 
-    <td class="pr-3 text-sm text-primary">{{ props.ability.name }}</td>
+    <td class="py-2 pr-3 text-sm text-primary">{{ props.ability.name }}</td>
 
-    <td class="text-right text-lg font-semibold text-primary tabular-nums">
+    <td class="py-2 text-right text-lg font-semibold text-primary tabular-nums">
       {{ formatSigned(props.total) }}
     </td>
   </tr>

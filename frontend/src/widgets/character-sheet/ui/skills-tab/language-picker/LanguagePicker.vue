@@ -8,6 +8,7 @@ import { Text } from '@shared/ui/text';
 import { ToggleChipGroup } from '@shared/ui/toggle-chip-group';
 
 import { STANDARD_LANGUAGE_OPTIONS } from '@widgets/character-sheet/config/skills';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import type { LanguagePickerProps } from './LanguagePicker.types';
 
@@ -65,18 +66,14 @@ const handleOtherBlur = (): void => {
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <h2 class="text-sm font-semibold text-primary">Languages</h2>
-
+  <SheetSection title="Languages">
     <ToggleChipGroup
       v-model="standard"
       :options="STANDARD_LANGUAGE_OPTIONS"
       legend="Standard languages"
     />
 
-    <div class="flex flex-col gap-1">
+    <div class="mt-4 flex flex-col gap-1">
       <Label :for="OTHER_INPUT_ID" class="text-xs text-secondary uppercase">
         Other languages
       </Label>
@@ -92,5 +89,5 @@ const handleOtherBlur = (): void => {
 
       <Text size="xs" theme="secondary">Free text — anything not on the list above.</Text>
     </div>
-  </section>
+  </SheetSection>
 </template>

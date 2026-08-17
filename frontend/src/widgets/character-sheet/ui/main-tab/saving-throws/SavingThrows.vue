@@ -7,6 +7,7 @@ import { Text } from '@shared/ui/text';
 import { ABILITIES, proficiencyBonus, savingThrowTotal } from '@entities/characters';
 
 import { formatSigned } from '@widgets/character-sheet/lib/format';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { SavingThrowRow } from './saving-throw-row';
 import type { SavingThrowsProps } from './SavingThrows.types';
@@ -36,38 +37,32 @@ const handleToggleProficiency = (stat: CharacterStat): void => {
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <div class="flex flex-wrap items-baseline justify-between gap-2">
-      <h2 class="text-sm font-semibold text-primary uppercase">Saving throws</h2>
-
+  <SheetSection title="Saving throws">
+    <template #actions>
       <Text size="xs" theme="secondary">
         Proficiency {{ formatSigned(bonus) }} · level {{ props.sheet.level }}
       </Text>
-    </div>
+    </template>
 
-    <div class="overflow-x-auto">
-      <table class="w-full min-w-max text-left">
-        <thead>
-          <tr class="text-xs text-secondary uppercase">
-            <th scope="col" class="pr-3 pb-2 text-center font-normal">Prof</th>
-            <th scope="col" class="pr-3 pb-2 font-normal">Save</th>
-            <th scope="col" class="pb-2 text-right font-normal">Total</th>
-          </tr>
-        </thead>
+    <table class="w-full text-left">
+      <thead>
+        <tr class="text-xs text-secondary uppercase">
+          <th scope="col" class="w-11 pb-2 text-center font-normal">Prof</th>
+          <th scope="col" class="pr-3 pb-2 font-normal">Save</th>
+          <th scope="col" class="pb-2 text-right font-normal">Total</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          <SavingThrowRow
-            v-for="ability in ABILITIES"
-            :key="ability.stat"
-            :ability="ability"
-            :is-proficient="isProficient(ability.stat)"
-            :total="savingThrowTotal(props.sheet, ability.stat, props.items)"
-            @toggle="handleToggleProficiency"
-          />
-        </tbody>
-      </table>
-    </div>
-  </section>
+      <tbody>
+        <SavingThrowRow
+          v-for="ability in ABILITIES"
+          :key="ability.stat"
+          :ability="ability"
+          :is-proficient="isProficient(ability.stat)"
+          :total="savingThrowTotal(props.sheet, ability.stat, props.items)"
+          @toggle="handleToggleProficiency"
+        />
+      </tbody>
+    </table>
+  </SheetSection>
 </template>

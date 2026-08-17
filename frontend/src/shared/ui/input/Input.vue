@@ -34,7 +34,7 @@ const fieldAttrs = computed(() => {
 const boxClasses = computed(() => {
   return [
     'flex w-full flex-row items-center gap-2 overflow-hidden rounded-sm ring-2 transition-all',
-    props.isDisabled ? 'cursor-not-allowed bg-bg-raised text-secondary' : '',
+    props.isDisabled ? 'cursor-not-allowed bg-muted text-secondary' : 'bg-bg-raised',
     props.hasError
       ? 'ring-danger/50 focus-within:ring-danger'
       : 'ring-primary/50 focus-within:ring-primary',
@@ -59,6 +59,7 @@ const fieldClasses =
       v-model="model"
       :class="fieldClasses"
       :type="props.type"
+      :inputmode="props.inputMode"
       :placeholder="props.placeholder"
       :disabled="props.isDisabled"
       :autocomplete="props.autocomplete"

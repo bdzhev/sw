@@ -4,6 +4,3 @@ export interface SheetHeaderProps {
   character: CharacterIdentity;
   sheet: CharacterSheet;
 }
-
-/** The numeric sheet fields the header edits in place. */
-export type SheetStatField = 'hpCurrent' | 'hpMax' | 'tempHp' | 'ac' | 'speed';

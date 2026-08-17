@@ -6,6 +6,7 @@ import {
   DefaultLayout,
   ResultLayout,
   AuthLayout,
+  SheetLayout,
 } from '@shared/ui/layouts';
 
 export const routes: RouteRecordRaw[] = [
@@ -74,7 +75,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => {
           return import('@pages/character');
         },
-        meta: { layout: DefaultLayout },
+        meta: { layout: SheetLayout },
         beforeEnter: (to, _from, next) => {
           if (to.params.tab) {
             next();

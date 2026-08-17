@@ -2,6 +2,7 @@ export {
   TRAIT_NAME_MAX_LENGTH,
   RESOURCE_NAME_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
+  RESOURCE_VALUE_LIMIT,
 } from './limits';
 
 export {

@@ -211,7 +211,6 @@ const handleCancelClick = (): void => {
               <AttackField label="Additional bonus">
                 <FormInput
                   name="additionalBonus"
-                  type="number"
                   placeholder="Magic weapon bonus, etc."
                 />
               </AttackField>
@@ -245,7 +244,7 @@ const handleCancelClick = (): void => {
               </div>
 
               <AttackField v-if="showsAmmo" label="Ammo remaining">
-                <FormInput name="ammoRemaining" type="number" placeholder="0" />
+                <FormInput name="ammoRemaining" input-mode="numeric" placeholder="0" />
               </AttackField>
 
               <div class="flex flex-col gap-2 pb-2">

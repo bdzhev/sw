@@ -106,7 +106,7 @@ const handleUseOneClick = (): void => {
 
             <div class="flex items-start gap-2">
               <div class="min-w-0 flex-1">
-                <FormInput name="amount" type="number" placeholder="0" />
+                <FormInput name="amount" input-mode="numeric" placeholder="0" />
               </div>
 
               <Button

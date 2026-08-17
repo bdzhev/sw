@@ -17,6 +17,7 @@ import {
 } from '@entities/characters';
 
 import type { AttackBody } from '@widgets/character-sheet/config/combat';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { AttackDetailDialog } from './attack-detail-dialog';
 import { AttackDialog } from './attack-dialog';
@@ -133,40 +134,40 @@ const handleUpdateAmmo = async (attack: Attack, value: number): Promise<void> =>
 </script>
 
 <template>
-  <section v-if="sheet" class="flex flex-col gap-4 py-6">
+  <section v-if="sheet" class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <InitiativePanel
       :sheet="sheet"
       :items="items"
       @update:bonus="handleInitiativeBonus"
     />
 
-    <div class="flex items-center justify-between gap-3">
-      <h2 class="text-base font-semibold text-primary">Attacks</h2>
+    <SheetSection title="Attacks" variant="plain">
+      <template #actions>
+        <Button size="sm" @click="handleAddClick">
+          <Plus :size="16" class="mr-1" aria-hidden="true" />
 
-      <Button size="sm" @click="handleAddClick">
-        <Plus :size="16" class="mr-1" aria-hidden="true" />
+          Add attack
+        </Button>
+      </template>
 
-        Add attack
-      </Button>
-    </div>
+      <Text v-if="!rows.length" theme="secondary">
+        No attacks yet. Add a weapon, an unarmed strike or a natural weapon.
+      </Text>
 
-    <Text v-if="!rows.length" theme="secondary">
-      No attacks yet. Add a weapon, an unarmed strike or a natural weapon.
-    </Text>
-
-    <ul v-else class="flex flex-col gap-2">
-      <AttackRow
-        v-for="attack in rows"
-        :key="attack.id"
-        :attack="attack"
-        :sheet="sheet"
-        :items="items"
-        :is-busy="isWriting"
-        @detail="handleDetail"
-        @toggle-pin="handleTogglePin"
-        @update-ammo="handleUpdateAmmo"
-      />
-    </ul>
+      <ul v-else class="flex flex-col gap-2">
+        <AttackRow
+          v-for="attack in rows"
+          :key="attack.id"
+          :attack="attack"
+          :sheet="sheet"
+          :items="items"
+          :is-busy="isWriting"
+          @detail="handleDetail"
+          @toggle-pin="handleTogglePin"
+          @update-ammo="handleUpdateAmmo"
+        />
+      </ul>
+    </SheetSection>
 
     <AttackDialog
       v-model:open="isFormOpen"

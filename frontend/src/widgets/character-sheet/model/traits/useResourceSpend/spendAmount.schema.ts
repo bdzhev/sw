@@ -3,8 +3,9 @@ import { z } from 'zod';
 
 /**
  * Built per resource rather than once at module scope: the ceiling is whatever is
- * left in the pool, which changes on every spend. Number inputs hand back
- * strings, hence the text-then-refine shape.
+ * left in the pool, which changes on every spend. The field is a text input with
+ * `input-mode="numeric"` — not `type="number"`, which would have `v-model` cast
+ * to a number — hence the text-then-refine shape.
  */
 export const spendAmountSchema = (remaining: number) => {
   return toTypedSchema(

@@ -11,6 +11,8 @@ import {
   type AbilitySheetField,
 } from '@entities/characters';
 
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
+
 import { AbilityScore } from './ability-score';
 import type { AbilityScoresProps } from './AbilityScores.types';
 
@@ -37,12 +39,8 @@ const handleScoreChange = (field: AbilitySheetField, score: number): void => {
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <h2 class="text-sm font-semibold text-primary uppercase">Ability scores</h2>
-
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+  <SheetSection title="Ability scores">
+    <ul class="flex flex-col">
       <AbilityScore
         v-for="ability in ABILITIES"
         :key="ability.stat"
@@ -52,6 +50,6 @@ const handleScoreChange = (field: AbilitySheetField, score: number): void => {
         :modifier="abilityModifier(totals[ability.stat])"
         @change="handleScoreChange"
       />
-    </div>
-  </section>
+    </ul>
+  </SheetSection>
 </template>

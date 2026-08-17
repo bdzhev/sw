@@ -9,7 +9,7 @@ const props = defineProps<SheetTabsProps>();
 <template>
   <nav
     aria-label="Character sheet sections"
-    class="-mx-4 overflow-x-auto border-b border-border px-4 md:mx-0 md:px-0"
+    class="page-x-bleed overflow-x-auto border-b border-border"
   >
     <ul class="flex min-w-max gap-1 md:min-w-0">
       <li v-for="tab in props.tabs" :key="tab.id">

@@ -3,7 +3,6 @@ import { computed } from 'vue';
 
 import { CharacterStat } from '@shared/api/characters';
 import { NumberField } from '@shared/ui/number-field';
-import { Text } from '@shared/ui/text';
 
 import {
   abilityModifier,
@@ -13,8 +12,12 @@ import {
 
 import { INITIATIVE_BONUS_LIMIT } from '@widgets/character-sheet/config/combat';
 import { formatSigned } from '@widgets/character-sheet/lib/format';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import type { InitiativePanelProps } from './InitiativePanel.types';
+
+const HINT =
+  'Feats and features that add to initiative — Alert and friends — go in the misc bonus.';
 
 const props = defineProps<InitiativePanelProps>();
 
@@ -39,24 +42,24 @@ const bonus = computed({
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-border bg-bg-secondary p-4 md:p-6"
-  >
-    <h2 class="text-xs text-secondary uppercase">Initiative</h2>
-
-    <div class="grid grid-cols-2 items-end gap-3 sm:grid-cols-3">
+  <SheetSection title="Initiative" :description="HINT">
+    <div class="grid grid-cols-3 items-start gap-3">
       <div class="flex min-w-0 flex-col gap-1">
-        <span class="text-xs text-secondary">Total</span>
+        <span class="truncate text-xs text-secondary uppercase">Total</span>
 
-        <p class="text-3xl font-semibold text-accent-primary tabular-nums">
+        <p
+          class="flex min-h-11 items-center text-3xl font-semibold text-accent-primary tabular-nums md:min-h-9"
+        >
           {{ formatSigned(total) }}
         </p>
       </div>
 
       <div class="flex min-w-0 flex-col gap-1">
-        <span class="text-xs text-secondary">Dex modifier</span>
+        <span class="truncate text-xs text-secondary uppercase">Dex mod</span>
 
-        <p class="text-xl font-semibold text-primary tabular-nums">
+        <p
+          class="flex min-h-11 items-center text-3xl font-semibold text-secondary tabular-nums md:min-h-9"
+        >
           {{ formatSigned(dexModifier) }}
         </p>
       </div>
@@ -64,15 +67,9 @@ const bonus = computed({
       <NumberField
         v-model="bonus"
         label="Misc bonus"
-        class="col-span-2 sm:col-span-1"
         :min="-INITIATIVE_BONUS_LIMIT"
         :max="INITIATIVE_BONUS_LIMIT"
       />
     </div>
-
-    <Text size="xs" theme="secondary">
-      Feats and features that add to initiative — Alert and friends — go in the misc
-      bonus.
-    </Text>
-  </section>
+  </SheetSection>
 </template>

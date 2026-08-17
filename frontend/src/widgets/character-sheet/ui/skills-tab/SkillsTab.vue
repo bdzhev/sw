@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { Languages, SkillProficiencies } from '@shared/api/characters';
+import { DataTable } from '@shared/ui/data-table';
 import { Skeleton } from '@shared/ui/skeleton';
 
 import {
@@ -16,15 +17,26 @@ import {
   useSheetAutosave,
 } from '@entities/characters';
 
-import { SKILL_ABILITY_ORDER } from '@widgets/character-sheet/config/skills';
+import {
+  SKILL_ABILITY_ORDER,
+  SKILL_COLUMNS,
+} from '@widgets/character-sheet/config/skills';
 import type {
   SkillGroupView,
   SkillProficiencyLevel,
+  SkillRowView,
 } from '@widgets/character-sheet/config/skills';
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { LanguagePicker } from './language-picker';
 import { SkillGroup } from './skill-group';
 import { SkillSummary } from './skill-summary';
+
+const TABLE_CAPTION =
+  'Skills grouped by governing ability. Each proficiency button cycles none, proficient, expertise.';
+
+/** The modifier column's header follows its numbers to the right. */
+const HEADER_CLASSES = { modifier: 'text-right' };
 
 const route = useRoute();
 const id = route.params.id as string;
@@ -62,6 +74,17 @@ const groups = computed<SkillGroupView[]>(() => {
         };
       }),
     };
+  });
+});
+
+/**
+ * The table's row model. The body is still rendered per governing ability by
+ * `SkillGroup`, so this is what drives the header and the row count, not the
+ * markup order.
+ */
+const skillRows = computed<SkillRowView[]>(() => {
+  return groups.value.flatMap((group) => {
+    return group.skills;
   });
 });
 
@@ -110,39 +133,21 @@ const handleUpdateLanguages = (value: Languages, immediate = false) => {
         :proficiency-bonus="proficiencyBonus(sheet)"
       />
 
-      <div class="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
-        <table class="w-full min-w-max text-left">
-          <caption class="sr-only">
-            Skills grouped by governing ability. Each proficiency button cycles none,
-            proficient, expertise.
-          </caption>
-
-          <thead>
-            <tr class="border-b border-border">
-              <th scope="col" class="px-2 py-2 text-xs text-secondary uppercase">
-                Skill
-              </th>
-              <th scope="col" class="px-2 py-2 text-xs text-secondary uppercase">
-                Ability
-              </th>
-              <th scope="col" class="px-2 py-2 text-xs text-secondary uppercase">Prof</th>
-              <th
-                scope="col"
-                class="px-2 py-2 text-right text-xs text-secondary uppercase"
-              >
-                Mod
-              </th>
-            </tr>
-          </thead>
-
+      <SheetSection title="Skills">
+        <DataTable
+          :columns="SKILL_COLUMNS"
+          :data="skillRows"
+          :caption="TABLE_CAPTION"
+          :header-classes="HEADER_CLASSES"
+        >
           <SkillGroup
             v-for="group in groups"
             :key="group.ability"
             :group="group"
             @cycle="handleCycleProficiency"
           />
-        </table>
-      </div>
+        </DataTable>
+      </SheetSection>
 
       <LanguagePicker :languages="languages" @update="handleUpdateLanguages" />
     </template>

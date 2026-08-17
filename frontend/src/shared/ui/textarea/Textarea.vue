@@ -25,8 +25,8 @@ const { value, errorMessage, handleChange, handleBlur } = useField<string>(() =>
 
 const textareaClasses = computed(() => {
   return [
-    'w-full resize-y rounded-sm bg-transparent px-2 py-3 text-base text-primary ring-2 outline-none transition-all placeholder:text-secondary md:py-2 md:text-sm',
-    props.disabled ? 'cursor-not-allowed text-secondary' : '',
+    'w-full resize-y rounded-sm bg-bg-raised px-2 py-3 text-base text-primary ring-2 outline-none transition-all placeholder:text-secondary md:py-2 md:text-sm',
+    props.disabled ? 'cursor-not-allowed bg-muted text-secondary' : '',
     errorMessage.value
       ? 'ring-danger/50 focus-within:ring-danger'
       : 'ring-primary/50 focus-within:ring-primary',

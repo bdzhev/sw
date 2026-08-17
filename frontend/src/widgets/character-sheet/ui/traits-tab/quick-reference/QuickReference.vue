@@ -5,6 +5,8 @@ import { computed } from 'vue';
 import type { ClassResource, Trait } from '@shared/api/characters';
 import { Text } from '@shared/ui/text';
 
+import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
+
 import { ResourceRow } from '../resource-row';
 import { TraitRow } from '../trait-row';
 import type { QuickReferenceProps } from './QuickReference.types';
@@ -35,14 +37,10 @@ const handleSpend = (resource: ClassResource, amount: number): void => {
 </script>
 
 <template>
-  <section
-    class="flex flex-col gap-3 rounded-lg border border-accent-primary/30 bg-bg-secondary/40 p-3 md:p-4"
-  >
-    <div class="flex items-center gap-2">
+  <SheetSection title="Quick reference" variant="accent">
+    <template #actions>
       <Pin :size="16" class="shrink-0 text-accent-primary" />
-
-      <h4 class="text-primary">Quick reference</h4>
-    </div>
+    </template>
 
     <Text v-if="isEmpty" size="sm" theme="secondary">
       Pin a trait or a resource to keep it one tap away during play.
@@ -66,5 +64,5 @@ const handleSpend = (resource: ClassResource, amount: number): void => {
         @toggle-pin="handleTraitTogglePin"
       />
     </ul>
-  </section>
+  </SheetSection>
 </template>

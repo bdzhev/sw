@@ -45,14 +45,7 @@
 
   /**
    * Values come from the shadcn preset `b1Lhw7mSAq`, `.dark` block only — the app
-   * has no light theme. The preset's own variable names are deliberately not
-   * introduced: these semantic names stay, so nothing downstream changes and
-   * there is no second vocabulary to collide with (rules §4).
-   *
-   * shadcn's `--primary` is a fill paired with `--primary-foreground`, while our
-   * `--color-accent-primary` is the outline/text colour of a transparent button.
-   * So the bright `--sidebar-primary` takes that slot and the darker `--primary`
-   * becomes the hover fill, which keeps the existing light-on-dark relationship.
+   * has no light theme.
    */
   --color-bg-primary: oklch(0.147 0.004 49.25); /* --background */
   --color-bg-secondary: oklch(0.216 0.006 56.043); /* --card */
@@ -305,6 +298,23 @@
   @apply px-5 md:px-10 lg:px-22;
 }
 
+/**
+ * Cancel an inherited `page-x`, for a full-bleed bar or strip inside a guttered
+ * container. The element must not also be `w-full` — a fixed width ignores the
+ * negative margins and shifts left instead of widening.
+ */
+@utility page-x-escape {
+  @apply -mx-5 md:-mx-10 lg:-mx-22;
+}
+
+/**
+ * Escape the gutter and re-apply it inside, for a strip that scrolls edge to
+ * edge while its content still starts on the gutter.
+ */
+@utility page-x-bleed {
+  @apply page-x-escape page-x;
+}
+
 @utility bg-radial {
   background-image: radial-gradient(
     circle at center,
@@ -355,19 +365,25 @@ body {
 /**
  * Headings scale with the viewport here, once, so a section only overrides the
  * scale when its type is genuinely special (the landing hero, for instance).
+ *
+ * `@layer base` is load-bearing: unlayered rules beat every `@layer`, so
+ * without it these win over the utilities layer and a `text-sm` on an `<h2>` is
+ * silently ignored.
  */
-h1 {
-  @apply text-2xl font-extrabold md:text-3xl lg:text-4xl;
-}
+@layer base {
+  h1 {
+    @apply text-2xl font-extrabold md:text-3xl lg:text-4xl;
+  }
 
-h2 {
-  @apply text-xl font-bold md:text-2xl lg:text-3xl;
-}
+  h2 {
+    @apply text-xl font-bold md:text-2xl lg:text-3xl;
+  }
 
-h3 {
-  @apply text-lg font-extrabold md:text-xl lg:text-2xl;
-}
+  h3 {
+    @apply text-lg font-extrabold md:text-xl lg:text-2xl;
+  }
 
-h4 {
-  @apply text-base font-bold md:text-lg lg:text-xl;
+  h4 {
+    @apply text-base font-bold md:text-lg lg:text-xl;
+  }
 }

@@ -34,7 +34,7 @@ const status = computed<StatusKey>(() => {
     role="status"
     aria-live="polite"
     :class="[
-      'sticky bottom-0 z-40 flex h-8 shrink-0 items-center gap-2 border-t bg-bg-secondary/80 px-4 backdrop-blur-md transition-all duration-300 md:px-6',
+      'sticky bottom-0 z-40 page-x-bleed flex h-8 shrink-0 items-center gap-2 border-t bg-bg-secondary/80 backdrop-blur-md transition-all duration-300',
       barClasses[status],
     ]"
   >
