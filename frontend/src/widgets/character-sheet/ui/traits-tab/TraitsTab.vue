@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+
+import { useBreakpoint } from '@shared/lib/ui';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
 import { Separator } from '@shared/ui/separator';
@@ -38,6 +41,13 @@ const {
   toggleResourcePin: handleResourceTogglePin,
   spendResource: handleSpend,
 } = useTraitsTab();
+
+const { isDesktop } = useBreakpoint();
+
+/** The two lists sit side by side from lg, so the rule between them turns with them. */
+const separatorOrientation = computed(() => {
+  return isDesktop.value ? 'vertical' : 'horizontal';
+});
 </script>
 
 <template>
@@ -51,20 +61,24 @@ const {
       @spend="handleSpend"
     />
 
-    <TraitsList
-      :traits="allTraits"
-      :is-saving="isSavingTrait"
-      @toggle-pin="handleTraitTogglePin"
-    />
+    <div class="flex flex-col gap-4 lg:flex-row lg:gap-6">
+      <TraitsList
+        :traits="allTraits"
+        :is-saving="isSavingTrait"
+        class="lg:min-w-0 lg:flex-1"
+        @toggle-pin="handleTraitTogglePin"
+      />
 
-    <Separator />
+      <Separator :orientation="separatorOrientation" />
 
-    <ResourcesList
-      :resources="allResources"
-      :is-saving="isSavingResource"
-      @toggle-pin="handleResourceTogglePin"
-      @spend="handleSpend"
-    />
+      <ResourcesList
+        :resources="allResources"
+        :is-saving="isSavingResource"
+        class="lg:min-w-0 lg:flex-1"
+        @toggle-pin="handleResourceTogglePin"
+        @spend="handleSpend"
+      />
+    </div>
 
     <TraitDialog
       v-model:open="isTraitDialogOpen"

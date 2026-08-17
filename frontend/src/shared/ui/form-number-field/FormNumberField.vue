@@ -45,8 +45,8 @@ const { value, errorMessage } = useField<number | undefined>(() => {
       :increment-label="props.incrementLabel"
     />
 
-    <div v-if="props.showError" class="h-6 pt-1">
-      <p v-if="errorMessage" class="text-xs text-danger">{{ errorMessage }}</p>
-    </div>
+    <p v-if="props.showError && errorMessage" class="pt-1 text-xs text-danger">
+      {{ errorMessage }}
+    </p>
   </div>
 </template>

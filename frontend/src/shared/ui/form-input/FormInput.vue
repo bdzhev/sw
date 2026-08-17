@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Label } from 'reka-ui';
 import { useField } from 'vee-validate';
 import { useAttrs, useId } from 'vue';
 
@@ -52,15 +51,13 @@ const handleFocus = (): void => {
 </script>
 
 <template>
-  <div :class="['flex w-full flex-col', attrs.class]">
-    <Label v-if="props.label" :for="fieldId" class="mb-1 text-sm text-secondary">
-      {{ props.label }}
-    </Label>
-
+  <div :class="['flex w-full flex-col gap-1', attrs.class]">
     <Input
       :id="fieldId"
       :model-value="value"
       :name="props.name"
+      :label="props.label"
+      :is-label-hidden="props.isLabelHidden"
       :type="props.type"
       :input-mode="props.inputMode"
       :placeholder="props.placeholder"
@@ -80,9 +77,8 @@ const handleFocus = (): void => {
       </template>
     </Input>
 
-    <!-- Fixed height so an appearing message does not shift the form. -->
-    <div v-if="props.showError" class="h-6 pt-1">
-      <p v-if="errorMessage" class="text-xs text-danger">{{ errorMessage }}</p>
-    </div>
+    <p v-if="props.showError && errorMessage" class="pt-1 text-xs text-danger">
+      {{ errorMessage }}
+    </p>
   </div>
 </template>

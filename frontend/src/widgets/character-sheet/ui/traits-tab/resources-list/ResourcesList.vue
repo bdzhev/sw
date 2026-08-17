@@ -51,7 +51,7 @@ const handleSpend = (resource: ClassResource, amount: number): void => {
       No pools tracked. Add rage, ki, channel divinity — or anything homebrew.
     </Text>
 
-    <ul v-else class="grid grid-cols-1 gap-2 lg:grid-cols-2">
+    <ul v-else class="flex flex-col gap-2">
       <ResourceRow
         v-for="resource in props.resources"
         :key="resource.id"

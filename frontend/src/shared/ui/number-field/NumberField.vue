@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { Minus, Plus } from 'lucide-vue-next';
 import {
-  Label,
   NumberFieldDecrement,
   NumberFieldIncrement,
   NumberFieldInput,
   NumberFieldRoot,
 } from 'reka-ui';
 import { useId } from 'vue';
+
+import { FieldLabel } from '@shared/ui/field-label';
 
 import type { NumberFieldProps } from './NumberField.types';
 
@@ -42,12 +43,9 @@ const STEP_BUTTON_CLASSES =
 
 <template>
   <div v-bind="$attrs" class="flex min-w-0 flex-col gap-1">
-    <Label
-      :for="fieldId"
-      :class="['text-xs text-secondary uppercase', props.isLabelHidden && 'sr-only']"
-    >
+    <FieldLabel :field-id="fieldId" :is-hidden="props.isLabelHidden">
       {{ props.label }}
-    </Label>
+    </FieldLabel>
 
     <NumberFieldRoot
       :id="fieldId"

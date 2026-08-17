@@ -40,7 +40,6 @@ import {
 import { formatSigned } from '@widgets/character-sheet/lib/format';
 import { attackFormSchema } from '@widgets/character-sheet/model/combat';
 
-import { AttackField } from './attack-field';
 import type { AttackDialogProps } from './AttackDialog.types';
 
 const props = withDefaults(defineProps<AttackDialogProps>(), { isSaving: false });
@@ -171,52 +170,43 @@ const handleCancelClick = (): void => {
 
         <form class="flex min-h-0 flex-col" @submit.prevent="handleSubmit">
           <DialogBody>
-            <div class="flex flex-col">
-              <AttackField label="Name">
-                <FormInput name="name" placeholder="Longsword, claws, unarmed strike…" />
-              </AttackField>
+            <div class="flex flex-col gap-4">
+              <FormInput
+                name="name"
+                label="Name"
+                placeholder="Longsword, claws, unarmed strike…"
+              />
 
-              <AttackField label="Ability">
-                <Select name="ability" :options="ABILITY_OPTIONS" class="mb-2" />
-              </AttackField>
+              <div class="flex flex-col gap-1">
+                <Select name="ability" label="Ability" :options="ABILITY_OPTIONS" />
 
-              <Text size="xs" theme="secondary" class="pb-4">
-                Finesse uses whichever of Strength or Dexterity is higher — the same one
-                for the attack roll and the damage roll, never mixed.
-              </Text>
-
-              <AttackField label="Delivery">
-                <Select name="delivery" :options="DELIVERY_OPTIONS" class="mb-6" />
-              </AttackField>
-
-              <div class="flex flex-col gap-1 pb-6">
-                <span class="text-xs text-secondary uppercase">Proficient</span>
-
-                <FormSwitch name="proficient" :label="proficientLabel" />
+                <Text size="xs" theme="secondary">
+                  Finesse uses whichever of Strength or Dexterity is higher — the same one
+                  for the attack roll and the damage roll, never mixed.
+                </Text>
               </div>
 
-              <AttackField label="Damage dice">
-                <FormInput name="damageDice" placeholder="1d8" />
-              </AttackField>
+              <Select name="delivery" label="Delivery" :options="DELIVERY_OPTIONS" />
 
-              <AttackField label="Damage type">
-                <Select
-                  name="damageType"
-                  :options="DAMAGE_TYPE_OPTIONS"
-                  placeholder="Select a damage type…"
-                  class="mb-6"
-                />
-              </AttackField>
+              <FormSwitch name="proficient" :label="proficientLabel" />
 
-              <AttackField label="Additional bonus">
-                <FormInput
-                  name="additionalBonus"
-                  placeholder="Magic weapon bonus, etc."
-                />
-              </AttackField>
+              <FormInput name="damageDice" label="Damage dice" placeholder="1d8" />
+
+              <Select
+                name="damageType"
+                label="Damage type"
+                :options="DAMAGE_TYPE_OPTIONS"
+                placeholder="Select a damage type…"
+              />
+
+              <FormInput
+                name="additionalBonus"
+                label="Additional bonus"
+                placeholder="Magic weapon bonus, etc."
+              />
 
               <div
-                class="mb-6 flex flex-col gap-2 rounded-md border border-border bg-bg-primary p-3"
+                class="flex flex-col gap-2 rounded-md border border-border bg-bg-primary p-3"
               >
                 <span class="text-xs text-secondary uppercase">Preview</span>
 
@@ -243,19 +233,19 @@ const handleCancelClick = (): void => {
                 <span class="text-xs text-secondary">{{ attackBreakdown(preview) }}</span>
               </div>
 
-              <AttackField v-if="showsAmmo" label="Ammo remaining">
-                <FormInput name="ammoRemaining" input-mode="numeric" placeholder="0" />
-              </AttackField>
+              <FormInput
+                v-if="showsAmmo"
+                name="ammoRemaining"
+                label="Ammo remaining"
+                input-mode="numeric"
+                placeholder="0"
+              />
 
-              <div class="flex flex-col gap-2 pb-2">
-                <span class="text-xs text-secondary uppercase">Properties</span>
-
-                <ToggleChipGroup
-                  v-model="properties"
-                  :options="ATTACK_PROPERTY_OPTIONS"
-                  legend="Attack properties"
-                />
-              </div>
+              <ToggleChipGroup
+                v-model="properties"
+                :options="ATTACK_PROPERTY_OPTIONS"
+                legend="Properties"
+              />
             </div>
           </DialogBody>
 

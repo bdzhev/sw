@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Label } from 'reka-ui';
 import { computed, ref, watch } from 'vue';
 
 import type { Languages } from '@shared/api/characters';
@@ -11,8 +10,6 @@ import { STANDARD_LANGUAGE_OPTIONS } from '@widgets/character-sheet/config/skill
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import type { LanguagePickerProps } from './LanguagePicker.types';
-
-const OTHER_INPUT_ID = 'languages-other';
 
 const props = defineProps<LanguagePickerProps>();
 
@@ -74,13 +71,9 @@ const handleOtherBlur = (): void => {
     />
 
     <div class="mt-4 flex flex-col gap-1">
-      <Label :for="OTHER_INPUT_ID" class="text-xs text-secondary uppercase">
-        Other languages
-      </Label>
-
       <Input
-        :id="OTHER_INPUT_ID"
         :model-value="otherDraft"
+        label="Other languages"
         placeholder="Thieves' cant, homebrew tongues…"
         @update:model-value="handleOtherInput"
         @focus="handleOtherFocus"

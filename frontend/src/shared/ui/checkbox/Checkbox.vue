@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Check } from 'lucide-vue-next';
-import { CheckboxIndicator, CheckboxRoot, Label } from 'reka-ui';
+import { CheckboxIndicator, CheckboxRoot } from 'reka-ui';
 import { useId } from 'vue';
+
+import { FieldLabel } from '@shared/ui/field-label';
 
 import type { CheckboxProps } from './Checkbox.types';
 
@@ -35,11 +37,12 @@ const checkboxId = useId();
       </span>
     </CheckboxRoot>
 
-    <Label
-      :for="checkboxId"
-      :class="['cursor-pointer text-sm text-primary', props.isLabelHidden && 'sr-only']"
+    <FieldLabel
+      :field-id="checkboxId"
+      :is-hidden="props.isLabelHidden"
+      class="cursor-pointer"
     >
       {{ props.label }}
-    </Label>
+    </FieldLabel>
   </div>
 </template>

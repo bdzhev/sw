@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Label, SwitchRoot, SwitchThumb } from 'reka-ui';
+import { SwitchRoot, SwitchThumb } from 'reka-ui';
 import { useId } from 'vue';
+
+import { FieldLabel } from '@shared/ui/field-label';
 
 import type { SwitchProps } from './Switch.types';
 
@@ -18,17 +20,15 @@ const switchId = useId();
 
 <template>
   <div v-bind="$attrs" class="flex min-h-11 items-center justify-between gap-3">
-    <Label
-      :for="switchId"
-      :class="[
-        'flex cursor-pointer items-center gap-2 text-sm text-secondary',
-        props.isLabelHidden && 'sr-only',
-      ]"
+    <FieldLabel
+      :field-id="switchId"
+      :is-hidden="props.isLabelHidden"
+      class="flex cursor-pointer items-center gap-2"
     >
       <slot name="icon" />
 
       {{ props.label }}
-    </Label>
+    </FieldLabel>
 
     <SwitchRoot
       :id="switchId"

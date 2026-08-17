@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Label, Primitive } from 'reka-ui';
+import { Primitive } from 'reka-ui';
 import { useField } from 'vee-validate';
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
+
+import { FieldLabel } from '@shared/ui/field-label';
 
 import type { TextareaProps } from './Textarea.types';
 
@@ -12,7 +14,11 @@ const props = withDefaults(defineProps<TextareaProps>(), {
   rows: 4,
   disabled: false,
   showError: true,
+  isLabelHidden: false,
 });
+
+/** Not the field `name`: two textareas bound to one field would share an id. */
+const fieldId = useId();
 
 /**
  * Field-bound like `input` and `select`, so a form only ever names the field.
@@ -36,14 +42,14 @@ const textareaClasses = computed(() => {
 
 <template>
   <div class="flex w-full flex-col gap-1">
-    <Label v-if="props.label" :for="props.name" class="text-sm text-secondary">
+    <FieldLabel v-if="props.label" :field-id="fieldId" :is-hidden="props.isLabelHidden">
       {{ props.label }}
-    </Label>
+    </FieldLabel>
 
     <Primitive
       as="textarea"
       v-bind="$attrs"
-      :id="props.name"
+      :id="fieldId"
       :name="props.name"
       :value="value"
       :rows="props.rows"

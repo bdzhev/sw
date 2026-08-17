@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ToggleGroupItem, ToggleGroupRoot } from 'reka-ui';
 
+import { FIELD_LABEL_CLASSES } from '@shared/ui/field-label';
+
 import type { ToggleChipGroupProps } from './ToggleChipGroup.types';
 
 defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(defineProps<ToggleChipGroupProps>(), {
   isDisabled: false,
+  isLegendHidden: false,
 });
 
 const selected = defineModel<string[]>({
@@ -18,7 +21,10 @@ const selected = defineModel<string[]>({
 
 <template>
   <fieldset v-bind="$attrs" class="min-w-0 border-0 p-0">
-    <legend class="sr-only">{{ props.legend }}</legend>
+    <!-- Margin, not a flex gap: a fieldset lays its legend out specially. -->
+    <legend :class="[FIELD_LABEL_CLASSES, 'mb-1', props.isLegendHidden && 'sr-only']">
+      {{ props.legend }}
+    </legend>
 
     <ToggleGroupRoot
       v-model="selected"

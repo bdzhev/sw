@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { computed, useAttrs, useId } from 'vue';
 
+import { FieldLabel } from '@shared/ui/field-label';
+
 import type { InputProps } from './Input.types';
 
 defineOptions({ inheritAttrs: false });
@@ -10,6 +12,7 @@ const props = withDefaults(defineProps<InputProps>(), {
   placeholder: '',
   hasError: false,
   isDisabled: false,
+  isLabelHidden: false,
 });
 
 const model = defineModel<string | number>({ default: '' });
@@ -50,22 +53,28 @@ const fieldClasses =
 </script>
 
 <template>
-  <div :class="[boxClasses, attrs.class]">
-    <slot name="left" />
+  <div :class="['flex w-full flex-col gap-1', attrs.class]">
+    <FieldLabel v-if="props.label" :field-id="inputId" :is-hidden="props.isLabelHidden">
+      {{ props.label }}
+    </FieldLabel>
 
-    <input
-      v-bind="fieldAttrs"
-      :id="inputId"
-      v-model="model"
-      :class="fieldClasses"
-      :type="props.type"
-      :inputmode="props.inputMode"
-      :placeholder="props.placeholder"
-      :disabled="props.isDisabled"
-      :autocomplete="props.autocomplete"
-      :aria-invalid="props.hasError || undefined"
-    />
+    <div :class="boxClasses">
+      <slot name="left" />
 
-    <slot name="right" />
+      <input
+        v-bind="fieldAttrs"
+        :id="inputId"
+        v-model="model"
+        :class="fieldClasses"
+        :type="props.type"
+        :inputmode="props.inputMode"
+        :placeholder="props.placeholder"
+        :disabled="props.isDisabled"
+        :autocomplete="props.autocomplete"
+        :aria-invalid="props.hasError || undefined"
+      />
+
+      <slot name="right" />
+    </div>
   </div>
 </template>

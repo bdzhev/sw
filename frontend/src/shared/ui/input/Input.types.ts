@@ -4,6 +4,9 @@ export interface InputProps {
    * Omit and one is generated.
    */
   id?: string;
+  label?: string;
+  /** Keep the name for screen readers, drop it visually. */
+  isLabelHidden?: boolean;
   type?: string;
   /**
    * On-screen keyboard for a numeric field that must stay a **text** input.

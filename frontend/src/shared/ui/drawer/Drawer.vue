@@ -53,7 +53,7 @@ usePointerSwipe(panelRef, {
       <DialogContent
         :aria-describedby="undefined"
         :class="[
-          'fixed top-0 z-1000 flex h-[100svh] w-72 max-w-[85%] flex-col border-border bg-bg-secondary/95 backdrop-blur-3xl motion-reduce:animate-none',
+          'fixed top-0 z-1000 flex h-[100svh] w-72 max-w-[85%] flex-col border-border bg-bg-elevated/95 backdrop-blur-3xl motion-reduce:animate-none',
           sideClasses[props.side],
           animationClasses[props.side],
         ]"

@@ -102,11 +102,14 @@ const handleUseOneClick = (): void => {
           </ul>
 
           <form class="flex flex-col gap-1" @submit.prevent="handleSubmit">
-            <Text size="sm" theme="secondary">{{ amountLabel }}</Text>
-
-            <div class="flex items-start gap-2">
+            <div class="flex items-end gap-2">
               <div class="min-w-0 flex-1">
-                <FormInput name="amount" input-mode="numeric" placeholder="0" />
+                <FormInput
+                  name="amount"
+                  :label="amountLabel"
+                  input-mode="numeric"
+                  placeholder="0"
+                />
               </div>
 
               <Button

@@ -11,6 +11,12 @@ import { useSidebarUi } from '../../model/useSidebarUi';
 import { RouteList } from '../route-list';
 import { BurgerButton } from './burger-button';
 
+/**
+ * The root is a fragment — bar plus drawer — so a consumer's `class` would be
+ * dropped rather than inherited. It has to be placed by hand.
+ */
+defineOptions({ inheritAttrs: false });
+
 const uiStore = useSidebarUi();
 const route = useRoute();
 
@@ -25,6 +31,7 @@ onBeforeUnmount(uiStore.closeDrawer);
 
 <template>
   <header
+    v-bind="$attrs"
     class="sticky top-0 z-500 flex h-mobile-bar shrink-0 flex-row items-center gap-2 border-b border-border bg-bg-secondary/80 page-x backdrop-blur-md"
   >
     <BurgerButton class="-ml-3" />

@@ -8,7 +8,9 @@ export interface ToggleChipOption {
 
 export interface ToggleChipGroupProps {
   options: ToggleChipOption[];
-  /** Names the group for screen readers; rendered as an `sr-only` legend. */
+  /** Names the group, as a visible `<legend>` in the shared field-label style. */
   legend: string;
+  /** Keep the legend for screen readers, drop it visually. */
+  isLegendHidden?: boolean;
   isDisabled?: boolean;
 }

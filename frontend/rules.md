@@ -87,14 +87,13 @@ src/shared/ui/scroll-area/
 
 Rules, stated individually so none of them get skimmed past:
 
-1. **No `components/` wrapper folder.** A sub-component folder sits directly inside its parent's folder. `scroll-area/scroll-bar/` — never `scroll-area/components/scroll-bar/`.
-2. **No `Base` prefix.** The file is `ScrollArea.vue`, not `BaseScrollArea.vue`. The PascalCase filename is the kebab-case folder name.
-3. **Types go in `<Component>.types.ts`**, never `.props.ts`. It exports `interface <Component>Props`. Import it with `import type`.
-4. **Every folder has an `index.ts`**, and it is the only thing outsiders may import. Consumers write `@shared/ui/scroll-area` — never `@shared/ui/scroll-area/ScrollArea.vue`, never `@shared/ui/scroll-area/scroll-bar/ScrollBar.vue`.
-5. **Nesting is recursive.** A sub-component with its own sub-component repeats the same shape, one level deeper. There is no special case at any depth.
-6. **No top-level `src/shared/ui/index.ts` barrel.** Don't add one — it defeats code splitting and creates import cycles.
-7. **A segment is not a folder with an `index.ts`.** `ui/`, `model/`, `lib/` and `config/` never get one. The barrels live one level in, on the **group** folder — `lib/format/index.ts`, `config/combat/index.ts`, `model/traits/index.ts` — and that group path is what an importer writes: `@widgets/character-sheet/lib/format`, never `.../lib/format/numbers`. The slice's own root `index.ts` reaches for the component file directly (`export { default as CharacterSheet } from './ui/CharacterSheet.vue'`), because there is no `./ui` to import from.
-8. **Barrels re-export by name.** No `export *` — it hides what a folder publishes, and two files exporting the same name collide silently.
+1. **No `Base` prefix.** The file is `ScrollArea.vue`, not `BaseScrollArea.vue`. The PascalCase filename is the kebab-case folder name.
+2. **Types go in `<Component>.types.ts`**, never `.props.ts`. It exports `interface <Component>Props`. Import it with `import type`.
+3. **Every folder has an `index.ts`**, and it is the only thing outsiders may import. Consumers write `@shared/ui/scroll-area` — never `@shared/ui/scroll-area/ScrollArea.vue`, never `@shared/ui/scroll-area/scroll-bar/ScrollBar.vue`.
+4. **Nesting is recursive.** A sub-component with its own sub-component repeats the same shape, one level deeper. There is no special case at any depth.
+5. **No top-level `src/shared/ui/index.ts` barrel.** Don't add one — it defeats code splitting and creates import cycles.
+6. **A segment is not a folder with an `index.ts`.** `ui/`, `model/`, `lib/` and `config/` never get one. The barrels live one level in, on the **group** folder — `lib/format/index.ts`, `config/combat/index.ts`, `model/traits/index.ts` — and that group path is what an importer writes: `@widgets/character-sheet/lib/format`, never `.../lib/format/numbers`. The slice's own root `index.ts` reaches for the component file directly (`export { default as CharacterSheet } from './ui/CharacterSheet.vue'`), because there is no `./ui` to import from.
+7. **Barrels re-export by name.** No `export *` — it hides what a folder publishes, and two files exporting the same name collide silently.
 
 `index.ts` shape — default-import the `.vue`, re-export named, re-export the sub-folder:
 
@@ -126,13 +125,15 @@ import { ScrollBar } from './scroll-bar';
 
 Much of `src/shared/ui` predates these rules. Three dead patterns you will encounter:
 
-| Legacy                        | Current             |
-| ----------------------------- | ------------------- |
-| `BaseCard.vue`                | `Card.vue`          |
-| `card/components/CardHeader/` | `card/card-header/` |
-| `BaseCard.props.ts`           | `Card.types.ts`     |
+| Legacy                        | Current            |
+| ----------------------------- | ------------------ |
+| `BaseText.vue`                | `Text.vue`         |
+| `some-part/components/Child/` | `some-part/child/` |
+| `BaseText.props.ts`           | `Text.types.ts`    |
 
-These are being migrated branch by branch. When you touch such a folder: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do. Never add a new file _into_ a legacy `components/` folder — create the properly-placed folder instead.
+What still carries the `Base` prefix and a `.props.ts` is `shared/ui/{image,progress-bar,skeleton,text}` plus `widgets/try-again-card` (whose `TryAgainCard.vue` also sits in the widget root with no `ui/` segment).
+
+When you touch one of those: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do.
 
 ### Compound components
 
@@ -205,6 +206,17 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   | number entry, with or without −/+ | `@shared/ui/number-field` — it owns clamping and parsing, so do not write another `clamp` |
   | multi-select chips                | `@shared/ui/toggle-chip-group` — emits the value that changed                             |
   | any button, including icon-only   | `@shared/ui/button` with `is-icon-only` (there is no separate `IconButton`)               |
+  | a label above a field             | the control's own `label` prop — never a `<span>` above it, and never a wrapper component |
+
+  **A field's label is the control's `label` prop.** Every field renders it through
+  `@shared/ui/field-label`, which owns the only field-label style —
+  `text-xs text-secondary uppercase` — and wires `for` to the control's id so
+  clicking the label focuses it. A `<span>` above an input has no `for`, so the
+  control ends up with no accessible name; that is what `AttackField` and nine
+  copies of it were doing. `toggle-chip-group` is the one exception and uses
+  `FIELD_LABEL_CLASSES` on a real `<legend>`, because a `<fieldset>`'s caption
+  cannot be a `<label>`. A caption over a _value_ rather than a control (the
+  initiative tiles, `SkillSummary`) is not a label and stays a `<span>`.
 
   **Anything Button already decides, pass as a prop — never as a `class`.** `variant`, `size`, `width`, `align` and `is-unpadded` exist because the thing they set is a plain utility: a consumer's `justify-start` loses to the base `justify-center`, and `px-0` loses to `px-4`, on stylesheet order rather than on the order you wrote them. That failure is silent. `class` is for layout the button does not own — `flex-1`, `shrink-0`, a margin.
 

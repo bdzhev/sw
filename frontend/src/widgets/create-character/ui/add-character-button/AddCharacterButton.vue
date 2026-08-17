@@ -7,7 +7,10 @@ import { onBeforeRouteLeave } from 'vue-router';
 import { MAX_CHARACTERS } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import {
+  DialogCloseButton,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogOverlay,
   DialogPortal,
   DialogRoot,
@@ -26,6 +29,11 @@ import { CreateCharacterForm } from '../create-character-form';
 import type { AddCharacterButtonProps } from './AddCharacterButton.types';
 
 const LABEL = 'New character';
+
+const DIALOG_TITLE = 'Create a new character';
+
+const DIALOG_DESCRIPTION =
+  "Enter a name, race and class for you new character. You won't be able to change the class or the race.";
 
 const LIMIT_REACHED_LABEL = `You have reached the limit of ${MAX_CHARACTERS} characters. Delete one to create another.`;
 
@@ -50,7 +58,7 @@ const handleTriggerClick = () => {
   isOpen.value = true;
 };
 
-const closeDialog = () => {
+const handleClose = () => {
   isOpen.value = false;
 };
 </script>
@@ -81,10 +89,18 @@ const closeDialog = () => {
     <DialogPortal>
       <DialogOverlay />
 
-      <DialogContent :aria-describedby="undefined">
-        <DialogTitle class="sr-only">{{ t('Create a new character') }}</DialogTitle>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{{ t(DIALOG_TITLE) }}</DialogTitle>
 
-        <CreateCharacterForm v-on:submit="closeDialog" v-on:cancel="closeDialog" />
+          <DialogCloseButton />
+        </DialogHeader>
+
+        <DialogDescription class="px-6 pb-2 text-sm">
+          {{ t(DIALOG_DESCRIPTION) }}
+        </DialogDescription>
+
+        <CreateCharacterForm @submit="handleClose" @cancel="handleClose" />
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

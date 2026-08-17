@@ -12,13 +12,18 @@ import {
   SelectViewport,
 } from 'reka-ui';
 import { useField } from 'vee-validate';
-import { computed } from 'vue';
+import { computed, useId } from 'vue';
+
+import { FieldLabel } from '@shared/ui/field-label';
 
 import type { SelectOption, SelectProps } from './Select.types';
 
 const props = withDefaults(defineProps<SelectProps>(), {
   placeholder: 'Select an option...',
+  isLabelHidden: false,
 });
+
+const triggerId = useId();
 
 const { value, errorMessage, handleBlur } = useField<SelectOption['value'] | undefined>(
   () => {
@@ -44,9 +49,14 @@ const selectedLabel = computed(() => {
 </script>
 
 <template>
-  <div class="mb-1 w-full">
+  <div class="flex w-full flex-col gap-1">
+    <FieldLabel v-if="props.label" :field-id="triggerId" :is-hidden="props.isLabelHidden">
+      {{ props.label }}
+    </FieldLabel>
+
     <SelectRoot v-model="value" @update:model-value="handleSelect">
       <SelectTrigger
+        :id="triggerId"
         :class="[
           'flex min-h-11 w-full cursor-pointer items-center justify-between rounded-md bg-bg-raised px-3 py-2 text-base text-secondary ring-2 transition-all duration-200 hover:bg-bg-raised-hover focus:ring-secondary focus:outline-none md:min-h-0 md:text-sm',
           errorMessage ? 'ring-danger/50' : 'ring-primary/50',

@@ -78,6 +78,13 @@
 
   /* Muted: disabled fills, the loading shimmer, dim-until-hover icons. */
   --color-muted: oklch(0.268 0.007 34.298); /* --muted */
+
+  /**
+   * Surfaces that float above the page: dialog, drawer, toast. Lighter than
+   * --color-bg-secondary on purpose — the overlay behind them is the page colour
+   * at 80%, so a card-coloured panel over it reads as flat.
+   */
+  --color-bg-elevated: oklch(0.3 0.006 286.033);
 }
 
 @utility loading-animation {
