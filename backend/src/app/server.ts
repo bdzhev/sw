@@ -7,6 +7,7 @@ import { authMiddleware } from '@shared/middleware';
 import { authRoutes } from '@modules/auth';
 import { characterRoutes, charactersRoutes } from '@modules/characters';
 import { quizRoutes } from '@modules/quiz';
+import { spellsRoutes } from '@modules/spells';
 import { userRoutes } from '@modules/users';
 
 const app = new Hono();
@@ -85,5 +86,10 @@ app.route('/character', characterRoutes);
 
 app.use('/quiz/*', authMiddleware);
 app.route('/quiz', quizRoutes);
+
+// Only /spells/search is exposed. A bare `GET /spells` would sit outside the
+// wildcard above and answer without a session.
+app.use('/spells/*', authMiddleware);
+app.route('/spells', spellsRoutes);
 
 export default app;

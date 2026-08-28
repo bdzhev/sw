@@ -59,6 +59,66 @@ export const SPELLCASTING_ABILITY_BY_CLASS: Record<CharacterClass, CharacterStat
     [CharacterClass.ROGUE]: null,
   };
 
+export type SlotTableMaxima = Partial<Record<string, number>>;
+
+const slotsFromTable = (table: readonly number[][], level: number): SlotTableMaxima => {
+  const row = table[level - 1] ?? [];
+
+  return row.reduce<SlotTableMaxima>((maxima, count, index) => {
+    if (count > 0) {
+      maxima[String(index + 1)] = count;
+    }
+
+    return maxima;
+  }, {});
+};
+
+/**
+ * What the rules say this character's slots would be. Nothing derives the grid
+ * from this any more — the player types their own maxima — but the tab offers
+ * it as a one-tap fill, which is the whole reason these tables still earn their
+ * place here. `null` means the progression has no table to read.
+ */
+export const slotMaximaFromProgression = (
+  progression: SpellcastingProgression,
+  level: number,
+): SlotTableMaxima | null => {
+  switch (progression) {
+    case SpellcastingProgression.FULL:
+      return slotsFromTable(FULL_CASTER_SLOTS, level);
+    case SpellcastingProgression.HALF:
+      return slotsFromTable(HALF_CASTER_SLOTS, level);
+    case SpellcastingProgression.THIRD:
+      return slotsFromTable(THIRD_CASTER_SLOTS, level);
+    case SpellcastingProgression.PACT: {
+      const pact = PACT_MAGIC_SLOTS[level - 1];
+
+      return pact ? { [String(pact.slotLevel)]: pact.slots } : {};
+    }
+    default:
+      return null;
+  }
+};
+
+/**
+ * The caster ability the sheet actually uses.
+ *
+ * Fighter and rogue map to `null` above, but an eldritch knight or arcane
+ * trickster overrides progression to `third` — the exact case the override
+ * exists for — and would otherwise get a working slot grid with a dash for save
+ * DC and attack bonus. INT is the SRD ability for both subclasses.
+ */
+export const resolveSpellcastingAbility = (
+  characterClass: CharacterClass,
+  progression: SpellcastingProgression,
+): CharacterStat | null => {
+  const fromClass = SPELLCASTING_ABILITY_BY_CLASS[characterClass];
+
+  if (fromClass) return fromClass;
+
+  return progression === SpellcastingProgression.NONE ? null : CharacterStat.INT;
+};
+
 /**
  * The two saving throws each class is proficient in. This is the one
  * proficiency the app auto-fills, because it involves no choice at all —

@@ -42,6 +42,8 @@
   --animate-toast-out: toast-out 140ms ease-in;
   --animate-menu-in: menu-in 120ms ease-out;
   --animate-menu-out: menu-out 100ms ease-in;
+  --animate-accordion-down: accordion-down 180ms ease-out;
+  --animate-accordion-up: accordion-up 150ms ease-in;
 
   /**
    * Values come from the shadcn preset `b1Lhw7mSAq`, `.dark` block only — the app
@@ -162,6 +164,31 @@
   to {
     opacity: 0;
     transform: scale(0.97);
+  }
+}
+
+/**
+ * Height, not max-height: reka measures the panel and publishes the number as
+ * `--reka-accordion-content-height`, so the open state animates to a real value
+ * instead of an arbitrary ceiling that would make short panels look slow.
+ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--reka-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--reka-accordion-content-height);
+  }
+
+  to {
+    height: 0;
   }
 }
 

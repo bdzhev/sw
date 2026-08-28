@@ -1,17 +1,10 @@
 import {
   CharacterStat,
-  SpellcastingProgression,
   type CharacterSheet,
   type InventoryItem,
 } from '@shared/api/characters';
 
-import {
-  FULL_CASTER_SLOTS,
-  HALF_CASTER_SLOTS,
-  PACT_MAGIC_SLOTS,
-  proficiencyBonusForLevel,
-  THIRD_CASTER_SLOTS,
-} from '../class-tables';
+import { proficiencyBonusForLevel } from '../class-tables';
 import { PERCEPTION_SKILL_KEY, SKILLS } from '../skills';
 
 /**
@@ -167,47 +160,22 @@ export const spellAttackBonus = (
 
 export type SlotMaxima = Partial<Record<string, number>>;
 
-const slotsFromTable = (table: readonly number[][], level: number): SlotMaxima => {
-  const row = table[level - 1] ?? [];
-
-  return row.reduce<SlotMaxima>((maxima, count, index) => {
-    if (count > 0) {
-      maxima[String(index + 1)] = count;
-    }
-
-    return maxima;
-  }, {});
-};
-
 /**
- * Slot maxima for the sheet's progression, keyed by slot level as a string so
- * they line up with the stored `spellSlots.current`.
+ * Slot maxima, keyed by slot level as a string so they line up with the stored
+ * `spellSlots.current`.
  *
- * `custom` is the one progression whose maxima are player-entered, so it reads
- * them back off the row instead of a table. Pact magic lands in the same
- * keyspace with exactly one populated key.
+ * Player-entered for every character now, not read off a class table. The
+ * tables were right about the rules and wrong about this app's job — every
+ * other tab already refuses to assert what a character should have, and
+ * `custom` progression only ever helped a player who knew to go looking for it.
+ * The tables stay in `class-tables` for level-up and for the fill-from-table
+ * action; nothing derives the grid from them.
  */
 export const spellSlotMaxima = (sheet: CharacterSheet): SlotMaxima => {
-  switch (sheet.spellcastingProgression) {
-    case SpellcastingProgression.FULL:
-      return slotsFromTable(FULL_CASTER_SLOTS, sheet.level);
-    case SpellcastingProgression.HALF:
-      return slotsFromTable(HALF_CASTER_SLOTS, sheet.level);
-    case SpellcastingProgression.THIRD:
-      return slotsFromTable(THIRD_CASTER_SLOTS, sheet.level);
-    case SpellcastingProgression.PACT: {
-      const pact = PACT_MAGIC_SLOTS[sheet.level - 1];
-
-      return pact ? { [String(pact.slotLevel)]: pact.slots } : {};
-    }
-    case SpellcastingProgression.CUSTOM:
-      return sheet.spellSlots.max ?? {};
-    default:
-      return {};
-  }
+  return sheet.spellSlots.max ?? {};
 };
 
-/** Slot levels with a non-zero maximum — what the slot grid renders. */
+/** Slot levels with a non-zero maximum. Not the grid — that shows all nine. */
 export const availableSlotLevels = (sheet: CharacterSheet): number[] => {
   const maxima = spellSlotMaxima(sheet);
 

@@ -2,6 +2,8 @@ export {
   proficiencyBonusForLevel,
   HIT_DIE_BY_CLASS,
   SPELLCASTING_ABILITY_BY_CLASS,
+  resolveSpellcastingAbility,
+  slotMaximaFromProgression,
   SAVE_PROFICIENCIES_BY_CLASS,
   SPEED_BY_RACE,
   DEFAULT_PROGRESSION_BY_CLASS,

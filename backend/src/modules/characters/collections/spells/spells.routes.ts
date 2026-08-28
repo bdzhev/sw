@@ -7,6 +7,7 @@ import { errorHook } from '@shared/validation';
 
 import { requireOwnedCharacter } from '../collection.ownership';
 import type { OwnedCharacterVariables } from '../collection.ownership';
+import { selectCharacterSpell } from './spells.mapper';
 import { createSpellSchema, updateSpellSchema } from './spells.schemas';
 
 /**
@@ -35,7 +36,10 @@ characterSpellsRoutes.post(
         .values({ ...values, characterId })
         .returning();
 
-      return c.json(created[0], 201);
+      // Re-read through the join: `.returning()` alone answers with a shape the
+      // list GET never produces, and the client appends this response straight
+      // into its cache. See spells.mapper.ts.
+      return c.json(await selectCharacterSpell(created[0].id), 201);
     } catch (err) {
       // Mirrors the table's reference-xor-custom CHECK. The schema catches this
       // first; this is the backstop for a body shape it cannot see.
@@ -78,7 +82,7 @@ characterSpellsRoutes.patch(
         return c.json({ error: 'Spell not found' }, 404);
       }
 
-      return c.json(updated[0]);
+      return c.json(await selectCharacterSpell(updated[0].id));
     } catch (err) {
       // Mirrors the table's reference-xor-custom CHECK. The schema catches this
       // first; this is the backstop for a body shape it cannot see.

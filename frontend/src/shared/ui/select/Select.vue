@@ -11,29 +11,30 @@ import {
   SelectValue,
   SelectViewport,
 } from 'reka-ui';
-import { useField } from 'vee-validate';
-import { computed, useId } from 'vue';
+import { computed, useAttrs, useId } from 'vue';
 
 import { FieldLabel } from '@shared/ui/field-label';
 
 import type { SelectOption, SelectProps } from './Select.types';
 
+defineOptions({ inheritAttrs: false });
+
 const props = withDefaults(defineProps<SelectProps>(), {
   placeholder: 'Select an option...',
   isLabelHidden: false,
+  hasError: false,
+  isDisabled: false,
 });
 
-const triggerId = useId();
+const model = defineModel<SelectOption['value'] | undefined>();
 
-const { value, errorMessage, handleBlur } = useField<SelectOption['value'] | undefined>(
-  () => {
-    return props.name;
-  },
-);
+const attrs = useAttrs();
 
-const handleSelect = () => {
-  handleBlur();
-};
+const generatedId = useId();
+
+const triggerId = computed(() => {
+  return props.id ?? generatedId;
+});
 
 /**
  * Derived from `options` rather than left to SelectValue: reka computes its own
@@ -43,24 +44,26 @@ const handleSelect = () => {
  */
 const selectedLabel = computed(() => {
   return props.options.find((option) => {
-    return option.value === value.value;
+    return option.value === model.value;
   })?.label;
 });
 </script>
 
 <template>
-  <div class="flex w-full flex-col gap-1">
+  <div :class="['flex w-full flex-col gap-1', attrs.class]">
     <FieldLabel v-if="props.label" :field-id="triggerId" :is-hidden="props.isLabelHidden">
       {{ props.label }}
     </FieldLabel>
 
-    <SelectRoot v-model="value" @update:model-value="handleSelect">
+    <SelectRoot v-model="model" :disabled="props.isDisabled">
       <SelectTrigger
         :id="triggerId"
         :class="[
           'flex min-h-11 w-full cursor-pointer items-center justify-between rounded-md bg-bg-raised px-3 py-2 text-base text-secondary ring-2 transition-all duration-200 hover:bg-bg-raised-hover focus:ring-secondary focus:outline-none md:min-h-0 md:text-sm',
-          errorMessage ? 'ring-danger/50' : 'ring-primary/50',
+          props.hasError ? 'ring-danger/50' : 'ring-primary/50',
+          props.isDisabled && 'cursor-not-allowed opacity-60',
         ]"
+        :aria-invalid="props.hasError || undefined"
       >
         <SelectValue
           :class="['truncate', selectedLabel ? 'text-primary' : 'text-secondary']"
@@ -92,9 +95,5 @@ const selectedLabel = computed(() => {
         </SelectContent>
       </SelectPortal>
     </SelectRoot>
-
-    <p v-if="errorMessage" class="mt-1 text-xs font-medium text-danger">
-      {{ errorMessage }}
-    </p>
   </div>
 </template>

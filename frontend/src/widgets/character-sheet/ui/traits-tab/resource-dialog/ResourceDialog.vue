@@ -16,8 +16,8 @@ import {
 } from '@shared/ui/dialog';
 import { FormInput } from '@shared/ui/form-input';
 import { FormNumberField } from '@shared/ui/form-number-field';
+import { FormSelect } from '@shared/ui/form-select';
 import { FormSwitch } from '@shared/ui/form-switch';
-import { Select } from '@shared/ui/select';
 import { Text } from '@shared/ui/text';
 import { Textarea } from '@shared/ui/textarea';
 
@@ -76,7 +76,7 @@ const handleOpenChange = (isOpen: boolean): void => {
 
           <DialogBody>
             <div class="flex flex-col gap-2">
-              <Select
+              <FormSelect
                 name="resource"
                 :options="RESOURCE_OPTIONS"
                 placeholder="Which resource?"
@@ -114,7 +114,7 @@ const handleOpenChange = (isOpen: boolean): void => {
               />
 
               <div class="flex flex-col">
-                <Select
+                <FormSelect
                   name="resetTrigger"
                   :options="RESET_TRIGGER_OPTIONS"
                   placeholder="Resets on…"

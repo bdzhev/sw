@@ -15,8 +15,8 @@ import {
   DialogTitle,
 } from '@shared/ui/dialog';
 import { FormInput } from '@shared/ui/form-input';
+import { FormSelect } from '@shared/ui/form-select';
 import { FormSwitch } from '@shared/ui/form-switch';
-import { Select } from '@shared/ui/select';
 import { Text } from '@shared/ui/text';
 import { ToggleChipGroup } from '@shared/ui/toggle-chip-group';
 
@@ -178,7 +178,7 @@ const handleCancelClick = (): void => {
               />
 
               <div class="flex flex-col gap-1">
-                <Select name="ability" label="Ability" :options="ABILITY_OPTIONS" />
+                <FormSelect name="ability" label="Ability" :options="ABILITY_OPTIONS" />
 
                 <Text size="xs" theme="secondary">
                   Finesse uses whichever of Strength or Dexterity is higher — the same one
@@ -186,13 +186,13 @@ const handleCancelClick = (): void => {
                 </Text>
               </div>
 
-              <Select name="delivery" label="Delivery" :options="DELIVERY_OPTIONS" />
+              <FormSelect name="delivery" label="Delivery" :options="DELIVERY_OPTIONS" />
 
               <FormSwitch name="proficient" :label="proficientLabel" />
 
               <FormInput name="damageDice" label="Damage dice" placeholder="1d8" />
 
-              <Select
+              <FormSelect
                 name="damageType"
                 label="Damage type"
                 :options="DAMAGE_TYPE_OPTIONS"

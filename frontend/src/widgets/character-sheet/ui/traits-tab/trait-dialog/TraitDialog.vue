@@ -15,8 +15,8 @@ import {
   DialogTitle,
 } from '@shared/ui/dialog';
 import { FormInput } from '@shared/ui/form-input';
+import { FormSelect } from '@shared/ui/form-select';
 import { FormSwitch } from '@shared/ui/form-switch';
-import { Select } from '@shared/ui/select';
 import { Textarea } from '@shared/ui/textarea';
 
 import { TRAIT_TAG_OPTIONS } from '@widgets/character-sheet/config/traits';
@@ -71,7 +71,7 @@ const handleOpenChange = (isOpen: boolean): void => {
             <div class="flex flex-col gap-2">
               <FormInput name="name" placeholder="Trait name" />
 
-              <Select
+              <FormSelect
                 name="tag"
                 :options="TRAIT_TAG_OPTIONS"
                 placeholder="Tag — race, class or other"

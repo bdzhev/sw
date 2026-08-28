@@ -27,21 +27,44 @@ const spellXor = <T extends { spellId?: unknown; customName?: unknown }>(
 
 const XOR_MESSAGE = 'Provide exactly one of spellId or customName';
 
+const MAX_SPELL_LEVEL = 9;
+
+const CUSTOM_LEVEL_MESSAGE = 'customLevel belongs to a custom entry only';
+
+/** A custom entry's level, so it can be cast. A reference spell's comes off the join. */
+const customLevel = z.number().int().min(0).max(MAX_SPELL_LEVEL).nullable();
+
 export const spellFields = z.object({
   spellId: z.uuid().nullable(),
   customName: name.nullable(),
   customDescription: description,
+  customLevel,
   sortOrder,
 });
+
+/** Nullable rather than absent, so clearing it back to "no level" stays legal. */
+const customLevelOnlyWhenCustom = <
+  T extends { spellId?: unknown; customLevel?: unknown },
+>(
+  entry: T
+): boolean => {
+  const hasReference = entry.spellId !== null && entry.spellId !== undefined;
+  const hasLevel =
+    entry.customLevel !== null && entry.customLevel !== undefined;
+
+  return !hasReference || !hasLevel;
+};
 
 export const createSpellSchema = spellFields
   .partial({
     spellId: true,
     customName: true,
     customDescription: true,
+    customLevel: true,
     sortOrder: true,
   })
-  .refine(spellXor, { message: XOR_MESSAGE });
+  .refine(spellXor, { message: XOR_MESSAGE })
+  .refine(customLevelOnlyWhenCustom, { message: CUSTOM_LEVEL_MESSAGE });
 
 /**
  * The patch is checked the same way, but only when it touches either side —
@@ -58,4 +81,5 @@ export const updateSpellSchema = spellFields
       return !touchesIdentity || spellXor(patch);
     },
     { message: XOR_MESSAGE }
-  );
+  )
+  .refine(customLevelOnlyWhenCustom, { message: CUSTOM_LEVEL_MESSAGE });

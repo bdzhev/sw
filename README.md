@@ -39,6 +39,14 @@ Only [Docker](https://www.docker.com) required — no need to clone the repo or 
    - Frontend: http://localhost:8080
    - Backend: http://localhost:3000
 
+3. Fill the spell library (once per database):
+   ```sh
+   docker compose exec backend bun run db:seed
+   ```
+   The spell data ships inside the image, so this needs no network. It is
+   idempotent — re-running it changes nothing — and skipping it leaves the
+   spellcasting tab's search with nothing to find.
+
 ---
 
 ## Local dev
@@ -50,4 +58,27 @@ make dev
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
 
-Database migrations run automatically on startup.
+Database migrations run automatically on startup. The spell library does not —
+seed it once per database:
+
+```sh
+make seed-dev      # make seed, for a prod-style stack
+```
+
+`backend/src/modules/spells/spells.data.json` is a committed snapshot, so seeding
+works offline and every checkout gets identical rows. `bun run spells:refresh`
+re-pulls it from the SRD API and rewrites that file; it is the only part that
+touches the network, and it is not part of any normal run.
+
+---
+
+## Attribution
+
+Spell data is taken from the D&D 5e System Reference Document, pulled via
+[dnd5eapi.co](https://www.dnd5eapi.co) ([5e-bits/5e-database](https://github.com/5e-bits/5e-database)).
+
+> This work includes material taken from the System Reference Document 5.1
+> ("SRD 5.1") by Wizards of the Coast LLC and available at
+> <https://dnd.wizards.com/resources/systems-reference-document>. The SRD 5.1 is
+> licensed under the Creative Commons Attribution 4.0 International License
+> available at <https://creativecommons.org/licenses/by/4.0/legalcode>.

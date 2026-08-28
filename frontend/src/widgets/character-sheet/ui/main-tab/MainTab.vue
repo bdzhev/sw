@@ -44,7 +44,10 @@ const separatorOrientation = computed(() => {
 </script>
 
 <template>
-  <Skeleton v-if="!sheet || !character" class="h-96 w-full rounded-lg" />
+  <!-- Skeleton hardcodes `h-full w-full`, so its size has to come from a wrapper. -->
+  <div v-if="!sheet || !character" class="h-96 w-full">
+    <Skeleton class="rounded-lg" />
+  </div>
 
   <section v-else class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <div class="grid gap-4 md:grid-cols-2 md:gap-6">

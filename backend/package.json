@@ -9,7 +9,9 @@
     "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit",
     "db:generate": "bunx drizzle-kit generate",
-    "db:migrate": "bunx drizzle-kit migrate"
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:seed": "bun run --env-file ../.env src/modules/spells/spells.seed.ts",
+    "spells:refresh": "bun run src/modules/spells/spells.refresh.ts"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.9.0",

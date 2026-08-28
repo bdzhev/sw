@@ -68,7 +68,11 @@ export enum SpellcastingProgression {
   CUSTOM = 'custom',
 }
 
-/** `max` is present only for `custom` progression; otherwise it is derived. */
+/**
+ * Both halves are player-entered for every character — the class tables no
+ * longer drive the grid. `max` stays optional for rows written before that
+ * change; an absent one reads as an empty pool.
+ */
 export interface SpellSlots {
   current: Partial<Record<string, number>>;
   max?: Partial<Record<string, number>>;
@@ -229,6 +233,8 @@ export interface CharacterSpell {
   spellId: string | null;
   customName: string | null;
   customDescription: string | null;
+  /** Custom entries only — a reference spell's level comes off `spell`. */
+  customLevel: number | null;
   sortOrder: number;
   createdAt: string;
   spell: SpellReference | null;

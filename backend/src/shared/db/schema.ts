@@ -101,10 +101,11 @@ export const spellcastingProgressionEnum = pgEnum('spellcasting_progression', [
  * and the controller is its only writer. The row is born with the character.
  *
  * Derived values are deliberately absent — modifiers, proficiency bonus, save
- * and skill totals, passive perception, initiative total, spell save DC, slot
- * maxima and resource maxima are all computed on the frontend from these
- * columns. `hp_max` is the one exception: hp per level is rolled by the player,
- * so it is stored and player-owned.
+ * and skill totals, passive perception, initiative total, spell save DC and
+ * resource maxima are all computed on the frontend from these columns. `hp_max`
+ * is one exception: hp per level is rolled by the player. Spell slot maxima are
+ * the other — they used to be derived from the class tables and are now typed
+ * in, so they live in `spell_slots.max` below.
  */
 export const characterSheets = pgTable('character_sheets', {
   characterId: uuid('character_id')
@@ -157,9 +158,11 @@ export const characterSheets = pgTable('character_sheets', {
     .notNull()
     .default('none'),
   /**
-   * `{ current: { "1".."9": int }, max?: { "1".."9": int } }`. `max` is present
-   * only for `custom` progression; otherwise maxima come from the class table.
-   * Pact magic uses the same keyspace with exactly one populated key.
+   * `{ current: { "1".."9": int }, max: { "1".."9": int } }`. Both halves are
+   * player-entered for every character — the class tables no longer drive the
+   * grid, so `max` is not derivable from `spellcasting_progression` and is the
+   * only record of what the pool is. `max` stays optional in the type for rows
+   * written before that change.
    */
   spellSlots: jsonb('spell_slots')
     .notNull()
@@ -423,6 +426,13 @@ export const characterSpells = pgTable(
     }),
     customName: text('custom_name'),
     customDescription: text('custom_description'),
+    /**
+     * Only meaningful for a custom entry — a reference spell's level comes off
+     * the join. Nullable rather than defaulted: rows added before casting
+     * existed have no level, and no level means no cast button, which is the
+     * honest answer rather than pretending they are cantrips.
+     */
+    customLevel: integer('custom_level'),
     sortOrder: integer('sort_order').notNull().default(0),
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },

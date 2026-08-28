@@ -15,6 +15,15 @@ prod-remote:
 qr:
 	@bun run scripts/printJoinQr.ts $(or $(PORT),8080)
 
+# Fills the shared spell library from the committed snapshot in
+# backend/src/modules/spells. No network, and idempotent — every row upserts on
+# its slug, so re-running is a no-op. Needed once per database.
+seed:
+	docker compose exec backend bun run db:seed
+
+seed-dev:
+	docker compose -f docker-compose.yml -f docker-compose.dev.yml exec backend bun run db:seed
+
 down:
 	docker compose down
 
@@ -27,4 +36,4 @@ clean:
 clean-dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml down --rmi local --volumes
 
-.PHONY: dev prod prod-remote qr down down-dev clean clean-dev
+.PHONY: dev prod prod-remote qr seed seed-dev down down-dev clean clean-dev

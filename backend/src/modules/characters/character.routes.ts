@@ -7,11 +7,9 @@ import {
   attacks,
   characters,
   characterSheets,
-  characterSpells,
   classResources,
   db,
   inventoryItems,
-  spells,
   traits,
 } from '@shared/db';
 import type { AuthVariables } from '@shared/middleware';
@@ -23,6 +21,8 @@ import {
   characterSpellsRoutes,
   itemsRoutes,
   resourcesRoutes,
+  selectCharacterSpells,
+  toCharacterSpell,
   traitsRoutes,
 } from './collections';
 
@@ -77,23 +77,7 @@ characterRoutes.get('/:id', async (c) => {
             asc(inventoryItems.sortOrder),
             asc(inventoryItems.createdAt)
           ),
-        db
-          .select({
-            id: characterSpells.id,
-            spellId: characterSpells.spellId,
-            customName: characterSpells.customName,
-            customDescription: characterSpells.customDescription,
-            sortOrder: characterSpells.sortOrder,
-            createdAt: characterSpells.createdAt,
-            spell: spells,
-          })
-          .from(characterSpells)
-          .leftJoin(spells, eq(characterSpells.spellId, spells.id))
-          .where(eq(characterSpells.characterId, id))
-          .orderBy(
-            asc(characterSpells.sortOrder),
-            asc(characterSpells.createdAt)
-          ),
+        selectCharacterSpells(id),
       ]);
 
     return c.json({
@@ -103,11 +87,7 @@ characterRoutes.get('/:id', async (c) => {
       traits: traitRows,
       classResources: resourceRows,
       inventoryItems: itemRows,
-      // `spell_id IS NULL` is the custom marker, so `isCustom` is computed here
-      // rather than stored — a stored boolean could drift away from the FK.
-      spells: spellRows.map((row) => {
-        return { ...row, isCustom: row.spellId === null };
-      }),
+      spells: spellRows.map(toCharacterSpell),
     });
   } catch (err) {
     console.error(err);

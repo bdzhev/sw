@@ -123,8 +123,14 @@ const handleUpdateLanguages = (value: Languages, immediate = false) => {
 <template>
   <section class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <template v-if="!sheet">
-      <Skeleton class="h-24 w-full rounded-lg" />
-      <Skeleton class="h-96 w-full rounded-lg" />
+      <!-- Skeleton hardcodes `h-full w-full`, so its size has to come from a wrapper. -->
+      <div class="h-24 w-full">
+        <Skeleton class="rounded-lg" />
+      </div>
+
+      <div class="h-96 w-full">
+        <Skeleton class="rounded-lg" />
+      </div>
     </template>
 
     <template v-else>

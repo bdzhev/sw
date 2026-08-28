@@ -4,4 +4,8 @@ export { attacksRoutes } from './attacks';
 export { traitsRoutes } from './traits';
 export { resourcesRoutes } from './resources';
 export { itemsRoutes } from './items';
-export { characterSpellsRoutes } from './spells';
+export {
+  characterSpellsRoutes,
+  selectCharacterSpells,
+  toCharacterSpell,
+} from './spells';

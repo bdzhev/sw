@@ -99,8 +99,14 @@ onBeforeRouteLeave(() => {
   <div class="flex flex-1 flex-col">
     <div class="flex flex-1 flex-col gap-4 pb-6">
       <template v-if="isFetchingCharacter && !character">
-        <Skeleton class="h-48 w-full rounded-lg" />
-        <Skeleton class="h-10 w-full" />
+        <!-- Skeleton hardcodes `h-full w-full`, so its size has to come from a wrapper. -->
+        <div class="h-48 w-full">
+          <Skeleton class="rounded-lg" />
+        </div>
+
+        <div class="h-10 w-full">
+          <Skeleton />
+        </div>
       </template>
 
       <template v-else-if="character">

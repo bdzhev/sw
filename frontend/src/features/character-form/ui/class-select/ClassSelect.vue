@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Select } from '@shared/ui/select';
+import { FormSelect } from '@shared/ui/form-select';
 
 import { characterClassSelectItems } from '@features/character-form/config';
 
@@ -9,7 +9,7 @@ const props = defineProps<ClassSelectProps>();
 </script>
 
 <template>
-  <Select
+  <FormSelect
     :name="props.name"
     :options="characterClassSelectItems"
     label="Class"
