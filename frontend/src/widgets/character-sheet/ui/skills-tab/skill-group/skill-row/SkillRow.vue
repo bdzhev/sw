@@ -56,6 +56,7 @@ const handleCycleClick = (): void => {
     <td class="px-2 py-1">
       <Button
         variant="transparent"
+        size="xs"
         is-icon-only
         :title="`${props.skill.label}: ${stateLabel}`"
         :aria-label="`${props.skill.label} — ${stateLabel}. Activate to cycle.`"

@@ -16,6 +16,14 @@ export const PAGE_SIZE = 10;
 export const MAX_CHARACTERS = 50;
 
 /**
+ * Mirrors MAX_ITEMS_PER_CHARACTER in the backend's
+ * collections/items/items.routes.ts. Mirrored so the Add control can disable
+ * itself rather than firing a request the server will answer with a 409; the
+ * server check stays as the backstop for a client that got there anyway.
+ */
+export const MAX_ITEMS = 200;
+
+/**
  * Two mount points, one rule: `/characters` (plural) is collection-level — the
  * paginated list and create. `/character/:id` (singular) is one character and
  * everything scoped to it.

@@ -99,6 +99,16 @@
    * at 80%, so a card-coloured panel over it reads as flat.
    */
   --color-bg-elevated: oklch(0.3 0.006 286.033);
+
+  /**
+   * Coin colours, for the currency captions only. Not in the semantic ramp
+   * above — these name a material, not a role, so they must never be reached for
+   * as "the warm one" or "the muted one". All three are light enough to read on
+   * --color-bg-secondary.
+   */
+  --color-coin-gold: oklch(0.83 0.14 88);
+  --color-coin-silver: oklch(0.8 0.02 250);
+  --color-coin-copper: oklch(0.68 0.13 45);
 }
 
 @utility loading-animation {

@@ -9,6 +9,7 @@ defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(defineProps<FormNumberFieldProps>(), {
   isLabelHidden: false,
+  size: 'md',
   step: 1,
   isDisabled: false,
   hasStepper: false,
@@ -34,6 +35,7 @@ const { value, errorMessage } = useField<number | undefined>(() => {
   <div v-bind="$attrs" class="flex w-full flex-col">
     <NumberField
       v-model="value"
+      :size="props.size"
       :label="props.label"
       :is-label-hidden="props.isLabelHidden"
       :min="props.min"

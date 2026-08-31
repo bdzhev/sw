@@ -17,7 +17,7 @@ const handleCycle = (skillKey: string): void => {
       <th
         scope="colgroup"
         colspan="4"
-        class="bg-bg-secondary px-2 py-2 text-left text-xs font-medium tracking-wide text-secondary uppercase"
+        class="rounded-sm bg-bg-primary px-2 py-2 text-left text-xs font-medium tracking-wide text-secondary uppercase"
       >
         {{ props.group.label }}
       </th>

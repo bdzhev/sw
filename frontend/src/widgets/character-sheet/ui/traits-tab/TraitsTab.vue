@@ -7,8 +7,8 @@ import { DialogRoot } from '@shared/ui/dialog';
 import { Separator } from '@shared/ui/separator';
 
 import { useTraitsTab } from '@widgets/character-sheet/model/traits';
+import { DetailDialog } from '@widgets/character-sheet/ui/detail-dialog';
 
-import { DetailDialog } from './detail-dialog';
 import { QuickReference } from './quick-reference';
 import { ResourceDialog } from './resource-dialog';
 import { ResourcesList } from './resources-list';

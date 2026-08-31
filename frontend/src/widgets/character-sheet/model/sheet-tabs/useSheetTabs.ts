@@ -34,6 +34,9 @@ interface UseSheetTabs {
  * work, and a tab has to be linkable. An unknown or missing `:tab` falls back
  * to main rather than rendering nothing.
  *
+ * Items is deliberately **not** in here. It is its own route and its own page,
+ * with its own header — not a value this segment can take.
+ *
  * Each tab carries its own target, so the nav is `RouterLink`s rather than
  * buttons that ask the router to do what a link already does.
  */

@@ -9,6 +9,14 @@ import { requireOwnedCharacter } from '../collection.ownership';
 import type { OwnedCharacterVariables } from '../collection.ownership';
 import { createItemSchema, updateItemSchema } from './items.schemas';
 
+/**
+ * `GET /character/:id` returns every sub-collection in full, unpaginated, so an
+ * unbounded inventory grows the one request the whole sheet blocks on. 200 rows
+ * keeps that response openable on a phone and is two orders of magnitude above
+ * any real sheet.
+ */
+export const MAX_ITEMS_PER_CHARACTER = 200;
+
 export const itemsRoutes = new Hono<{
   Variables: OwnedCharacterVariables;
 }>();
@@ -24,6 +32,21 @@ itemsRoutes.post(
     const values = c.req.valid('json');
 
     try {
+      // Count-then-insert is not atomic: two simultaneous creates can both pass
+      // and land on 201. Benign here (the UI disables the trigger at the cap);
+      // the atomic form is one INSERT ... SELECT ... WHERE (SELECT count(*)) < N.
+      const total = await db.$count(
+        inventoryItems,
+        eq(inventoryItems.characterId, characterId)
+      );
+
+      if (total >= MAX_ITEMS_PER_CHARACTER) {
+        return c.json(
+          { error: `Item limit reached (${MAX_ITEMS_PER_CHARACTER})` },
+          409
+        );
+      }
+
       const created = await db
         .insert(inventoryItems)
         .values({ ...values, characterId })

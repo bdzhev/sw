@@ -90,6 +90,18 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
+        // A page rather than a sixth tab: it carries its own header and shows
+        // none of the sheet's chrome. `items` would also match the `:tab?` route
+        // above, but router ranking scores a static segment over a param, so
+        // this wins regardless of declaration order.
+        path: 'character/:id/items',
+        name: RouteName.APP_CHARACTER_ITEMS,
+        component: () => {
+          return import('@pages/character-items');
+        },
+        meta: { layout: SheetLayout },
+      },
+      {
         path: 'settings',
         name: RouteName.APP_SETTINGS,
         component: () => {

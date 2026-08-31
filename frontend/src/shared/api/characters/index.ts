@@ -20,6 +20,7 @@ export {
   createCharacter,
   PAGE_SIZE,
   MAX_CHARACTERS,
+  MAX_ITEMS,
 } from './characters';
 
 export {
