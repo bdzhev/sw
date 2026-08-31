@@ -4,13 +4,11 @@ import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 
 import { CharacterStatus, type SheetPatch } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
-import { useBreakpoint } from '@shared/lib/ui';
 import { Skeleton } from '@shared/ui/skeleton';
 
 import { useCharacter, useSheetAutosave } from '@entities/characters';
 
 import { SheetTab, useSheetTabs } from '@widgets/character-sheet/model/sheet-tabs';
-import { MobileNavHeader } from '@widgets/sidebar-navigation';
 
 import { CombatTab } from './combat-tab';
 import { MainTab } from './main-tab';
@@ -20,8 +18,6 @@ import { SkillsTab } from './skills-tab';
 import { SpellcastingTab } from './spellcasting-tab';
 import { StatusBar } from './status-bar';
 import { TraitsTab } from './traits-tab';
-
-const { isMobile } = useBreakpoint();
 
 const route = useRoute();
 const router = useRouter();
@@ -94,8 +90,6 @@ onBeforeRouteLeave(() => {
 </script>
 
 <template>
-  <MobileNavHeader v-if="isMobile" class="page-x-escape" />
-
   <div class="flex flex-1 flex-col">
     <div class="flex flex-1 flex-col gap-4 pb-6">
       <template v-if="isFetchingCharacter && !character">

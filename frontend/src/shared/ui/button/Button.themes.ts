@@ -32,6 +32,22 @@ export const equalPaddingClasses: Record<ButtonSize, string> = {
   lg: 'p-6',
 };
 
+/**
+ * The icon-only box, which is its own scale rather than `equalPaddingClasses`
+ * plus a blanket 44px floor.
+ *
+ * `xs` hugs the glyph: for a chevron or a caret in a header, a 44px box is a
+ * hole with an icon floating in it, and the height is what gives it away. From
+ * `sm` up the floor stays — it is what every row-action button in the app relies
+ * on to stay tappable — and it is dropped from `md`, where the pointer is precise.
+ */
+export const iconOnlyClasses: Record<ButtonSize, string> = {
+  xs: 'p-1',
+  sm: 'min-h-11 min-w-11 p-3 md:min-h-0 md:min-w-0',
+  md: 'min-h-11 min-w-11 p-5 md:min-h-0 md:min-w-0',
+  lg: 'min-h-11 min-w-11 p-6 md:min-h-0 md:min-w-0',
+};
+
 export const roundClasses: Record<ButtonSize, string> = {
   xs: 'rounded-sm',
   sm: 'rounded-sm',

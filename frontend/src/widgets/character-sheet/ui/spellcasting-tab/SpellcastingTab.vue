@@ -12,7 +12,6 @@ import type { SpellSubmitValues } from '@widgets/character-sheet/model/spellcast
 
 import { AddSpellDialog } from './add-spell-dialog';
 import { CastDialog } from './cast-dialog';
-import { ProgressionField } from './progression-field';
 import { SpellDetailDialog } from './spell-detail-dialog';
 import { SpellList } from './spell-list';
 import { SpellSlots } from './spell-slots';
@@ -123,9 +122,9 @@ const handleAddCustom = async (values: SpellSubmitValues): Promise<void> => {
       :ability="castingAbility"
       :save-dc="saveDc"
       :attack-bonus="attackBonus"
+      :progression="progression"
+      @patch="handlePatch"
     />
-
-    <ProgressionField :progression="progression" @patch="handlePatch" />
 
     <SpellSlots
       :slots="sheet.spellSlots"

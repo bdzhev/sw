@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import {
   alignClasses,
   equalPaddingClasses,
+  iconOnlyClasses,
   paddingClasses,
   roundClasses,
   textClasses,
@@ -32,17 +33,29 @@ const isButtonElement = computed(() => {
   return props.as === 'button';
 });
 
-const buttonClasses = computed(() => {
-  const isSquare = props.isIconOnly || props.equalPadding;
-  const padding = isSquare ? equalPaddingClasses[props.size] : paddingClasses[props.size];
+/**
+ * Three padding scales, not two plus a modifier: an icon-only button's box and
+ * its touch floor belong to one decision per size, so `iconOnlyClasses` owns
+ * both. That is what lets `size="xs"` hug its glyph while `sm` and up keep the
+ * 44px minimum.
+ */
+const boxClasses = computed(() => {
+  if (props.isIconOnly) {
+    return iconOnlyClasses[props.size];
+  }
 
+  return props.equalPadding
+    ? equalPaddingClasses[props.size]
+    : paddingClasses[props.size];
+});
+
+const buttonClasses = computed(() => {
   return [
     variantClasses[props.variant],
     textClasses[props.size],
     alignClasses[props.align],
     props.isRound ? 'rounded-full' : roundClasses[props.size],
-    props.isUnpadded ? '' : padding,
-    props.isIconOnly ? 'min-h-11 min-w-11 md:min-h-0 md:min-w-0' : '',
+    props.isUnpadded ? '' : boxClasses.value,
     widthClasses[props.width],
     props.isLoading ? 'loading-animation' : '',
   ];

@@ -35,7 +35,12 @@ const value = computed<SelectOption['value'] | undefined>({
 
 <template>
   <div class="flex flex-col gap-1">
-    <Select v-model="value" label="Progression" :options="PROGRESSION_OPTIONS" />
+    <Select
+      v-model="value"
+      label="Progression"
+      :options="PROGRESSION_OPTIONS"
+      class="max-w-field"
+    />
 
     <Text size="xs" theme="secondary">
       Sets your spellcasting ability for save DC and attack bonus — an eldritch knight or

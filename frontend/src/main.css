@@ -19,6 +19,18 @@
    */
   --spacing-mobile-bar: 3.5rem;
 
+  /**
+   * The widest a single form control gets before it stops reading as a control.
+   * A select or an input stretched across a desktop card looks like a banner,
+   * not a field. Tailwind's `--container-*` namespace, so this is `max-w-field`
+   * (and `w-field` / `min-w-field`) at every breakpoint.
+   *
+   * Deliberately not applied inside `shared/ui/select` itself: a dialog's fields
+   * are meant to fill their column and match the inputs beside them. This is for
+   * a lone control on a wide sheet surface.
+   */
+  --container-field: 20rem;
+
   /* Below Tailwind's `xs`, for status chrome that must not compete with content. */
   --text-xxs: 0.6875rem;
 

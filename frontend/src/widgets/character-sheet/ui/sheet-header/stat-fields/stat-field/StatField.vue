@@ -21,12 +21,18 @@ const value = defineModel<number>({ required: true });
   <div v-if="props.isReadonly" class="flex min-w-0 flex-col gap-1">
     <span class="truncate text-xs text-secondary uppercase">{{ props.label }}</span>
 
-    <p class="text-xl font-semibold text-primary tabular-nums">{{ value }}</p>
+    <p class="text-base font-semibold text-primary tabular-nums">{{ value }}</p>
   </div>
 
+  <!--
+    Always `sm`: five of these share one line at phone width, and matching the
+    desktop row to it keeps the header reading as chrome rather than as the
+    loudest thing on the sheet.
+  -->
   <NumberField
     v-else
     v-model="value"
+    size="sm"
     :label="props.label"
     :min="props.min"
     :max="props.max"

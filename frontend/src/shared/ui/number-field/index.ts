@@ -1,4 +1,4 @@
 import NumberField from './NumberField.vue';
 
 export { NumberField };
-export type { NumberFieldProps } from './NumberField.types';
+export type { NumberFieldProps, NumberFieldSize } from './NumberField.types';

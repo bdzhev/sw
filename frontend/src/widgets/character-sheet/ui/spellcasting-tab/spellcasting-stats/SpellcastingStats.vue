@@ -1,13 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
+import type { SheetPatch } from '@shared/api/characters';
+
 import { ABILITY_LABELS } from '@entities/characters';
 
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
+import { ProgressionField } from './progression-field';
 import type { SpellcastingStatsProps } from './SpellcastingStats.types';
 
 const props = defineProps<SpellcastingStatsProps>();
+
+const emit = defineEmits<{ patch: [patch: SheetPatch, immediate?: boolean] }>();
+
+const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  emit('patch', patch, immediate);
+};
 
 const abilityLabel = computed(() => {
   return props.ability ? ABILITY_LABELS[props.ability] : '—';
@@ -48,5 +57,9 @@ const tiles = computed(() => {
         <dd class="text-lg font-semibold text-primary">{{ tile.value }}</dd>
       </div>
     </dl>
+
+    <!-- The control sits under the numbers it produces: those are what you read
+         mid-game, and progression is set once and then left alone. -->
+    <ProgressionField :progression="props.progression" @patch="handlePatch" />
   </SheetSection>
 </template>

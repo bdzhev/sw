@@ -10,12 +10,14 @@ import { useId } from 'vue';
 
 import { FieldLabel } from '@shared/ui/field-label';
 
+import { inputSizeClasses } from './NumberField.themes';
 import type { NumberFieldProps } from './NumberField.types';
 
 defineOptions({ inheritAttrs: false });
 
 const props = withDefaults(defineProps<NumberFieldProps>(), {
   isLabelHidden: false,
+  size: 'md',
   step: 1,
   isDisabled: false,
   hasStepper: false,
@@ -66,7 +68,10 @@ const STEP_BUTTON_CLASSES =
 
       <NumberFieldInput
         inputmode="numeric"
-        class="min-h-11 w-full min-w-0 rounded-md border border-border bg-bg-raised px-2 text-center text-xl font-semibold text-primary tabular-nums outline-none focus:border-accent-primary disabled:cursor-not-allowed disabled:bg-muted disabled:text-secondary md:min-h-9"
+        :class="[
+          'min-h-11 w-full min-w-0 rounded-md border border-border bg-bg-raised text-center font-semibold text-primary tabular-nums outline-none focus:border-accent-primary disabled:cursor-not-allowed disabled:bg-muted disabled:text-secondary md:min-h-9',
+          inputSizeClasses[props.size],
+        ]"
       />
 
       <NumberFieldIncrement

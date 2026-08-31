@@ -29,9 +29,10 @@ export interface ButtonProps {
   isRound?: boolean;
   equalPadding?: boolean;
   /**
-   * Square padding and a 44px minimum box, for a button whose content is only
-   * an icon. Composes with every `variant`, which is why there is no parallel
-   * `icon-*` colour list to keep in step.
+   * Square padding for a button whose content is only an icon. The box comes from
+   * `iconOnlyClasses`, so it is `size`-driven: `xs` hugs the glyph, `sm` and up
+   * keep a 44px touch floor below md. Composes with every `variant`, which is why
+   * there is no parallel `icon-*` colour list to keep in step.
    *
    * An icon-only button has no text, so it needs an `aria-label` — pass one.
    */

@@ -1,6 +1,13 @@
+/**
+ * `md` is the default entry box. `sm` is for a tight row of them — the header's
+ * five stat fields at phone width, where five `md` boxes cannot fit one line.
+ */
+export type NumberFieldSize = 'sm' | 'md';
+
 export interface NumberFieldProps {
   /** Required: the field needs an accessible name. */
   label: string;
+  size?: NumberFieldSize;
   isLabelHidden?: boolean;
   min?: number;
   max?: number;
