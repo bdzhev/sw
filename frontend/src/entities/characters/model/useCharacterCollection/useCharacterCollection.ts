@@ -45,7 +45,9 @@ export const useCharacterCollection = <K extends CollectionKey>(
 
   const patchCache = (apply: (rows: CollectionRow[K][]) => CollectionRow[K][]) => {
     qc.setQueryData(queryKey, (old: CharacterDetailCache) => {
-      if (!old) return old;
+      if (!old) {
+        return old;
+      }
 
       return { ...old, [key]: apply(old[key] as CollectionRow[K][]) };
     });

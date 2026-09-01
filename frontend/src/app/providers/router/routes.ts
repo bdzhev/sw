@@ -102,6 +102,16 @@ export const routes: RouteRecordRaw[] = [
         meta: { layout: SheetLayout },
       },
       {
+        // Same ranking as the items page above: a static segment outranks the
+        // `:tab?` param, so this wins regardless of declaration order.
+        path: 'character/:id/settings',
+        name: RouteName.APP_CHARACTER_SETTINGS,
+        component: () => {
+          return import('@pages/character-settings');
+        },
+        meta: { layout: SheetLayout },
+      },
+      {
         path: 'settings',
         name: RouteName.APP_SETTINGS,
         component: () => {

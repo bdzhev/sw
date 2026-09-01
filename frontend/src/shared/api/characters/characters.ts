@@ -49,12 +49,38 @@ export const updateCharacter = ({
   return http.patch<CharacterIdentity>(`/character/${id}`, patch);
 };
 
-/** The autosave controller's `character` target. Absolute values, never deltas. */
+/** The autosave controller's target. Absolute values, never deltas. */
 export const updateCharacterSheet = (
   id: string,
   patch: SheetPatch,
 ): Promise<CharacterSheet> => {
   return http.patch<CharacterSheet>(`/character/${id}/sheet`, patch);
+};
+
+/**
+ * The same write, as a best-effort during page teardown. `keepalive` is what lets
+ * it outlive the document; `navigator.sendBeacon` cannot stand in because it is
+ * POST-only and every autosave target is a PATCH. Rejections are swallowed on
+ * purpose - there is no one left to tell, and the localStorage buffer is the real
+ * durability net.
+ */
+export const sendSheetPatchOnTeardown = (id: string, patch: SheetPatch): void => {
+  http.patch(`/character/${id}/sheet`, patch, { keepalive: true }).catch(() => {
+    /* the document is going away */
+  });
+};
+
+/**
+ * The three atomic actions - rest, level-up, setup. Each returns the full new
+ * state for the controller to adopt, rather than a partial the client has to
+ * reconcile.
+ */
+export const runCharacterAction = <T>(
+  id: string,
+  endpoint: string,
+  body: unknown,
+): Promise<T> => {
+  return http.post<T>(`/character/${id}/${endpoint}`, body);
 };
 
 export const deleteCharacter = async (id: string): Promise<void> => {

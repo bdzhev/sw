@@ -39,7 +39,9 @@ const schema = z
     quickReference: z.boolean(),
   })
   .superRefine((values, ctx) => {
-    if (values.resource !== CUSTOM_RESOURCE_VALUE) return;
+    if (values.resource !== CUSTOM_RESOURCE_VALUE) {
+      return;
+    }
 
     if (!values.customName) {
       ctx.addIssue({

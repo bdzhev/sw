@@ -60,7 +60,9 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
   const sourcedTriggerHint = computed(() => {
     const key = selectedResource.value;
 
-    if (!key || key === CUSTOM_RESOURCE_VALUE) return null;
+    if (!key || key === CUSTOM_RESOURCE_VALUE) {
+      return null;
+    }
 
     const name = KNOWN_RESOURCE_LABELS[key] ?? key;
     const sourced = KNOWN_RESET_TRIGGERS[key];
@@ -100,13 +102,17 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
    * the map at all — the rest land on manual for the player to correct.
    */
   watch(selectedResource, (key) => {
-    if (isEditing.value || !key) return;
+    if (isEditing.value || !key) {
+      return;
+    }
 
     form.setFieldValue('resetTrigger', KNOWN_RESET_TRIGGERS[key] ?? ResetTrigger.MANUAL);
   });
 
   watch(isOpen, (open) => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const row = getResource();
     const isKnown = row ? KNOWN_RESOURCE_LABELS[row.resourceKey] !== undefined : false;

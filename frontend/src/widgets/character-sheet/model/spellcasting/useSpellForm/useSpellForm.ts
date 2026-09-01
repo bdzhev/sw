@@ -30,7 +30,9 @@ export const useSpellForm = (options: UseSpellFormOptions) => {
 
   /** The dialog stays mounted between openings, so the fields are cleared on open. */
   watch(isOpen, (open) => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     form.resetForm({ values: { name: '', description: '' } });
   });

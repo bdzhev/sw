@@ -13,6 +13,7 @@ import {
   proficiencyBonus,
   skillTotal,
   SKILLS,
+  totalAbilityScores,
   useCharacter,
   useSheetAutosave,
 } from '@entities/characters';
@@ -52,10 +53,21 @@ const items = computed(() => {
   return character.value?.inventoryItems ?? [];
 });
 
+/**
+ * The item scan, once for all eighteen skills plus passive perception. Each helper
+ * used to redo it internally, so one hp edit walked the inventory nineteen times.
+ */
+const totals = computed(() => {
+  return sheet.value ? totalAbilityScores(sheet.value, items.value) : null;
+});
+
 const groups = computed<SkillGroupView[]>(() => {
   const current = sheet.value;
+  const scores = totals.value;
 
-  if (!current) return [];
+  if (!current || !scores) {
+    return [];
+  }
 
   return SKILL_ABILITY_ORDER.map((ability) => {
     return {
@@ -68,7 +80,7 @@ const groups = computed<SkillGroupView[]>(() => {
           key: skill.key,
           label: skill.label,
           abilityLabel: ABILITY_SHORT_LABELS[skill.ability],
-          modifier: skillTotal(current, skill.key, items.value),
+          modifier: skillTotal(scores, current, skill.key),
           proficiency: (current.skillProficiencies[skill.key] ??
             0) as SkillProficiencyLevel,
         };
@@ -88,6 +100,13 @@ const skillRows = computed<SkillRowView[]>(() => {
   });
 });
 
+const passive = computed(() => {
+  const current = sheet.value;
+  const scores = totals.value;
+
+  return current && scores ? passivePerception(scores, current) : 0;
+});
+
 const languages = computed<Languages>(() => {
   return {
     standard: sheet.value?.languages?.standard ?? [],
@@ -99,7 +118,9 @@ const languages = computed<Languages>(() => {
 const handleCycleProficiency = (skillKey: string) => {
   const current = sheet.value;
 
-  if (!current) return;
+  if (!current) {
+    return;
+  }
 
   const next: SkillProficiencies = { ...current.skillProficiencies };
   const level = next[skillKey] ?? 0;
@@ -134,11 +155,6 @@ const handleUpdateLanguages = (value: Languages, immediate = false) => {
     </template>
 
     <template v-else>
-      <SkillSummary
-        :passive-perception="passivePerception(sheet, items)"
-        :proficiency-bonus="proficiencyBonus(sheet)"
-      />
-
       <SheetSection title="Skills">
         <DataTable
           :columns="SKILL_COLUMNS"
@@ -154,6 +170,11 @@ const handleUpdateLanguages = (value: Languages, immediate = false) => {
           />
         </DataTable>
       </SheetSection>
+
+      <SkillSummary
+        :passive-perception="passive"
+        :proficiency-bonus="proficiencyBonus(sheet)"
+      />
 
       <LanguagePicker :languages="languages" @update="handleUpdateLanguages" />
     </template>

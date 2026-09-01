@@ -45,10 +45,20 @@ const STEP_BUTTON_CLASSES =
 
 <template>
   <div v-bind="$attrs" class="flex min-w-0 flex-col gap-1">
-    <FieldLabel :field-id="fieldId" :is-hidden="props.isLabelHidden">
+    <FieldLabel
+      :field-id="fieldId"
+      :is-hidden="props.isLabelHidden"
+      class="flex items-center gap-1"
+    >
       {{ props.label }}
+
+      <slot name="label-icon" />
     </FieldLabel>
 
+    <!--
+      reka changes the value on wheel by default, so scrolling the page with a field
+      focused silently edits it.
+    -->
     <NumberFieldRoot
       :id="fieldId"
       v-model="value"
@@ -56,6 +66,7 @@ const STEP_BUTTON_CLASSES =
       :max="props.max"
       :step="props.step"
       :disabled="props.isDisabled"
+      disable-wheel-change
       class="flex items-center gap-2"
     >
       <NumberFieldDecrement

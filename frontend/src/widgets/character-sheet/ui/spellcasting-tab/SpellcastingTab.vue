@@ -92,7 +92,9 @@ const handleRemove = (spell: CharacterSpell): void => {
 const handleConfirmDelete = async (): Promise<void> => {
   const spell = pendingDelete.value;
 
-  if (!spell) return;
+  if (!spell) {
+    return;
+  }
 
   if (await deleteSpell(spell.id)) {
     isDeleteOpen.value = false;

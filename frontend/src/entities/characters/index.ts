@@ -5,7 +5,7 @@ export { useUpdateCharacter } from './model/useUpdateCharacter';
 export { useCharacter } from './model/useCharacter';
 export { useCharacterCollection } from './model/useCharacterCollection';
 export { useSheetAutosave } from './model/useSheetAutosave';
-export type { AutosaveTarget, SaveState } from './model/useSheetAutosave';
+export type { SaveState } from './model/useSheetAutosave';
 
 export {
   proficiencyBonusForLevel,
@@ -39,7 +39,7 @@ export {
   availableSlotLevels,
   type AbilityScores,
   type SlotMaxima,
-} from './lib/derived-stats';
+} from './model/derived-stats';
 
 export {
   ABILITIES,

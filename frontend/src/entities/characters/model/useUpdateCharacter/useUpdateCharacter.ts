@@ -4,6 +4,8 @@ import {
   updateCharacter as updateCharacterRequest,
   characterQueries,
 } from '@shared/api/characters';
+import { getApiErrorMessage } from '@shared/lib/http';
+import { useToast } from '@shared/lib/ui';
 
 import type {
   CharacterDetailCache,
@@ -15,12 +17,15 @@ export const useUpdateCharacter = (options?: UseUpdateCharacterOptions) => {
   const { onSuccess } = options || {};
 
   const qc = useQueryClient();
+  const { showToast } = useToast();
 
   const { mutate: updateCharacter, isPending: isUpdating } = useMutation({
     mutationFn: updateCharacterRequest,
     onSuccess: (updated) => {
       qc.setQueryData(characterQueries.characters(), (old: CharactersCache) => {
-        if (!old) return old;
+        if (!old) {
+          return old;
+        }
 
         return {
           ...old,
@@ -43,13 +48,22 @@ export const useUpdateCharacter = (options?: UseUpdateCharacterOptions) => {
       qc.setQueryData(
         characterQueries.character(updated.id),
         (old: CharacterDetailCache) => {
-          if (!old) return old;
+          if (!old) {
+            return old;
+          }
 
           return { ...old, character: { ...old.character, ...updated } };
         },
       );
 
       onSuccess?.();
+    },
+    onError: (error) => {
+      showToast({
+        title: 'Could not save that change',
+        description: getApiErrorMessage(error, 'Please try again.'),
+        variant: 'error',
+      });
     },
   });
 

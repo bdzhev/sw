@@ -4,7 +4,12 @@ import { computed } from 'vue';
 import type { CharacterStat, SheetPatch } from '@shared/api/characters';
 import { Text } from '@shared/ui/text';
 
-import { ABILITIES, proficiencyBonus, savingThrowTotal } from '@entities/characters';
+import {
+  ABILITIES,
+  proficiencyBonus,
+  savingThrowTotal,
+  totalAbilityScores,
+} from '@entities/characters';
 
 import { formatSigned } from '@widgets/character-sheet/lib/format';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
@@ -23,6 +28,24 @@ const bonus = computed(() => {
 const isProficient = (stat: CharacterStat): boolean => {
   return props.sheet.saveProficiencies.includes(stat);
 };
+
+/**
+ * The item scan, once. Called from the template it ran six times per re-render, and
+ * the sheet re-renders on every autosaved edit — including ones no save depends on.
+ */
+const totals = computed(() => {
+  return totalAbilityScores(props.sheet, props.items);
+});
+
+const rows = computed(() => {
+  return ABILITIES.map((ability) => {
+    return {
+      ability,
+      isProficient: isProficient(ability.stat),
+      total: savingThrowTotal(totals.value, props.sheet, ability.stat),
+    };
+  });
+});
 
 /** Single-shot edit, so it skips the debounce and writes the whole new set. */
 const handleToggleProficiency = (stat: CharacterStat): void => {
@@ -55,11 +78,11 @@ const handleToggleProficiency = (stat: CharacterStat): void => {
 
       <tbody>
         <SavingThrowRow
-          v-for="ability in ABILITIES"
-          :key="ability.stat"
-          :ability="ability"
-          :is-proficient="isProficient(ability.stat)"
-          :total="savingThrowTotal(props.sheet, ability.stat, props.items)"
+          v-for="row in rows"
+          :key="row.ability.stat"
+          :ability="row.ability"
+          :is-proficient="row.isProficient"
+          :total="row.total"
           @toggle="handleToggleProficiency"
         />
       </tbody>

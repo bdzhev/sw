@@ -31,7 +31,9 @@ export const useResourceSpend = (options: UseResourceSpendOptions) => {
   const spend = (cost: number) => {
     const clamped = Math.min(Math.max(1, cost), meta.remaining.value);
 
-    if (clamped <= 0) return;
+    if (clamped <= 0) {
+      return;
+    }
 
     onSpend(clamped);
   };
@@ -47,7 +49,9 @@ export const useResourceSpend = (options: UseResourceSpendOptions) => {
   };
 
   const isAbilityDisabled = (ability: ResourceSubAbility): boolean => {
-    if (meta.isExhausted.value) return true;
+    if (meta.isExhausted.value) {
+      return true;
+    }
 
     return ability.cost !== null && ability.cost > meta.remaining.value;
   };
@@ -61,7 +65,9 @@ export const useResourceSpend = (options: UseResourceSpendOptions) => {
   };
 
   watch(isOpen, (open) => {
-    if (open) return;
+    if (open) {
+      return;
+    }
 
     selectedAbilityName.value = null;
     form.resetForm({ values: { amount: '' } });

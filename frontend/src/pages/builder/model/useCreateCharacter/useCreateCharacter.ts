@@ -27,7 +27,9 @@ export const useCreateCharacter = (options?: UseCreateCharacterOptions) => {
       qc.setQueryData(
         characterQueries.character(characterId),
         (old: CharacterDetail | undefined) => {
-          if (!old) return old;
+          if (!old) {
+            return old;
+          }
 
           return {
             ...old,

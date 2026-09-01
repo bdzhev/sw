@@ -19,7 +19,11 @@ const value = defineModel<number>({ required: true });
 
 <template>
   <div v-if="props.isReadonly" class="flex min-w-0 flex-col gap-1">
-    <span class="truncate text-xs text-secondary uppercase">{{ props.label }}</span>
+    <span class="flex items-center gap-1 text-xs text-secondary uppercase">
+      <span class="truncate">{{ props.label }}</span>
+
+      <slot name="icon" />
+    </span>
 
     <p class="text-base font-semibold text-primary tabular-nums">{{ value }}</p>
   </div>
@@ -36,5 +40,9 @@ const value = defineModel<number>({ required: true });
     :label="props.label"
     :min="props.min"
     :max="props.max"
-  />
+  >
+    <template #label-icon>
+      <slot name="icon" />
+    </template>
+  </NumberField>
 </template>

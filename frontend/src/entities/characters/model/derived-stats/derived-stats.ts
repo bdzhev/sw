@@ -4,8 +4,8 @@ import {
   type InventoryItem,
 } from '@shared/api/characters';
 
-import { proficiencyBonusForLevel } from '../class-tables';
-import { PERCEPTION_SKILL_KEY, SKILLS } from '../skills';
+import { proficiencyBonusForLevel } from '@entities/characters/lib/class-tables';
+import { PERCEPTION_SKILL_KEY, SKILLS } from '@entities/characters/lib/skills';
 
 /**
  * Every derived number the sheet shows, in one module, so no tab reimplements
@@ -47,7 +47,9 @@ export const abilityModifier = (score: number): number => {
  */
 export const bonusesFromItems = (items: InventoryItem[]): Partial<AbilityScores> => {
   return items.reduce<Partial<AbilityScores>>((totals, item) => {
-    if (!item.isEquipped) return totals;
+    if (!item.isEquipped) {
+      return totals;
+    }
 
     for (const [stat, bonus] of Object.entries(item.statModifiers)) {
       const key = stat as CharacterStat;
@@ -58,7 +60,14 @@ export const bonusesFromItems = (items: InventoryItem[]): Partial<AbilityScores>
   }, {});
 };
 
-/** Base scores plus equipped-item bonuses — what the sheet actually displays. */
+/**
+ * Base scores plus equipped-item bonuses — what the sheet actually displays.
+ *
+ * **The one function here that walks the item list, and the one thing a consumer
+ * memoizes.** Everything downstream takes the result rather than the inputs: when
+ * these helpers each recomputed it internally, calling six of them cost six full
+ * scans of a two-hundred-item inventory and nothing at the call site said so.
+ */
 export const totalAbilityScores = (
   sheet: CharacterSheet,
   items: InventoryItem[] = [],
@@ -79,11 +88,11 @@ export const proficiencyBonus = (sheet: CharacterSheet): number => {
 };
 
 export const savingThrowTotal = (
+  totals: AbilityScores,
   sheet: CharacterSheet,
   stat: CharacterStat,
-  items: InventoryItem[] = [],
 ): number => {
-  const modifier = abilityModifier(totalAbilityScores(sheet, items)[stat]);
+  const modifier = abilityModifier(totals[stat]);
   const isProficient = sheet.saveProficiencies.includes(stat);
 
   return modifier + (isProficient ? proficiencyBonus(sheet) : 0);
@@ -94,38 +103,34 @@ export const savingThrowTotal = (
  * (proficient) or 2 (expertise).
  */
 export const skillTotal = (
+  totals: AbilityScores,
   sheet: CharacterSheet,
   skillKey: string,
-  items: InventoryItem[] = [],
 ): number => {
   const skill = SKILLS.find((entry) => {
     return entry.key === skillKey;
   });
 
-  if (!skill) return 0;
+  if (!skill) {
+    return 0;
+  }
 
-  const modifier = abilityModifier(totalAbilityScores(sheet, items)[skill.ability]);
+  const modifier = abilityModifier(totals[skill.ability]);
   const multiplier = sheet.skillProficiencies[skillKey] ?? 0;
 
   return modifier + proficiencyBonus(sheet) * multiplier;
 };
 
 export const passivePerception = (
+  totals: AbilityScores,
   sheet: CharacterSheet,
-  items: InventoryItem[] = [],
 ): number => {
-  return PASSIVE_BASE + skillTotal(sheet, PERCEPTION_SKILL_KEY, items);
+  return PASSIVE_BASE + skillTotal(totals, sheet, PERCEPTION_SKILL_KEY);
 };
 
 /** Dex modifier plus the stored misc bonus (Alert feat and friends). */
-export const initiativeTotal = (
-  sheet: CharacterSheet,
-  items: InventoryItem[] = [],
-): number => {
-  return (
-    abilityModifier(totalAbilityScores(sheet, items)[CharacterStat.DEX]) +
-    sheet.initiativeBonus
-  );
+export const initiativeTotal = (totals: AbilityScores, sheet: CharacterSheet): number => {
+  return abilityModifier(totals[CharacterStat.DEX]) + sheet.initiativeBonus;
 };
 
 export const hitDiceTotal = (sheet: CharacterSheet): number => {
@@ -133,29 +138,27 @@ export const hitDiceTotal = (sheet: CharacterSheet): number => {
 };
 
 export const spellSaveDc = (
+  totals: AbilityScores,
   sheet: CharacterSheet,
   ability: CharacterStat | null,
-  items: InventoryItem[] = [],
 ): number | null => {
-  if (!ability) return null;
+  if (!ability) {
+    return null;
+  }
 
-  return (
-    SPELL_SAVE_DC_BASE +
-    proficiencyBonus(sheet) +
-    abilityModifier(totalAbilityScores(sheet, items)[ability])
-  );
+  return SPELL_SAVE_DC_BASE + proficiencyBonus(sheet) + abilityModifier(totals[ability]);
 };
 
 export const spellAttackBonus = (
+  totals: AbilityScores,
   sheet: CharacterSheet,
   ability: CharacterStat | null,
-  items: InventoryItem[] = [],
 ): number | null => {
-  if (!ability) return null;
+  if (!ability) {
+    return null;
+  }
 
-  return (
-    proficiencyBonus(sheet) + abilityModifier(totalAbilityScores(sheet, items)[ability])
-  );
+  return proficiencyBonus(sheet) + abilityModifier(totals[ability]);
 };
 
 export type SlotMaxima = Partial<Record<string, number>>;

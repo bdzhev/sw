@@ -23,12 +23,17 @@ const props = defineProps<InitiativePanelProps>();
 
 const emit = defineEmits<{ 'update:bonus': [value: number] }>();
 
+/** The item scan, once - both numbers below are read off the same totals. */
+const totals = computed(() => {
+  return totalAbilityScores(props.sheet, props.items);
+});
+
 const total = computed(() => {
-  return initiativeTotal(props.sheet, props.items);
+  return initiativeTotal(totals.value, props.sheet);
 });
 
 const dexModifier = computed(() => {
-  return abilityModifier(totalAbilityScores(props.sheet, props.items)[CharacterStat.DEX]);
+  return abilityModifier(totals.value[CharacterStat.DEX]);
 });
 
 const bonus = computed({

@@ -25,7 +25,9 @@ watch(
     return props.languages.other;
   },
   (value) => {
-    if (!isEditingOther.value) otherDraft.value = value;
+    if (!isEditingOther.value) {
+      otherDraft.value = value;
+    }
   },
 );
 
@@ -52,7 +54,9 @@ const handleOtherInput = (value: string | number): void => {
 const handleOtherBlur = (): void => {
   isEditingOther.value = false;
 
-  if (otherDraft.value === props.languages.other) return;
+  if (otherDraft.value === props.languages.other) {
+    return;
+  }
 
   emit(
     'update',

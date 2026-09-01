@@ -57,25 +57,28 @@ const separatorOrientation = computed(() => {
     </div>
 
     <SheetSection>
-      <div class="flex flex-col gap-4 md:flex-row md:gap-6">
-        <HitDice
-          :sheet="sheet"
-          :character-class="character.character.characterClass"
-          class="md:min-w-0 md:flex-1"
-          @patch="handlePatch"
-        />
+      <div class="flex flex-col gap-4 md:gap-6">
+        <div class="flex flex-col gap-4 md:flex-row md:gap-6">
+          <HitDice
+            :sheet="sheet"
+            :character-class="character.character.characterClass"
+            class="md:min-w-0 md:flex-1"
+            @patch="handlePatch"
+          />
 
-        <Separator :orientation="separatorOrientation" />
+          <Separator :orientation="separatorOrientation" />
 
-        <Inspiration
-          :inspiration="sheet.inspiration"
-          class="md:min-w-0 md:flex-1"
-          @patch="handlePatch"
-        />
+          <Inspiration
+            :inspiration="sheet.inspiration"
+            class="md:min-w-0 md:flex-1"
+            @patch="handlePatch"
+          />
+        </div>
 
-        <Separator :orientation="separatorOrientation" />
+        <!-- Always horizontal: the actions own the row under the pair, at every width. -->
+        <Separator orientation="horizontal" />
 
-        <SheetActions class="md:min-w-0 md:flex-1" />
+        <SheetActions />
       </div>
     </SheetSection>
   </section>

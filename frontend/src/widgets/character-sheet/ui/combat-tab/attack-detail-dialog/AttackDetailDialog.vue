@@ -17,6 +17,8 @@ import {
 } from '@shared/ui/dialog';
 import { Text } from '@shared/ui/text';
 
+import { totalAbilityScores } from '@entities/characters';
+
 import {
   ABILITY_LABELS,
   ATTACK_PROPERTIES,
@@ -41,22 +43,26 @@ const emit = defineEmits<{
   remove: [];
 }>();
 
-const totals = computed(() => {
-  if (!props.attack) return null;
+const abilityTotals = computed(() => {
+  return totalAbilityScores(props.sheet, props.items);
+});
 
-  return attackTotals(
-    props.sheet,
-    {
-      ability: props.attack.ability,
-      proficient: props.attack.proficient,
-      additionalBonus: props.attack.additionalBonus,
-    },
-    props.items,
-  );
+const totals = computed(() => {
+  if (!props.attack) {
+    return null;
+  }
+
+  return attackTotals(abilityTotals.value, props.sheet, {
+    ability: props.attack.ability,
+    proficient: props.attack.proficient,
+    additionalBonus: props.attack.additionalBonus,
+  });
 });
 
 const abilityLabel = computed(() => {
-  if (!props.attack || !totals.value) return '';
+  if (!props.attack || !totals.value) {
+    return '';
+  }
 
   const label = ABILITY_LABELS[props.attack.ability];
 
@@ -66,14 +72,18 @@ const abilityLabel = computed(() => {
 });
 
 const damageLabel = computed(() => {
-  if (!props.attack || !totals.value) return '';
+  if (!props.attack || !totals.value) {
+    return '';
+  }
 
   return formatDamage(props.attack.damageDice, totals.value.damageBonus);
 });
 
 /** Known tags carry their rules text; an unrecognised one still gets a row. */
 const propertyDetails = computed(() => {
-  if (!props.attack) return [];
+  if (!props.attack) {
+    return [];
+  }
 
   return props.attack.properties.map((key) => {
     const known = ATTACK_PROPERTIES.find((property) => {

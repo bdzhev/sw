@@ -16,6 +16,8 @@ export {
   getCharacter,
   updateCharacter,
   updateCharacterSheet,
+  sendSheetPatchOnTeardown,
+  runCharacterAction,
   deleteCharacter,
   createCharacter,
   PAGE_SIZE,

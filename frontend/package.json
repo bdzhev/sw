@@ -9,6 +9,7 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
+    "analyze": "ANALYZE=1 vite build",
     "type-check": "vue-tsc --build",
     "lint": "oxlint --fix",
     "format": "oxfmt --write ."

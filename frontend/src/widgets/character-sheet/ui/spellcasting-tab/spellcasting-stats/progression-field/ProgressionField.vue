@@ -24,7 +24,9 @@ const value = computed<SelectOption['value'] | undefined>({
     return props.progression;
   },
   set: (next) => {
-    if (!next) return;
+    if (!next) {
+      return;
+    }
 
     // A one-shot edit with no follow-up write to carry it, so it goes
     // immediately rather than waiting out the debounce — same as Inspiration.

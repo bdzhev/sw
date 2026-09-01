@@ -70,7 +70,8 @@
             "allow": ["warn", "error"]
           }
         ],
-        "arrow-body-style": ["error", "always"]
+        "arrow-body-style": ["error", "always"],
+        "curly": ["error", "all"]
       }
     },
     {

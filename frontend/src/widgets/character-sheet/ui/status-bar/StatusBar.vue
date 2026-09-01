@@ -23,7 +23,9 @@ const STATUS_LABELS: Record<StatusKey, string> = {
  * timer, so the green is timed where the save is, not here.
  */
 const status = computed<StatusKey>(() => {
-  if (props.saveState === 'idle' && props.hasUnsavedChanges) return 'pending';
+  if (props.saveState === 'idle' && props.hasUnsavedChanges) {
+    return 'pending';
+  }
 
   return props.saveState;
 });

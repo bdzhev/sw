@@ -114,7 +114,9 @@ export const resolveSpellcastingAbility = (
 ): CharacterStat | null => {
   const fromClass = SPELLCASTING_ABILITY_BY_CLASS[characterClass];
 
-  if (fromClass) return fromClass;
+  if (fromClass) {
+    return fromClass;
+  }
 
   return progression === SpellcastingProgression.NONE ? null : CharacterStat.INT;
 };

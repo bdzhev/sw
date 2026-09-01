@@ -88,7 +88,9 @@ const handleMaxChange = (slotLevel: number, value: number): void => {
 
 /** Offered, never imposed — the tables are a shortcut, not the source of truth. */
 const handleFillClick = (): void => {
-  if (!props.tableMaxima) return;
+  if (!props.tableMaxima) {
+    return;
+  }
 
   emit('patch', { spellSlots: { ...props.slots, max: props.tableMaxima } });
 };

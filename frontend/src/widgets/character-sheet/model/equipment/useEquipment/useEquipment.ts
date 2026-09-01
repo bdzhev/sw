@@ -103,14 +103,16 @@ export const useEquipment = (): UseEquipment => {
    * cost sublist like the class resource control has.
    *
    * `usesRemaining` is a counter, so the plan wants it on the autosave channel —
-   * but the only `AutosaveTarget` today is `character`, and inventing a
+   * but the controller writes the sheet row and nothing else, and standing up a
    * sub-entity target is not this subpage's call. Absolute value, never a delta,
    * so the move is a one-line change once that target exists.
    */
   const spendUse = (item: InventoryItem): void => {
     const next = Math.max(0, (item.usesRemaining ?? 0) - 1);
 
-    if (next === item.usesRemaining) return;
+    if (next === item.usesRemaining) {
+      return;
+    }
 
     void items.updateRow({ rowId: item.id, patch: { usesRemaining: next } });
   };

@@ -99,12 +99,18 @@ const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
   return res.json() as Promise<T>;
 };
 
+/**
+ * `init` on `post`/`patch` exists for one flag: `keepalive`, which is what lets a
+ * request outlive the document during page teardown. Spread first, so a caller
+ * cannot reach in and change the method or the body.
+ */
 export const http = {
   get: <T>(path: string) => {
     return request<T>(path);
   },
-  post: <T>(path: string, body?: unknown) => {
+  post: <T>(path: string, body?: unknown, init?: RequestInit) => {
     return request<T>(path, {
+      ...init,
       method: 'POST',
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -115,8 +121,9 @@ export const http = {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   },
-  patch: <T>(path: string, body?: unknown) => {
+  patch: <T>(path: string, body?: unknown, init?: RequestInit) => {
     return request<T>(path, {
+      ...init,
       method: 'PATCH',
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });

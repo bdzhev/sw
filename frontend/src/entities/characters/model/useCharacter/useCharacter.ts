@@ -26,6 +26,14 @@ export const useCharacter = (options: UseCharacterOptions) => {
     },
     refetchOnMount: shouldRefetchOnMount,
     retry: RETRIES,
+    /**
+     * vue-query wraps query state in a deep `readonly()` by default, so every read
+     * of a nested value - and the sheet detail nests five row arrays plus four jsonb
+     * objects - goes through a readonly proxy. Safe to make shallow because nothing
+     * mutates cached data in place: this store and `useCharacterCollection` both
+     * write whole new objects through `setQueryData`.
+     */
+    shallow: true,
   });
 
   const isCharacterNotFound = computed(() => {

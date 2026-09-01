@@ -61,6 +61,9 @@ const buttonClasses = computed(() => {
   ];
 });
 
+const BASE_CLASSES =
+  'flex cursor-pointer flex-row items-center whitespace-nowrap transition-all duration-200 disabled:cursor-not-allowed disabled:bg-fg disabled:text-bg-secondary disabled:inset-ring-0 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50';
+
 const isDisabled = computed(() => {
   return props.isDisabled || props.isLoading;
 });
@@ -72,10 +75,7 @@ const isDisabled = computed(() => {
     :type="isButtonElement ? props.type : undefined"
     :disabled="isButtonElement ? isDisabled : undefined"
     :aria-disabled="isButtonElement ? undefined : isDisabled || undefined"
-    :class="[
-      `flex cursor-pointer flex-row items-center transition-all duration-200 disabled:cursor-not-allowed disabled:bg-fg disabled:text-bg-secondary disabled:inset-ring-0 aria-disabled:pointer-events-none aria-disabled:cursor-not-allowed aria-disabled:opacity-50`,
-      buttonClasses,
-    ]"
+    :class="[BASE_CLASSES, buttonClasses]"
   >
     <slot />
   </Primitive>

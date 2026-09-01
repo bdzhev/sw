@@ -20,6 +20,8 @@ import { FormSwitch } from '@shared/ui/form-switch';
 import { Text } from '@shared/ui/text';
 import { ToggleChipGroup } from '@shared/ui/toggle-chip-group';
 
+import { totalAbilityScores } from '@entities/characters';
+
 import {
   ABILITY_OPTIONS,
   ATTACK_PROPERTY_OPTIONS,
@@ -78,7 +80,9 @@ watch(
     return props.open;
   },
   (open) => {
-    if (open) form.resetForm({ values: valuesFromAttack(props.attack) });
+    if (open) {
+      form.resetForm({ values: valuesFromAttack(props.attack) });
+    }
   },
 );
 
@@ -90,17 +94,17 @@ const isProficient = computed(() => {
   return Boolean(values.proficient);
 });
 
+const abilityTotals = computed(() => {
+  return totalAbilityScores(props.sheet, props.items);
+});
+
 /** Live as the player types, so the calculated result is visible before saving. */
 const preview = computed(() => {
-  return attackTotals(
-    props.sheet,
-    {
-      ability: values.ability ?? AttackAbility.STRENGTH,
-      proficient: isProficient.value,
-      additionalBonus: parseBonus(values.additionalBonus ?? ''),
-    },
-    props.items,
-  );
+  return attackTotals(abilityTotals.value, props.sheet, {
+    ability: values.ability ?? AttackAbility.STRENGTH,
+    proficient: isProficient.value,
+    additionalBonus: parseBonus(values.additionalBonus ?? ''),
+  });
 });
 
 const damagePreview = computed(() => {

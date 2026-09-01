@@ -7,4 +7,5 @@ export interface SheetHeaderProps {
   sheet: CharacterSheet;
   /** Passed in rather than built here, so the header owns no route knowledge. */
   itemsLink: RouteLocationRaw;
+  settingsLink: RouteLocationRaw;
 }

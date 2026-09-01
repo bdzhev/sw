@@ -24,6 +24,7 @@ const raw = computed(() => {
   return abilityScores(props.sheet);
 });
 
+/** The item scan, once. Every row below reads its total off this. */
 const totals = computed(() => {
   return totalAbilityScores(props.sheet, props.items);
 });

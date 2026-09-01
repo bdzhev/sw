@@ -37,7 +37,9 @@ export const useSheetShell = (): UseSheetShell => {
   watch(
     character,
     (detail) => {
-      if (!detail) return;
+      if (!detail) {
+        return;
+      }
 
       // The quiz is the only path to a character with scores, so a pending one
       // goes back to it rather than being shown an all-tens sheet.

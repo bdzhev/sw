@@ -34,7 +34,9 @@ export const useTraitForm = (options: UseTraitFormOptions) => {
    * rather than at mount — otherwise editing a second trait shows the first one.
    */
   watch(isOpen, (open) => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const trait = getTrait();
 

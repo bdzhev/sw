@@ -17,7 +17,8 @@ const LEVEL_UP_HINT = 'Levelling up arrives in a later update.';
 
 <template>
   <SheetSection title="Actions" variant="plain" :heading-level="3">
-    <div class="flex flex-col gap-2 sm:flex-row">
+    <!-- Wraps rather than overflowing: the buttons cannot shrink below their labels. -->
+    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
       <TooltipRoot>
         <!-- A disabled button swallows pointer events, so the span is the trigger. -->
         <TooltipTrigger as="span" tabindex="0" class="inline-flex w-full sm:w-fit">

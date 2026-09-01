@@ -130,7 +130,9 @@ export const useItemForm = (options: UseItemFormOptions): UseItemForm => {
 
   /** Reset on open, not on close: closing mid-edit must not blank the boxes first. */
   watch(isOpen, (open) => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
 
     const item = getItem();
 

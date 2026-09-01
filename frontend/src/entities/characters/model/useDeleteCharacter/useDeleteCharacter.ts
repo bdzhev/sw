@@ -21,7 +21,9 @@ export const useDeleteCharacter = () => {
       const previous = qc.getQueryData<CharactersCache>(characterQueries.characters());
 
       qc.setQueryData(characterQueries.characters(), (old: CharactersCache) => {
-        if (!old) return old;
+        if (!old) {
+          return old;
+        }
 
         return {
           ...old,

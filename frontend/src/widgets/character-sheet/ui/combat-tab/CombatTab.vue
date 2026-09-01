@@ -97,7 +97,9 @@ const handleSubmitAttack = async (body: AttackBody): Promise<void> => {
 const handleConfirmDelete = async (): Promise<void> => {
   const target = selected.value;
 
-  if (!target) return;
+  if (!target) {
+    return;
+  }
 
   try {
     await attacks.deleteRow(target.id);

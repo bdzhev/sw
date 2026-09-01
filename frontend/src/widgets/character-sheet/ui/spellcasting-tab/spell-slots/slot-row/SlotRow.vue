@@ -51,13 +51,6 @@ const maxValue = computed<number | undefined>({
   >
     <span class="text-sm font-medium text-primary">{{ label }}</span>
 
-    <!--
-      Both fields carry a hard width. `w-auto` is a no-op, and without a cap the
-      input's `w-full` resolves against a content-derived parent and falls back
-      to the `<input>`'s intrinsic size — about 200px each, which overflowed a
-      phone. `w-40` matches the combat tab's ammo field, the other stepper that
-      shares a row.
-    -->
     <div class="flex min-w-0 items-center gap-2">
       <NumberField
         v-model="currentValue"

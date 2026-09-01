@@ -2,9 +2,20 @@ import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
-// import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, type Plugin } from 'vite';
+import { visualizer } from 'rollup-plugin-visualizer';
+import { defineConfig, type Plugin, type PluginOption } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
+
+/**
+ * The only packages on every route's critical path. Their transitive deps come
+ * along via `advancedChunks.includeDependenciesRecursively` (rolldown default),
+ * so `@vue/*`, `query-core` and `vue-demi` need no arm of their own.
+ *
+ * Each alternative is anchored with a trailing `[\\/]` so `vue` cannot match
+ * `vue-i18n`, `vue-demi` or `@tanstack/vue-table`.
+ */
+const FRAMEWORK_RE =
+  /node_modules[\\/](?:vue|vue-router|pinia|@tanstack[\\/]vue-query)[\\/]/;
 
 const skipConfigJsInDev = (): Plugin => {
   return {
@@ -22,6 +33,22 @@ const skipConfigJsInDev = (): Plugin => {
   };
 };
 
+/** Treemap of the real chunk graph. Run `bun run analyze`. */
+const analyzePlugins = (): PluginOption[] => {
+  if (process.env.ANALYZE !== '1') {
+    return [];
+  }
+
+  return [
+    visualizer({
+      filename: 'stats.html',
+      template: 'treemap',
+      gzipSize: true,
+      brotliSize: true,
+    }) as PluginOption,
+  ];
+};
+
 export default defineConfig({
   server: {
     host: true,
@@ -32,12 +59,7 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     tailwindcss(),
-    // visualizer({
-    //   filename: 'stats.html',
-    //   open: true,
-    //   gzipSize: true,
-    //   brotliSize: true,
-    // }),
+    ...analyzePlugins(),
   ],
   resolve: {
     alias: {
@@ -51,21 +73,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          switch (true) {
-            case id.includes('ogl'):
-              return 'ogl';
-            case id.includes('gsap'):
-              return 'gsap';
-            case id.includes('zod'):
-              return 'zod';
-            case id.includes('tanstack'):
-              return 'tanstack';
-            case id.includes('node_modules'):
-              return 'vendor';
-            default:
-              return undefined;
-          }
+        // One group on purpose. A `node_modules` catch-all forces every dep
+        // onto the critical path; naming a group for gsap/zod does the same,
+        // since Vite preloads shared group chunks from index.html. Everything
+        // unlisted falls through to rolldown's per-reachability splitting,
+        // which also splits finer than a package-name group can.
+        advancedChunks: {
+          groups: [{ name: 'framework', test: FRAMEWORK_RE, priority: 30 }],
         },
       },
     },

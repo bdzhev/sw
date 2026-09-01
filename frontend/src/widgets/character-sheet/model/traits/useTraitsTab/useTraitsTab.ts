@@ -140,14 +140,16 @@ export const useTraitsTab = () => {
 
   /**
    * `current` is a counter, so the plan wants it on the autosave channel — but the
-   * only `AutosaveTarget` today is `character`, and inventing a sub-entity target
-   * is not this tab's call. Absolute value, never a delta, so the move is a
+   * controller writes the sheet row and nothing else, and standing up a sub-entity
+   * target is not this tab's call. Absolute value, never a delta, so the move is a
    * one-line change once that target exists.
    */
   const spendResource = (resource: ClassResource, amount: number) => {
     const next = Math.max(0, resource.current - amount);
 
-    if (next === resource.current) return;
+    if (next === resource.current) {
+      return;
+    }
 
     void resources.updateRow({ rowId: resource.id, patch: { current: next } });
   };

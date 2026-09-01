@@ -10,6 +10,7 @@ import {
   slotMaximaFromProgression,
   spellAttackBonus,
   spellSaveDc,
+  totalAbilityScores,
   useCharacter,
   useCharacterCollection,
   useSheetAutosave,
@@ -70,15 +71,20 @@ export const useSpellcastingTab = () => {
       : null;
   });
 
+  /** The item scan, once - the save DC and the attack bonus share it. */
+  const totals = computed(() => {
+    return sheet.value ? totalAbilityScores(sheet.value, items.value) : null;
+  });
+
   const saveDc = computed(() => {
-    return sheet.value
-      ? spellSaveDc(sheet.value, castingAbility.value, items.value)
+    return sheet.value && totals.value
+      ? spellSaveDc(totals.value, sheet.value, castingAbility.value)
       : null;
   });
 
   const attackBonus = computed(() => {
-    return sheet.value
-      ? spellAttackBonus(sheet.value, castingAbility.value, items.value)
+    return sheet.value && totals.value
+      ? spellAttackBonus(totals.value, sheet.value, castingAbility.value)
       : null;
   });
 
@@ -147,7 +153,9 @@ export const useSpellcastingTab = () => {
   const castAtLevel = (slotLevel: number): void => {
     const slots = sheet.value?.spellSlots;
 
-    if (!slots) return;
+    if (!slots) {
+      return;
+    }
 
     const key = String(slotLevel);
     const next = Math.max(0, (slots.current[key] ?? 0) - 1);

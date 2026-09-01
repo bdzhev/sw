@@ -3,13 +3,12 @@ import {
   AttackDelivery,
   CharacterStat,
   type CharacterSheet,
-  type InventoryItem,
 } from '@shared/api/characters';
 
 import {
   abilityModifier,
   proficiencyBonus,
-  totalAbilityScores,
+  type AbilityScores,
 } from '@entities/characters';
 
 import { STAT_LABELS } from '@widgets/character-sheet/config/combat';
@@ -41,17 +40,19 @@ export const tracksAmmo = (delivery: AttackDelivery): boolean => {
  * drives both the attack roll and the damage roll — they can never be mixed.
  */
 export const resolveAttackStat = (
-  sheet: CharacterSheet,
+  totals: AbilityScores,
   ability: AttackAbility,
-  items: InventoryItem[] = [],
 ): CharacterStat => {
-  if (ability === AttackAbility.STRENGTH) return CharacterStat.STR;
-  if (ability === AttackAbility.DEXTERITY) return CharacterStat.DEX;
+  if (ability === AttackAbility.STRENGTH) {
+    return CharacterStat.STR;
+  }
 
-  const scores = totalAbilityScores(sheet, items);
+  if (ability === AttackAbility.DEXTERITY) {
+    return CharacterStat.DEX;
+  }
 
-  return abilityModifier(scores[CharacterStat.DEX]) >
-    abilityModifier(scores[CharacterStat.STR])
+  return abilityModifier(totals[CharacterStat.DEX]) >
+    abilityModifier(totals[CharacterStat.STR])
     ? CharacterStat.DEX
     : CharacterStat.STR;
 };
@@ -61,12 +62,12 @@ export const resolveAttackStat = (
  * Extra damage *dice* have no field by design — they go in the name or a tag.
  */
 export const attackTotals = (
+  totals: AbilityScores,
   sheet: CharacterSheet,
   input: AttackMathInput,
-  items: InventoryItem[] = [],
 ): AttackTotals => {
-  const stat = resolveAttackStat(sheet, input.ability, items);
-  const modifier = abilityModifier(totalAbilityScores(sheet, items)[stat]);
+  const stat = resolveAttackStat(totals, input.ability);
+  const modifier = abilityModifier(totals[stat]);
   const proficiency = input.proficient ? proficiencyBonus(sheet) : 0;
 
   return {

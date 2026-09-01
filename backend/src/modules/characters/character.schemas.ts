@@ -24,6 +24,9 @@ const MAX_ABILITY_SCORE = 30;
 const MAX_COUNTER = 9999;
 const MAX_DEATH_SAVES = 3;
 const MAX_SLOT_COUNT = 99;
+const MAX_TEXT_LENGTH = 4000;
+const MAX_CONDITIONS = 20;
+const MAX_CONDITION_LENGTH = 40;
 
 const counter = z.number().int().min(0).max(MAX_COUNTER);
 
@@ -53,8 +56,8 @@ export const characterListQuerySchema = z.object({
 export const updateCharacterSchema = z
   .object({
     name: z.string().trim().min(1).max(MAX_NAME_LENGTH),
-    lore: z.string().nullable(),
-    appearance: z.string().nullable(),
+    lore: z.string().max(MAX_TEXT_LENGTH).nullable(),
+    appearance: z.string().max(MAX_TEXT_LENGTH).nullable(),
   })
   .partial()
   .strict()
@@ -96,7 +99,10 @@ export const updateSheetSchema = z
     hitDiceRemaining: counter,
     deathSaveSuccesses: z.number().int().min(0).max(MAX_DEATH_SAVES),
     deathSaveFailures: z.number().int().min(0).max(MAX_DEATH_SAVES),
-    conditions: z.array(z.string()),
+    /** Name badges only. Capped because the sheet GET returns this column in full. */
+    conditions: z
+      .array(z.string().trim().min(1).max(MAX_CONDITION_LENGTH))
+      .max(MAX_CONDITIONS),
     languages: z.object({
       standard: z.array(z.string()),
       other: z.string(),

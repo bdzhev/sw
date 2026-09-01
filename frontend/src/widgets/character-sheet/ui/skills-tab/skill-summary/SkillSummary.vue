@@ -16,7 +16,7 @@ const props = defineProps<SkillSummaryProps>();
           Passive perception
         </Text>
 
-        <p class="text-4xl leading-none font-semibold text-primary tabular-nums">
+        <p class="text-2xl leading-none font-semibold text-primary tabular-nums">
           {{ props.passivePerception }}
         </p>
 

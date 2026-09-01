@@ -260,12 +260,15 @@ export interface CharactersPage {
 
 export type CreateCharacterPayload = Omit<CharacterSummary, 'status' | 'id'>;
 
-/** Partial by design — the route accepts any non-empty subset. */
+/**
+ * Partial by design — the route accepts any non-empty subset. `null` clears a
+ * text column; `undefined` leaves it alone.
+ */
 export interface UpdateCharacterPayload {
   id: string;
   name?: string;
-  lore?: string;
-  appearance?: string;
+  lore?: string | null;
+  appearance?: string | null;
 }
 
 /** Only the fields the autosave controller is allowed to write. */
