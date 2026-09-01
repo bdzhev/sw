@@ -332,6 +332,8 @@ Known side-effectful modules — do not re-export these through a wider barrel: 
 
 Match on `node_modules[\\/]<pkg>[\\/]`, never a bare substring: the old `id.includes('zod')` also caught `@vee-validate/zod`, and library arms were tested before the `node_modules` arm, so a `src/` folder named `ogl-shaders/` would have silently teleported app code into the `ogl` chunk.
 
+**A slot that a layout never renders still ships.** `App.vue` hands `header`, `navigation` and `footer` to every layout, and each layout renders at most one of them — so Vue never _creates_ the unused ones, but a static `import` still puts the code in the eagerly-preloaded entry chunk. `LandingHeader` and `SidebarNavigation` are therefore `defineAsyncComponent`; that alone cut the entry from 190 KB to 127 KB. `LandingFooter` stays static on purpose — 20 lines with no dependencies is not worth a request. Anything added to the app shell should follow the same test: defer it if a layout renders it conditionally and it carries real dependencies.
+
 **A `@shared` module used by exactly one route is not shared.** `shared/ui/data-table` (only `SkillsTab.vue`) and `shared/lib/ui/useVirtualGrid` (only `CharactersList.vue`) each drag a 40–60 KB dependency. Living in `@shared` is fine; putting them on the critical path is not.
 
 To inspect the real chunk graph:
