@@ -50,7 +50,7 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     { immediate: true },
   );
 
-  const handleTryAgainClick = () => {
+  const refetchQuizData = () => {
     if (characterError) {
       refetchCharacter();
     }
@@ -78,6 +78,6 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     character,
     quizItems,
     hasError,
-    onTryAgainClick: handleTryAgainClick,
+    refetchQuizData,
   };
 };
