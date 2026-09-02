@@ -66,7 +66,7 @@ const handleRemoveClick = (): void => {
       <!-- Icon-only, so the label the button already carried is now its whole name. -->
       <Button
         v-if="isCastable"
-        size="xs"
+        size="sm"
         variant="secondary"
         :is-icon-only="true"
         :is-disabled="hasNoSlots || props.isSaving"
@@ -77,8 +77,8 @@ const handleRemoveClick = (): void => {
       </Button>
 
       <Button
-        variant="transparent"
-        size="xs"
+        variant="ghostDanger"
+        size="sm"
         :is-icon-only="true"
         :is-disabled="props.isSaving"
         aria-label="Remove spell"

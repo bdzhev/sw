@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
+import { BackButton } from '@shared/ui/back-button';
 import { Button } from '@shared/ui/button';
 import { FormInput } from '@shared/ui/form-input';
 import { Skeleton } from '@shared/ui/skeleton';
@@ -9,7 +11,6 @@ import { Textarea } from '@shared/ui/textarea';
 
 import { useSettingsForm } from '@widgets/character-sheet/model/settings';
 import { useSheetShell } from '@widgets/character-sheet/model/sheet-shell';
-import { BackButton } from '@widgets/character-sheet/ui/back-button';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { IdentitySummary } from './identity-summary';
@@ -27,7 +28,7 @@ const { isSaving, isDirty, handleSubmit } = useSettingsForm({
   },
 });
 
-const sheetLink = computed(() => {
+const sheetLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER, params: { id: characterId, tab: 'main' } };
 });
 

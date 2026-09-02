@@ -5,7 +5,11 @@ export type ButtonVariant =
   | 'neutral'
   | 'accent'
   | 'warning'
-  | 'danger';
+  | 'danger'
+  | 'ghostSecondary'
+  | 'ghostAccent'
+  | 'ghostWarning'
+  | 'ghostDanger';
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 

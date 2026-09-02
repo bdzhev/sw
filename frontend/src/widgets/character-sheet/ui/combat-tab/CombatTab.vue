@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 
 import { CollectionKey } from '@shared/api/characters';
 import type { Attack } from '@shared/api/characters';
+import { RouteName } from '@shared/lib/router';
 import { Button } from '@shared/ui/button';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
@@ -24,8 +25,8 @@ import { AttackDialog } from './attack-dialog';
 import { AttackRow } from './attack-row';
 import { InitiativePanel } from './initiative-panel';
 
-const route = useRoute();
-const id = route.params.id as string;
+const route = useRoute(RouteName.APP_CHARACTER);
+const id = route.params.id;
 
 const { character } = useCharacter({ id });
 const attacks = useCharacterCollection(CollectionKey.ATTACKS, { characterId: id });

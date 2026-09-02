@@ -70,4 +70,22 @@ export const variantClasses: Record<ButtonVariant, string> = {
   warning: 'bg-transparent text-warning hover:bg-warning/10',
   danger:
     'bg-none text-danger inset-ring-danger inset-ring-2 ring-danger hover:bg-danger hover:text-primary hover:inset-ring-0',
+  /**
+   * The ghost family: borderless, tinted `/10` at rest and `/20` on hover, with
+   * the colour carried by the text — lucide icons stroke `currentColor`, so a
+   * glyph needs nothing of its own. For an action that sits in a row, a menu or
+   * a toolbar, where a ringed `danger`/`primary` would draw a box around every
+   * item, and where the fully transparent `warning`/`accent`/`neutral` read as
+   * plain text until the pointer is already on them.
+   *
+   * `ghostAccent` is branding-coloured because that is what `accent` is; the two
+   * accent tokens belong to `primary` instead. Every class here is written out
+   * in full on purpose — Tailwind scans source text, so a composed
+   * `bg-${token}/10` would emit no CSS at all.
+   */
+  ghostSecondary:
+    'bg-secondary/10 text-secondary hover:bg-secondary/20 hover:text-primary',
+  ghostAccent: 'bg-branding/10 text-branding hover:bg-branding/20',
+  ghostWarning: 'bg-warning/10 text-warning hover:bg-warning/20',
+  ghostDanger: 'bg-danger/10 text-danger hover:bg-danger/20',
 };

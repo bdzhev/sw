@@ -5,12 +5,12 @@ import { RouterLink } from 'vue-router';
 
 import type { SheetPatch } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
+import { BackButton } from '@shared/ui/back-button';
 import { Button } from '@shared/ui/button';
 import { Text } from '@shared/ui/text';
 
 import { withDeathSaveReset } from '@widgets/character-sheet/lib/header';
 
-import { BackButton } from '../back-button';
 import { ConditionsStrip } from './conditions-strip';
 import { DeathSaves } from './death-saves';
 import type { SheetHeaderProps } from './SheetHeader.types';

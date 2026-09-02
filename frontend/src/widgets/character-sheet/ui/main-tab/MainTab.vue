@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { SheetPatch } from '@shared/api/characters';
+import { RouteName } from '@shared/lib/router';
 import { useBreakpoint } from '@shared/lib/ui';
 import { Separator } from '@shared/ui/separator';
 import { Skeleton } from '@shared/ui/skeleton';
@@ -19,8 +20,8 @@ import { SheetActions } from './sheet-actions';
 
 const { isMobile } = useBreakpoint();
 
-const route = useRoute();
-const id = route.params.id as string;
+const route = useRoute(RouteName.APP_CHARACTER);
+const id = route.params.id;
 
 const { character } = useCharacter({ id });
 const autosave = useSheetAutosave();

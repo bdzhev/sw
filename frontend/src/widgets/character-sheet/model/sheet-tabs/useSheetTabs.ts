@@ -41,13 +41,12 @@ interface UseSheetTabs {
  * buttons that ask the router to do what a link already does.
  */
 export const useSheetTabs = (characterId: string): UseSheetTabs => {
-  const route = useRoute();
+  const route = useRoute(RouteName.APP_CHARACTER);
 
   const activeTab = computed<SheetTab>(() => {
-    const raw = route.params.tab;
-    const value = Array.isArray(raw) ? raw[0] : raw;
+    const value = route.params.tab;
 
-    return value && isSheetTab(value) ? value : SheetTab.MAIN;
+    return isSheetTab(value) ? value : SheetTab.MAIN;
   });
 
   const tabs = computed<SheetTabLink[]>(() => {

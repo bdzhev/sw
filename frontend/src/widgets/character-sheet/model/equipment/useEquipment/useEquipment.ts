@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 
 import { CollectionKey, MAX_ITEMS } from '@shared/api/characters';
 import type { CharacterSheet, InventoryItem, SheetPatch } from '@shared/api/characters';
+import { RouteName } from '@shared/lib/router';
 
 import {
   useCharacter,
@@ -41,11 +42,11 @@ interface UseEquipment {
  * has to be a singleton — see the note there.
  */
 export const useEquipment = (): UseEquipment => {
-  const route = useRoute();
+  const route = useRoute(RouteName.APP_CHARACTER_ITEMS);
   const ui = useEquipmentUi();
 
   const characterId = computed(() => {
-    return route.params.id as string;
+    return route.params.id;
   });
 
   const { character } = useCharacter({ id: characterId.value });

@@ -105,7 +105,7 @@ const handleSpend = (amount: number): void => {
         </Button>
 
         <Button
-          variant="neutral"
+          variant="ghostDanger"
           is-icon-only
           aria-label="Delete resource"
           @click="handleRemoveClick"

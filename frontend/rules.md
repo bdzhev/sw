@@ -288,6 +288,16 @@ oxlint covers correctness (its `correctness` category is on) plus the house rule
 - `padding-line-between-statements` (deprecated stylistic rule, no oxlint equivalent).
 - `no-unused-vars` does **not** apply to `.vue` files in oxlint. `noUnusedLocals`/`noUnusedParameters` in `tsconfig.app.json` cover it instead, and `vue-tsc` understands template usage, so this is better coverage than before.
 
+### Typed routes
+
+`shared/lib/router/routeMap.ts` declares a `RouteNamedMap` and augments vue-router's `TypesConfig`, so route names and params are checked types rather than strings. **It is the twin of `app/providers/router/routes.ts` — add, rename or re-path a route in one and you must do it in the other**, or the compiler is describing a router that no longer exists.
+
+- **Read params through the route name**: `useRoute(RouteName.APP_CHARACTER).params.id` is `string`. A bare `useRoute()` returns the union of every route, so `params.id` does not exist on it — that is the map working, not a bug to cast away. Where one composable serves several routes that share a param, name the union (`useRoute<CharacterRouteName>()`).
+- **`as string` on a param is now a lie with no purpose.** Nine sites had one; the cast was hiding `string[] | undefined` and, worse, an unnamed route. There is no reason to write one again — and `Array.isArray(route.params.x)` is likewise dead, the map already says whether a param is an array.
+- **A location built in a `computed` needs an explicit `RouteLocationRaw`.** In an object literal an enum member widens from `RouteName.APP_HOME` to `RouteName`, which matches no single entry in the map; the annotation pins it back. Symptom is a wall of "not assignable to `RouteLocationAsRelativeTyped<...>`".
+- **In a `beforeEnter`, narrow on `to.name` before touching `to.params`** — the name is a literal in the map, so `if (to.name !== RouteName.X)` narrows the params for the rest of the guard. Do not cast `to.params`.
+- What the map catches: an unknown route name, an unknown param, a wrong param type, and a param read that the route does not have. What it does not: an **omitted** `params` object, which vue-router types optional.
+
 Run before committing:
 
 ```sh

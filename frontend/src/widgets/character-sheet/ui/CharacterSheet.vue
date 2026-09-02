@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
 
@@ -31,12 +32,16 @@ const TAB_COMPONENTS = {
   [SheetTab.TRAITS]: TraitsTab,
 };
 
-/** Items and settings are pages of their own, so these are links out, not tabs. */
-const itemsLink = computed(() => {
+/**
+ * Items and settings are pages of their own, so these are links out, not tabs.
+ * The annotation is load-bearing: in an object literal an enum member widens to
+ * the whole enum, and the typed route map wants the literal.
+ */
+const itemsLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER_ITEMS, params: { id: characterId } };
 });
 
-const settingsLink = computed(() => {
+const settingsLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER_SETTINGS, params: { id: characterId } };
 });
 </script>

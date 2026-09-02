@@ -70,6 +70,7 @@ const bonus = computed({
       </div>
 
       <NumberField
+        class="max-w-24 md:max-w-32"
         v-model="bonus"
         label="Misc bonus"
         :min="-INITIATIVE_BONUS_LIMIT"

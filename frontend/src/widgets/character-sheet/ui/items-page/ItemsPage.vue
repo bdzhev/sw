@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next';
 import { computed } from 'vue';
+import type { RouteLocationRaw } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
+import { BackButton } from '@shared/ui/back-button';
 import { Button } from '@shared/ui/button';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
@@ -12,7 +14,6 @@ import { useSheetAutosave } from '@entities/characters';
 
 import { useEquipment, useEquipmentUi } from '@widgets/character-sheet/model/equipment';
 import { useSheetShell } from '@widgets/character-sheet/model/sheet-shell';
-import { BackButton } from '@widgets/character-sheet/ui/back-button';
 import { DetailDialog } from '@widgets/character-sheet/ui/detail-dialog';
 import { StatusBar } from '@widgets/character-sheet/ui/status-bar';
 
@@ -49,7 +50,7 @@ const {
 const ui = useEquipmentUi();
 const autosave = useSheetAutosave();
 
-const sheetLink = computed(() => {
+const sheetLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER, params: { id: characterId, tab: 'main' } };
 });
 

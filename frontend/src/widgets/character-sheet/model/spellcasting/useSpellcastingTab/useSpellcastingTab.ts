@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router';
 
 import { CollectionKey, SpellcastingProgression } from '@shared/api/characters';
 import type { SheetPatch } from '@shared/api/characters';
+import { RouteName } from '@shared/lib/router';
 
 import {
   availableSlotLevels,
@@ -27,10 +28,10 @@ import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
  * discrete explicit call. Those are two different channels on purpose.
  */
 export const useSpellcastingTab = () => {
-  const route = useRoute();
+  const route = useRoute(RouteName.APP_CHARACTER);
 
   const characterId = computed(() => {
-    return route.params.id as string;
+    return route.params.id;
   });
 
   const { character } = useCharacter({ id: characterId.value });

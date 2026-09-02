@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, inject } from 'vue';
-import { useRouter } from 'vue-router';
+import { type RouteLocationRaw, useRouter } from 'vue-router';
 
 import { CharacterStatus } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
@@ -22,11 +22,15 @@ const isPending = computed(() => {
 const handleCtaClick = () => {
   const id = ctx?.id;
 
-  const redirectLink = isActive.value
+  if (!id) {
+    return;
+  }
+
+  const redirectLink: RouteLocationRaw = isActive.value
     ? { name: RouteName.APP_CHARACTER, params: { id } }
     : { name: RouteName.APP_BUILDER, params: { id } };
 
-  router.push(redirectLink);
+  void router.push(redirectLink);
 };
 </script>
 

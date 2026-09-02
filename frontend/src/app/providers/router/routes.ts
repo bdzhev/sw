@@ -7,6 +7,7 @@ import {
   ResultLayout,
   AuthLayout,
   SheetLayout,
+  BuilderLayout,
 } from '@shared/ui/layouts';
 
 export const routes: RouteRecordRaw[] = [
@@ -52,18 +53,16 @@ export const routes: RouteRecordRaw[] = [
         component: () => {
           return import('@pages/builder');
         },
-        meta: { layout: DefaultLayout },
+        meta: { layout: BuilderLayout },
+        /** `to.name` is a literal in the typed route map, so it narrows `params`. */
         beforeEnter: (to, _from, next) => {
-          const rawId = to.params.id;
-          const id = Array.isArray(rawId) ? rawId[0] : rawId;
-
-          if (!id) {
-            next({ name: RouteName.APP_HOME });
+          if (to.name === RouteName.APP_BUILDER && to.params.id) {
+            next();
 
             return;
           }
 
-          next();
+          next({ name: RouteName.APP_HOME });
         },
       },
       {
@@ -77,7 +76,7 @@ export const routes: RouteRecordRaw[] = [
         },
         meta: { layout: SheetLayout },
         beforeEnter: (to, _from, next) => {
-          if (to.params.tab) {
+          if (to.name !== RouteName.APP_CHARACTER || to.params.tab) {
             next();
 
             return;

@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { Languages, SkillProficiencies } from '@shared/api/characters';
+import { RouteName } from '@shared/lib/router';
 import { DataTable } from '@shared/ui/data-table';
 import { Skeleton } from '@shared/ui/skeleton';
 
@@ -39,8 +40,8 @@ const TABLE_CAPTION =
 /** The modifier column's header follows its numbers to the right. */
 const HEADER_CLASSES = { modifier: 'text-right' };
 
-const route = useRoute();
-const id = route.params.id as string;
+const route = useRoute(RouteName.APP_CHARACTER);
+const id = route.params.id;
 
 const { character } = useCharacter({ id });
 const autosave = useSheetAutosave();

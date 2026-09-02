@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 
 import { CollectionKey } from '@shared/api/characters';
 import type { ClassResource, Trait } from '@shared/api/characters';
+import { RouteName } from '@shared/lib/router';
 
 import { useCharacter, useCharacterCollection } from '@entities/characters';
 
@@ -23,11 +24,11 @@ const byPinOrder = <T extends { pinOrder: number }>(rows: T[]): T[] => {
  * to be a singleton — see the note there.
  */
 export const useTraitsTab = () => {
-  const route = useRoute();
+  const route = useRoute(RouteName.APP_CHARACTER);
   const ui = useTraitsUi();
 
   const characterId = computed(() => {
-    return route.params.id as string;
+    return route.params.id;
   });
 
   const { character } = useCharacter({ id: characterId.value });

@@ -61,7 +61,7 @@ const separatorOrientation = computed(() => {
       @spend="handleSpend"
     />
 
-    <div class="flex flex-col gap-4 lg:flex-row lg:gap-6">
+    <div class="flex flex-col gap-4 lg:flex-row">
       <TraitsList
         :traits="allTraits"
         :is-saving="isSavingTrait"

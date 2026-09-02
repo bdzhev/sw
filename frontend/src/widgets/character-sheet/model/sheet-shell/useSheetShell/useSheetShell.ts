@@ -2,7 +2,7 @@ import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 
 import { CharacterStatus, type SheetPatch } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
+import { type CharacterRouteName, RouteName } from '@shared/lib/router';
 
 import { useCharacter, useSheetAutosave } from '@entities/characters';
 
@@ -21,9 +21,10 @@ import type { UseSheetShell } from './useSheetShell.types';
  * not clear a pending patch mid-flight.
  */
 export const useSheetShell = (): UseSheetShell => {
-  const route = useRoute();
+  /** The sheet, its items page and its settings page all carry `:id`. */
+  const route = useRoute<CharacterRouteName>();
   const router = useRouter();
-  const characterId = route.params.id as string;
+  const characterId = route.params.id;
 
   const { character, isFetchingCharacter, isCharacterNotFound } = useCharacter({
     id: characterId,
