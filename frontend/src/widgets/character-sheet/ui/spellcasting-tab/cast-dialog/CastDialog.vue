@@ -23,8 +23,9 @@ import { SlotOption } from './slot-option';
 
 const props = withDefaults(defineProps<CastDialogProps>(), { isSaving: false });
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   cast: [slotLevel: number];
 }>();
 
@@ -44,16 +45,12 @@ const description = computed(() => {
 
 const handleSelect = (slotLevel: number): void => {
   emit('cast', slotLevel);
-  emit('update:open', false);
-};
-
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
+  open.value = false;
 };
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

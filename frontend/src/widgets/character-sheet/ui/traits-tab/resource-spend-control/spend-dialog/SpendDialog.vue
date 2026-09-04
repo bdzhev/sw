@@ -22,8 +22,9 @@ import { SubAbilityOption } from './sub-ability-option';
 
 const props = withDefaults(defineProps<SpendDialogProps>(), { isSaving: false });
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   spend: [amount: number];
 }>();
 
@@ -47,17 +48,13 @@ const {
     return props.resource;
   },
   isOpen: () => {
-    return props.open;
+    return open.value;
   },
   onSpend: (amount) => {
     emit('spend', amount);
-    emit('update:open', false);
+    open.value = false;
   },
 });
-
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
-};
 
 const handleSelectAbility = (ability: ResourceSubAbility): void => {
   selectAbility(ability);
@@ -69,7 +66,7 @@ const handleUseOneClick = (): void => {
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

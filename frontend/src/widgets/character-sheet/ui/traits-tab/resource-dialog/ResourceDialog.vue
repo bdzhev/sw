@@ -35,8 +35,9 @@ import type { ResourceDialogProps } from './ResourceDialog.types';
 
 const props = withDefaults(defineProps<ResourceDialogProps>(), { isSaving: false });
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   submit: [values: ResourceSubmitValues];
 }>();
 
@@ -46,20 +47,16 @@ const { title, isEditing, isCustomResource, maxHint, sourcedTriggerHint, handleS
       return props.resource;
     },
     isOpen: () => {
-      return props.open;
+      return open.value;
     },
     onSubmit: (values) => {
       emit('submit', values);
     },
   });
-
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
-};
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

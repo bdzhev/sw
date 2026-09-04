@@ -18,7 +18,7 @@ import type { SpellDetailDialogProps } from './SpellDetailDialog.types';
 
 const props = defineProps<SpellDetailDialogProps>();
 
-const emit = defineEmits<{ 'update:open': [open: boolean] }>();
+const open = defineModel<boolean>('open', { required: true });
 
 /** An empty shell keeps `useSpellMeta` unconditional while nothing is selected. */
 const EMPTY_SPELL = {
@@ -45,14 +45,10 @@ const {
 } = useSpellMeta(() => {
   return props.spell ?? EMPTY_SPELL;
 });
-
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
-};
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

@@ -35,8 +35,9 @@ import type { AttackDetailDialogProps } from './AttackDetailDialog.types';
 
 const props = defineProps<AttackDetailDialogProps>();
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   edit: [];
   remove: [];
 }>();
@@ -93,10 +94,6 @@ const propertyDetails = computed(() => {
   });
 });
 
-const handleOpenChange = (next: boolean): void => {
-  emit('update:open', next);
-};
-
 const handleEditClick = (): void => {
   emit('edit');
 };
@@ -107,7 +104,7 @@ const handleRemoveClick = (): void => {
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

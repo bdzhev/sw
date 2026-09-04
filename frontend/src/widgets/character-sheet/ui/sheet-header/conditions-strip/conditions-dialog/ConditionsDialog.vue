@@ -27,8 +27,9 @@ import type { ConditionsDialogProps } from './ConditionsDialog.types';
 
 const props = defineProps<ConditionsDialogProps>();
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   update: [conditions: string[]];
 }>();
 
@@ -74,10 +75,6 @@ const selected = computed({
   },
 });
 
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
-};
-
 const handleCustomSubmit = (): void => {
   const entry = draft.value.trim().toLowerCase();
 
@@ -100,7 +97,7 @@ const handleCustomSubmit = (): void => {
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

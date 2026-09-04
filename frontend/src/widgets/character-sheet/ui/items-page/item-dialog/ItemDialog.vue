@@ -36,8 +36,9 @@ import type { ItemDialogProps } from './ItemDialog.types';
 
 const props = withDefaults(defineProps<ItemDialogProps>(), { isSaving: false });
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   submit: [values: ItemSubmitValues];
 }>();
 
@@ -46,20 +47,16 @@ const { title, hasBonuses, hasLimitedUses, handleSubmit } = useItemForm({
     return props.item;
   },
   isOpen: () => {
-    return props.open;
+    return open.value;
   },
   onSubmit: (values) => {
     emit('submit', values);
   },
 });
-
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
-};
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

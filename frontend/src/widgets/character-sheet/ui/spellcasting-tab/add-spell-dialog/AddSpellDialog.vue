@@ -33,8 +33,9 @@ import { SpellSearchResults } from './spell-search-results';
 
 const props = withDefaults(defineProps<AddSpellDialogProps>(), { isSaving: false });
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   addReference: [spell: SpellReference];
   addCustom: [values: SpellSubmitValues];
 }>();
@@ -76,7 +77,7 @@ const canWidenSearch = computed(() => {
 
 const { handleSubmit } = useSpellForm({
   isOpen: () => {
-    return props.open;
+    return open.value;
   },
   onSubmit: (values) => {
     emit('addCustom', values);
@@ -114,10 +115,6 @@ const handleLoadMore = (): void => {
   void loadNextSpells();
 };
 
-const handleOpenChange = (isOpen: boolean): void => {
-  emit('update:open', isOpen);
-};
-
 /** Switching tabs drops the previous results rather than showing them under a new filter. */
 watch(mode, () => {
   filters.value = null;
@@ -126,7 +123,7 @@ watch(mode, () => {
 /** The dialog stays mounted between openings, so it is reset on open. */
 watch(
   () => {
-    return props.open;
+    return open.value;
   },
   (isOpen) => {
     if (!isOpen) {
@@ -141,7 +138,7 @@ watch(
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 

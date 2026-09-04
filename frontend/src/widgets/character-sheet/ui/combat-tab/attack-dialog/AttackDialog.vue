@@ -44,8 +44,9 @@ import type { AttackDialogProps } from './AttackDialog.types';
 
 const props = withDefaults(defineProps<AttackDialogProps>(), { isSaving: false });
 
+const open = defineModel<boolean>('open', { required: true });
+
 const emit = defineEmits<{
-  'update:open': [open: boolean];
   submit: [body: AttackBody];
 }>();
 
@@ -75,7 +76,7 @@ const { meta, values } = form;
 
 watch(
   () => {
-    return props.open;
+    return open.value;
   },
   (open) => {
     if (open) {
@@ -144,17 +145,13 @@ const handleSubmit = (event?: Event): void => {
   void submitAttack(event);
 };
 
-const handleOpenChange = (next: boolean): void => {
-  emit('update:open', next);
-};
-
 const handleCancelClick = (): void => {
-  emit('update:open', false);
+  open.value = false;
 };
 </script>
 
 <template>
-  <DialogRoot :open="props.open" @update:open="handleOpenChange">
+  <DialogRoot v-model:open="open">
     <DialogPortal>
       <DialogOverlay />
 
