@@ -3,9 +3,10 @@ import { ref } from 'vue';
 
 import type { InventoryItem } from '@shared/api/characters';
 
+import type { DetailPayload } from '@widgets/character-sheet/config/detail';
 import { modifierSummary, usesPool } from '@widgets/character-sheet/lib/equipment';
 
-import type { ItemDetailPayload, PendingItemDelete } from './useEquipmentUi.types';
+import type { PendingItemDelete } from './useEquipmentUi.types';
 
 /**
  * Which dialog is open, and what it is open *about*.
@@ -22,7 +23,7 @@ export const useEquipmentUi = defineStore('equipmentUi', () => {
   const editedItem = ref<InventoryItem | null>(null);
 
   const isDetailOpen = ref(false);
-  const detail = ref<ItemDetailPayload>({ title: '', description: null, meta: '' });
+  const detail = ref<DetailPayload>({ title: '', description: null, meta: '' });
 
   const isDeleteOpen = ref(false);
   const pendingDelete = ref<PendingItemDelete>({ rowId: '', name: '' });

@@ -32,15 +32,13 @@ import type { UseSpellcastingTab } from './useSpellcastingTab.types';
 export const useSpellcastingTab = (): UseSpellcastingTab => {
   const route = useRoute(RouteName.APP_CHARACTER);
 
-  const characterId = computed(() => {
-    return route.params.id;
-  });
+  const characterId = route.params.id;
 
-  const { character } = useCharacter({ id: characterId.value });
+  const { character } = useCharacter({ id: characterId });
   const autosave = useSheetAutosave();
 
   const spells = useCharacterCollection(CollectionKey.SPELLS, {
-    characterId: characterId.value,
+    characterId: characterId,
   });
 
   const sheet = computed(() => {

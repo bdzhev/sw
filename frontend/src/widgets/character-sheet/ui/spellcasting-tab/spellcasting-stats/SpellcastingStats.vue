@@ -5,6 +5,7 @@ import type { SheetPatch } from '@shared/api/characters';
 
 import { ABILITY_LABELS } from '@entities/characters';
 
+import { formatSigned } from '@widgets/character-sheet/lib/format';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { ProgressionField } from './progression-field';
@@ -28,9 +29,7 @@ const saveDcLabel = computed(() => {
 
 /** An attack bonus is always written signed, +0 included. */
 const attackBonusLabel = computed(() => {
-  return props.attackBonus === null
-    ? '—'
-    : `${props.attackBonus >= 0 ? '+' : ''}${props.attackBonus}`;
+  return props.attackBonus === null ? '—' : formatSigned(props.attackBonus);
 });
 
 const tiles = computed(() => {

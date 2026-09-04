@@ -1,19 +1,12 @@
 import { useForm } from 'vee-validate';
-import { computed, watch, type ComputedRef } from 'vue';
+import { computed, watch } from 'vue';
 
 import type { CharacterIdentity } from '@shared/api/characters';
-import { useToast } from '@shared/lib/ui';
 
 import { useUpdateCharacter } from '@entities/characters';
 
 import { settingsFormSchema } from './settingsForm.schema';
-import type { UseSettingsFormOptions } from './useSettingsForm.types';
-
-interface UseSettingsForm {
-  isSaving: ComputedRef<boolean>;
-  isDirty: ComputedRef<boolean>;
-  handleSubmit: (event?: Event) => void;
-}
+import type { UseSettingsForm, UseSettingsFormOptions } from './useSettingsForm.types';
 
 const blankValues = (): Record<string, unknown> => {
   return { name: '', lore: '', appearance: '' };
@@ -33,9 +26,7 @@ const valuesFromCharacter = (character: CharacterIdentity): Record<string, unkno
  * the row the autosave controller owns, racing it with a stale object.
  */
 export const useSettingsForm = (options: UseSettingsFormOptions): UseSettingsForm => {
-  const { getCharacter } = options;
-
-  const { showToast } = useToast();
+  const { getCharacter, onSaved } = options;
 
   const form = useForm({
     validationSchema: settingsFormSchema,
@@ -43,12 +34,7 @@ export const useSettingsForm = (options: UseSettingsFormOptions): UseSettingsFor
   });
 
   const { updateCharacter, isUpdating } = useUpdateCharacter({
-    onSuccess: () => {
-      showToast({
-        title: 'Saved',
-        description: 'Your character details are up to date.',
-      });
-    },
+    onSuccess: onSaved,
   });
 
   const isSaving = computed(() => {

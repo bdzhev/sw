@@ -65,7 +65,9 @@ const ammo = computed({
 });
 
 const pinLabel = computed(() => {
-  return props.attack.quickReference ? 'Unpin from quick access' : 'Pin to quick access';
+  return props.attack.quickReference
+    ? 'Unpin from quick reference'
+    : 'Pin to quick reference';
 });
 
 const pinClasses = computed(() => {

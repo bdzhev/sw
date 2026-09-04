@@ -1,2 +1,2 @@
 export { useSettingsForm } from './useSettingsForm';
-export type { UseSettingsFormOptions } from './useSettingsForm.types';
+export type { UseSettingsForm, UseSettingsFormOptions } from './useSettingsForm.types';

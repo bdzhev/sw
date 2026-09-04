@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
+import { useToast } from '@shared/lib/ui';
 import { BackButton } from '@shared/ui/back-button';
 import { Button } from '@shared/ui/button';
 import { FormInput } from '@shared/ui/form-input';
@@ -22,9 +23,14 @@ import { IdentitySummary } from './identity-summary';
  */
 const { characterId, character, isFetchingCharacter } = useSheetShell();
 
+const { showToast } = useToast();
+
 const { isSaving, isDirty, handleSubmit } = useSettingsForm({
   getCharacter: () => {
     return character.value?.character;
+  },
+  onSaved: () => {
+    showToast({ title: 'Saved', description: 'Your character details are up to date.' });
   },
 });
 

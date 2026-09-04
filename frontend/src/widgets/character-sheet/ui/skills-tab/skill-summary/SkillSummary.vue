@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Text } from '@shared/ui/text';
 
+import { formatSigned } from '@widgets/character-sheet/lib/format';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import type { SkillSummaryProps } from './SkillSummary.types';
@@ -31,7 +32,7 @@ const props = defineProps<SkillSummaryProps>();
         </Text>
 
         <p class="text-2xl leading-none font-semibold text-primary tabular-nums">
-          +{{ props.proficiencyBonus }}
+          {{ formatSigned(props.proficiencyBonus) }}
         </p>
 
         <Text size="xs" theme="secondary">from level</Text>

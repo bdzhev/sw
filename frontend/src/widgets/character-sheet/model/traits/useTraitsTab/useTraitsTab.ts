@@ -28,17 +28,15 @@ export const useTraitsTab = (): UseTraitsTab => {
   const route = useRoute(RouteName.APP_CHARACTER);
   const ui = useTraitsUi();
 
-  const characterId = computed(() => {
-    return route.params.id;
-  });
+  const characterId = route.params.id;
 
-  const { character } = useCharacter({ id: characterId.value });
+  const { character } = useCharacter({ id: characterId });
 
   const traits = useCharacterCollection(CollectionKey.TRAITS, {
-    characterId: characterId.value,
+    characterId: characterId,
   });
   const resources = useCharacterCollection(CollectionKey.CLASS_RESOURCES, {
-    characterId: characterId.value,
+    characterId: characterId,
   });
 
   const allTraits = computed(() => {

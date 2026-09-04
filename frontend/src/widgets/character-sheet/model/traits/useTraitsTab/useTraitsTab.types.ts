@@ -2,9 +2,11 @@ import type { ComputedRef, Ref } from 'vue';
 
 import type { ClassResource, Trait } from '@shared/api/characters';
 
+import type { DetailPayload } from '@widgets/character-sheet/config/detail';
+
 import type { ResourceSubmitValues } from '../useResourceForm';
 import type { TraitSubmitValues } from '../useTraitForm';
-import type { DetailPayload, PendingDelete } from '../useTraitsUi';
+import type { PendingDelete } from '../useTraitsUi';
 
 /**
  * Written down rather than inferred, because the width is the point: twenty-one

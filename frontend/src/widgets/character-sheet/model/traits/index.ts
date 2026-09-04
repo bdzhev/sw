@@ -1,7 +1,7 @@
 export { useTraitsTab } from './useTraitsTab';
 export type { UseTraitsTab } from './useTraitsTab';
 export { useTraitsUi } from './useTraitsUi';
-export type { DetailPayload, PendingDelete } from './useTraitsUi';
+export type { PendingDelete } from './useTraitsUi';
 export { useTraitForm } from './useTraitForm';
 export type { TraitSubmitValues, UseTraitFormOptions } from './useTraitForm';
 export { useResourceForm } from './useResourceForm';

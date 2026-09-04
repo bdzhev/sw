@@ -3,13 +3,14 @@ import { ref } from 'vue';
 
 import type { ClassResource, Trait } from '@shared/api/characters';
 
+import type { DetailPayload } from '@widgets/character-sheet/config/detail';
 import {
   RESET_TRIGGER_LABELS,
   TRAIT_TAG_LABELS,
 } from '@widgets/character-sheet/config/traits';
 import { resourceLabel } from '@widgets/character-sheet/lib/traits';
 
-import type { DetailPayload, PendingDelete } from './useTraitsUi.types';
+import type { PendingDelete } from './useTraitsUi.types';
 
 /**
  * Which dialog is open, and what it is open *about*.

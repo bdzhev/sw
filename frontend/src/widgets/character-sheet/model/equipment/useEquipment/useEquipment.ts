@@ -25,15 +25,13 @@ export const useEquipment = (): UseEquipment => {
   const route = useRoute(RouteName.APP_CHARACTER_ITEMS);
   const ui = useEquipmentUi();
 
-  const characterId = computed(() => {
-    return route.params.id;
-  });
+  const characterId = route.params.id;
 
-  const { character } = useCharacter({ id: characterId.value });
+  const { character } = useCharacter({ id: characterId });
   const autosave = useSheetAutosave();
 
   const items = useCharacterCollection(CollectionKey.INVENTORY_ITEMS, {
-    characterId: characterId.value,
+    characterId: characterId,
   });
 
   const sheet = computed(() => {

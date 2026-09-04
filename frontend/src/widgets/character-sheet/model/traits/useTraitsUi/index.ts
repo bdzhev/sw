@@ -1,2 +1,2 @@
 export { useTraitsUi } from './useTraitsUi';
-export type { DetailPayload, PendingDelete } from './useTraitsUi.types';
+export type { PendingDelete } from './useTraitsUi.types';

@@ -2,7 +2,9 @@ import type { ComputedRef, Ref } from 'vue';
 
 import type { CharacterSheet, InventoryItem, SheetPatch } from '@shared/api/characters';
 
-import type { ItemDetailPayload, PendingItemDelete } from '../useEquipmentUi';
+import type { DetailPayload } from '@widgets/character-sheet/config/detail';
+
+import type { PendingItemDelete } from '../useEquipmentUi';
 import type { ItemSubmitValues } from '../useItemForm';
 
 export interface UseEquipment {
@@ -14,7 +16,7 @@ export interface UseEquipment {
   isItemDialogOpen: Ref<boolean>;
   editedItem: Ref<InventoryItem | null>;
   isDetailOpen: Ref<boolean>;
-  detail: Ref<ItemDetailPayload>;
+  detail: Ref<DetailPayload>;
   isDeleteOpen: Ref<boolean>;
   pendingDelete: Ref<PendingItemDelete>;
   submitItem: (values: ItemSubmitValues) => Promise<void>;

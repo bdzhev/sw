@@ -3,11 +3,11 @@ import { computed, toValue, type MaybeRefOrGetter } from 'vue';
 import type { ClassResource } from '@shared/api/characters';
 
 import {
-  KNOWN_RESOURCE_LABELS,
   RESET_TRIGGER_LABELS,
   RESOURCE_SUB_ABILITIES,
   type ResourceSubAbility,
 } from '@widgets/character-sheet/config/traits';
+import { resourceLabel } from '@widgets/character-sheet/lib/traits';
 
 /**
  * Everything the row, the use control and the use dialog all need to know about
@@ -20,9 +20,7 @@ export const useResourceMeta = (source: MaybeRefOrGetter<ClassResource>) => {
   });
 
   const label = computed(() => {
-    return (
-      KNOWN_RESOURCE_LABELS[resource.value.resourceKey] ?? resource.value.resourceKey
-    );
+    return resourceLabel(resource.value);
   });
 
   /**
