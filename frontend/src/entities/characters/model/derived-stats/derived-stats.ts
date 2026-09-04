@@ -4,8 +4,9 @@ import {
   type InventoryItem,
 } from '@shared/api/characters';
 
-import { proficiencyBonusForLevel } from '@entities/characters/lib/class-tables';
-import { PERCEPTION_SKILL_KEY, SKILLS } from '@entities/characters/lib/skills';
+import { MAX_SLOT_LEVEL } from '@entities/characters/config/class-tables';
+import { PERCEPTION_SKILL_KEY, SKILLS } from '@entities/characters/config/skills';
+import { proficiencyBonusForLevel } from '@entities/characters/model/class-tables';
 
 /**
  * Every derived number the sheet shows, in one module, so no tab reimplements
@@ -20,7 +21,6 @@ const ABILITY_BASE = 10;
 const ABILITY_STEP = 2;
 const PASSIVE_BASE = 10;
 const SPELL_SAVE_DC_BASE = 8;
-const MAX_SLOT_LEVEL = 9;
 
 export type AbilityScores = Record<CharacterStat, number>;
 

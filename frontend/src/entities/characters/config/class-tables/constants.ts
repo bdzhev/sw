@@ -5,9 +5,12 @@ import {
   SpellcastingProgression,
 } from '@shared/api/characters';
 
+import type { PactMagicSlots } from './types';
+
 /**
  * The rules tables, in one place, because four tabs and all three atomic server
- * actions read them. Pure data, no I/O.
+ * actions read them. Pure data, no I/O — the lookups that read them live in
+ * `model/class-tables`, which imports from here.
  *
  * A wrong number here is wrong in several features at once, so every table below
  * is transcribed from a source that spells the numbers out (the vault's
@@ -15,17 +18,6 @@ import {
  * by level, cantrips/spells-known counts — are deliberately absent rather than
  * guessed; see the note at the bottom.
  */
-
-const PROFICIENCY_BASE = 2;
-const LEVELS_PER_PROFICIENCY_STEP = 4;
-
-/**
- * +2 at 1-4, +3 at 5-8, +4 at 9-12, +5 at 13-16, +6 at 17-20. Exact for the
- * whole 1-20 range, so the formula is the table.
- */
-export const proficiencyBonusForLevel = (level: number): number => {
-  return Math.floor((level - 1) / LEVELS_PER_PROFICIENCY_STEP) + PROFICIENCY_BASE;
-};
 
 export const HIT_DIE_BY_CLASS: Record<CharacterClass, number> = {
   [CharacterClass.BARBARIAN]: 12,
@@ -59,67 +51,8 @@ export const SPELLCASTING_ABILITY_BY_CLASS: Record<CharacterClass, CharacterStat
     [CharacterClass.ROGUE]: null,
   };
 
-export type SlotTableMaxima = Partial<Record<string, number>>;
-
-const slotsFromTable = (table: readonly number[][], level: number): SlotTableMaxima => {
-  const row = table[level - 1] ?? [];
-
-  return row.reduce<SlotTableMaxima>((maxima, count, index) => {
-    if (count > 0) {
-      maxima[String(index + 1)] = count;
-    }
-
-    return maxima;
-  }, {});
-};
-
-/**
- * What the rules say this character's slots would be. Nothing derives the grid
- * from this any more — the player types their own maxima — but the tab offers
- * it as a one-tap fill, which is the whole reason these tables still earn their
- * place here. `null` means the progression has no table to read.
- */
-export const slotMaximaFromProgression = (
-  progression: SpellcastingProgression,
-  level: number,
-): SlotTableMaxima | null => {
-  switch (progression) {
-    case SpellcastingProgression.FULL:
-      return slotsFromTable(FULL_CASTER_SLOTS, level);
-    case SpellcastingProgression.HALF:
-      return slotsFromTable(HALF_CASTER_SLOTS, level);
-    case SpellcastingProgression.THIRD:
-      return slotsFromTable(THIRD_CASTER_SLOTS, level);
-    case SpellcastingProgression.PACT: {
-      const pact = PACT_MAGIC_SLOTS[level - 1];
-
-      return pact ? { [String(pact.slotLevel)]: pact.slots } : {};
-    }
-    default:
-      return null;
-  }
-};
-
-/**
- * The caster ability the sheet actually uses.
- *
- * Fighter and rogue map to `null` above, but an eldritch knight or arcane
- * trickster overrides progression to `third` — the exact case the override
- * exists for — and would otherwise get a working slot grid with a dash for save
- * DC and attack bonus. INT is the SRD ability for both subclasses.
- */
-export const resolveSpellcastingAbility = (
-  characterClass: CharacterClass,
-  progression: SpellcastingProgression,
-): CharacterStat | null => {
-  const fromClass = SPELLCASTING_ABILITY_BY_CLASS[characterClass];
-
-  if (fromClass) {
-    return fromClass;
-  }
-
-  return progression === SpellcastingProgression.NONE ? null : CharacterStat.INT;
-};
+/** The highest slot level in the rules. Nine, everywhere, for everyone. */
+export const MAX_SLOT_LEVEL = 9;
 
 /**
  * The two saving throws each class is proficient in. This is the one
@@ -253,11 +186,6 @@ export const THIRD_CASTER_SLOTS: readonly number[][] = [
   [4, 3, 3, 1],
   [4, 3, 3, 1],
 ];
-
-export interface PactMagicSlots {
-  slots: number;
-  slotLevel: number;
-}
 
 /** Warlock — one slot level, small pool, recovers on a **short** rest. */
 export const PACT_MAGIC_SLOTS: readonly PactMagicSlots[] = [

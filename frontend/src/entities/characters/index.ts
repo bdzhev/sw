@@ -8,11 +8,9 @@ export { useSheetAutosave } from './model/useSheetAutosave';
 export type { SaveState } from './model/useSheetAutosave';
 
 export {
-  proficiencyBonusForLevel,
+  MAX_SLOT_LEVEL,
   HIT_DIE_BY_CLASS,
   SPELLCASTING_ABILITY_BY_CLASS,
-  resolveSpellcastingAbility,
-  slotMaximaFromProgression,
   SAVE_PROFICIENCIES_BY_CLASS,
   SPEED_BY_RACE,
   DEFAULT_PROGRESSION_BY_CLASS,
@@ -20,8 +18,14 @@ export {
   HALF_CASTER_SLOTS,
   THIRD_CASTER_SLOTS,
   PACT_MAGIC_SLOTS,
-  type SlotTableMaxima,
-} from './lib/class-tables';
+} from './config/class-tables';
+export type { PactMagicSlots, SlotTableMaxima } from './config/class-tables';
+
+export {
+  proficiencyBonusForLevel,
+  slotMaximaFromProgression,
+  resolveSpellcastingAbility,
+} from './model/class-tables';
 
 export {
   abilityScores,
@@ -46,18 +50,14 @@ export {
   type SlotMaxima,
 } from './model/derived-stats';
 
-export {
-  ABILITIES,
-  ABILITY_LABELS,
-  ABILITY_SHORT_LABELS,
-  ABILITY_SHEET_FIELDS,
-  type AbilityDescriptor,
-  type AbilitySheetField,
-} from './lib/abilities';
+export { ABILITIES } from './config/abilities';
+export type { AbilityDescriptor, AbilitySheetField } from './config/abilities';
+
+export { abilityLabels, abilityShortLabels, abilitySheetFields } from './lib/abilities';
 
 export {
   SKILLS,
   PERCEPTION_SKILL_KEY,
   STANDARD_LANGUAGES,
   type SkillDefinition,
-} from './lib/skills';
+} from './config/skills';

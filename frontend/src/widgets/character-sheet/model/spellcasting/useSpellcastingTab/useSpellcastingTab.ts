@@ -17,6 +17,7 @@ import {
 } from '@entities/characters';
 
 import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
+import { withSlotSpent } from '@widgets/character-sheet/lib/spellcasting';
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 
 import type { UseSpellcastingTab } from './useSpellcastingTab.types';
@@ -142,10 +143,6 @@ export const useSpellcastingTab = (): UseSpellcastingTab => {
   };
 
   /**
-   * Absolute value, never a delta, and the whole `spellSlots` object — the
-   * autosave buffer merges by sheet field with no deep merge, so sending only
-   * `current` would drop a `max` edit still sitting in it.
-   *
    * Debounced rather than immediate: a slot counter is the self-healing
    * repeated-field case, where the next write resends the absolute value.
    */
@@ -156,12 +153,7 @@ export const useSpellcastingTab = (): UseSpellcastingTab => {
       return;
     }
 
-    const key = String(slotLevel);
-    const next = Math.max(0, (slots.current[key] ?? 0) - 1);
-
-    patchSheet({
-      spellSlots: { ...slots, current: { ...slots.current, [key]: next } },
-    });
+    patchSheet({ spellSlots: withSlotSpent(slots, slotLevel) });
   };
 
   const deleteSpell = async (rowId: string): Promise<boolean> => {

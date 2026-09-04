@@ -1,6 +1,8 @@
 import { SpellcastingProgression } from '@shared/api/characters';
 import type { SelectOption } from '@shared/ui/select';
 
+import { MAX_SLOT_LEVEL } from '@entities/characters';
+
 export const SPELL_NAME_MAX_LENGTH = 60;
 export const SPELL_DESCRIPTION_MAX_LENGTH = 2000;
 
@@ -48,8 +50,11 @@ export const PROGRESSION_OPTIONS: SelectOption[] = [
   },
 ];
 
-/** The highest slot level in the rules — the slot grid always renders all of them. */
-export const MAX_SLOT_LEVEL = 9;
+/**
+ * Re-exported, not declared: the rule belongs to the entity, which needs it for
+ * `availableSlotLevels` and cannot import upward from a widget.
+ */
+export { MAX_SLOT_LEVEL } from '@entities/characters';
 
 /** The freeform entry's level picker. Cantrip first, then 1..9. */
 export const SPELL_LEVEL_OPTIONS: SelectOption[] = [

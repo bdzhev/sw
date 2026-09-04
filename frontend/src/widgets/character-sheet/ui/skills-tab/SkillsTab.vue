@@ -8,8 +8,8 @@ import { DataTable } from '@shared/ui/data-table';
 import { Skeleton } from '@shared/ui/skeleton';
 
 import {
-  ABILITY_LABELS,
-  ABILITY_SHORT_LABELS,
+  abilityLabels,
+  abilityShortLabels,
   passivePerception,
   proficiencyBonus,
   skillModifier,
@@ -92,14 +92,14 @@ const groups = computed<SkillGroupView[]>(() => {
   return SKILL_ABILITY_ORDER.map((ability) => {
     return {
       ability,
-      label: ABILITY_LABELS[ability],
+      label: abilityLabels[ability],
       skills: SKILLS.filter((skill) => {
         return skill.ability === ability;
       }).map((skill) => {
         return {
           key: skill.key,
           label: skill.label,
-          abilityLabel: ABILITY_SHORT_LABELS[skill.ability],
+          abilityLabel: abilityShortLabels[skill.ability],
           modifier: skillModifier(
             scores,
             skill.ability,

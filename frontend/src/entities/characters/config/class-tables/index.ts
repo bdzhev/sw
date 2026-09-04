@@ -1,9 +1,7 @@
 export {
-  proficiencyBonusForLevel,
+  MAX_SLOT_LEVEL,
   HIT_DIE_BY_CLASS,
   SPELLCASTING_ABILITY_BY_CLASS,
-  resolveSpellcastingAbility,
-  slotMaximaFromProgression,
   SAVE_PROFICIENCIES_BY_CLASS,
   SPEED_BY_RACE,
   DEFAULT_PROGRESSION_BY_CLASS,
@@ -11,6 +9,5 @@ export {
   HALF_CASTER_SLOTS,
   THIRD_CASTER_SLOTS,
   PACT_MAGIC_SLOTS,
-  type PactMagicSlots,
-  type SlotTableMaxima,
-} from './class-tables';
+} from './constants';
+export type { PactMagicSlots, SlotTableMaxima } from './types';

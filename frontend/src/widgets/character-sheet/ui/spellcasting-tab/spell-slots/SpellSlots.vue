@@ -6,7 +6,14 @@ import { Accordion, AccordionItem } from '@shared/ui/accordion';
 import { Button } from '@shared/ui/button';
 
 import { MAX_SLOT_LEVEL } from '@widgets/character-sheet/config/spellcasting';
-import { slotPools } from '@widgets/character-sheet/lib/spellcasting';
+import {
+  slotAt,
+  slotPools,
+  withSlotCurrent,
+  withSlotMax,
+  withSlotMaxima,
+  type CastableSlot,
+} from '@widgets/character-sheet/lib/spellcasting';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { SlotRow } from './slot-row';
@@ -34,9 +41,9 @@ const pools = computed(() => {
  * All nine when open, for everyone — typing a max into level 3 is how level 3
  * comes to exist. The class tables no longer decide what a character can have.
  */
-const slotLevels = computed(() => {
+const rows = computed((): CastableSlot[] => {
   return Array.from({ length: MAX_SLOT_LEVEL }, (_, index) => {
-    return index + 1;
+    return slotAt(props.slots, index + 1);
   });
 });
 
@@ -55,35 +62,12 @@ const description = computed(() => {
     : 'Yours to set — check the rules for your class and level.';
 });
 
-const currentFor = (slotLevel: number): number => {
-  return props.slots.current[String(slotLevel)] ?? 0;
-};
-
-const maxFor = (slotLevel: number): number => {
-  return props.slots.max?.[String(slotLevel)] ?? 0;
-};
-
-/**
- * The whole `spellSlots` object every time. The autosave buffer merges pending
- * patches shallowly by sheet field — last write wins, no deep merge — so
- * sending half of it would drop the other half if an edit were still queued.
- */
 const handleCurrentChange = (slotLevel: number, value: number): void => {
-  emit('patch', {
-    spellSlots: {
-      ...props.slots,
-      current: { ...props.slots.current, [String(slotLevel)]: value },
-    },
-  });
+  emit('patch', { spellSlots: withSlotCurrent(props.slots, slotLevel, value) });
 };
 
 const handleMaxChange = (slotLevel: number, value: number): void => {
-  emit('patch', {
-    spellSlots: {
-      ...props.slots,
-      max: { ...props.slots.max, [String(slotLevel)]: value },
-    },
-  });
+  emit('patch', { spellSlots: withSlotMax(props.slots, slotLevel, value) });
 };
 
 /** Offered, never imposed — the tables are a shortcut, not the source of truth. */
@@ -92,7 +76,7 @@ const handleFillClick = (): void => {
     return;
   }
 
-  emit('patch', { spellSlots: { ...props.slots, max: props.tableMaxima } });
+  emit('patch', { spellSlots: withSlotMaxima(props.slots, props.tableMaxima) });
 };
 </script>
 
@@ -117,11 +101,11 @@ const handleFillClick = (): void => {
 
         <ul class="flex flex-col gap-2">
           <SlotRow
-            v-for="slotLevel in slotLevels"
-            :key="slotLevel"
-            :slot-level="slotLevel"
-            :current="currentFor(slotLevel)"
-            :max="maxFor(slotLevel)"
+            v-for="row in rows"
+            :key="row.slotLevel"
+            :slot-level="row.slotLevel"
+            :current="row.current"
+            :max="row.max"
             @change-current="handleCurrentChange"
             @change-max="handleMaxChange"
           />

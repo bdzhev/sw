@@ -1,6 +1,6 @@
 import { CharacterStat, type InventoryItem } from '@shared/api/characters';
 
-import { ABILITY_SHORT_LABELS } from '@entities/characters';
+import { abilityShortLabels } from '@entities/characters';
 
 import { formatSigned } from '@widgets/character-sheet/lib/format';
 
@@ -24,7 +24,7 @@ export const modifierSummary = (item: InventoryItem): string | null => {
       return Boolean(item.statModifiers[stat]);
     })
     .map((stat) => {
-      return `${ABILITY_SHORT_LABELS[stat]} ${formatSigned(item.statModifiers[stat] ?? 0)}`;
+      return `${abilityShortLabels[stat]} ${formatSigned(item.statModifiers[stat] ?? 0)}`;
     });
 
   return parts.length > 0 ? parts.join(' · ') : null;

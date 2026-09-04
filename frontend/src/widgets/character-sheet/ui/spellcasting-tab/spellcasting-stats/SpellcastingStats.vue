@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import type { SheetPatch } from '@shared/api/characters';
 
-import { ABILITY_LABELS } from '@entities/characters';
+import { abilityLabels } from '@entities/characters';
 
 import { formatSigned } from '@widgets/character-sheet/lib/format';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
@@ -20,7 +20,7 @@ const handlePatch = (patch: SheetPatch, immediate = false): void => {
 };
 
 const abilityLabel = computed(() => {
-  return props.ability ? ABILITY_LABELS[props.ability] : '—';
+  return props.ability ? abilityLabels[props.ability] : '—';
 });
 
 const saveDcLabel = computed(() => {

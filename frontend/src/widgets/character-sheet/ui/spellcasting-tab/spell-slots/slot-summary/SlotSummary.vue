@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { slotLevelLabel } from '@widgets/character-sheet/lib/spellcasting';
+import {
+  slotLevelLabel,
+  slotSpentCount,
+  slotTotalCount,
+} from '@widgets/character-sheet/lib/spellcasting';
 
 import { SlotPips } from './slot-pips';
 import type { SlotSummaryProps } from './SlotSummary.types';
@@ -14,15 +18,6 @@ const props = defineProps<SlotSummaryProps>();
  */
 const rowLabel = (pool: SlotSummaryProps['pools'][number]): string => {
   return `${pool.current} of ${pool.max} remaining`;
-};
-
-const spentIn = (pool: SlotSummaryProps['pools'][number]): number => {
-  return Math.max(0, pool.max - pool.current);
-};
-
-/** A player who typed a current above their max still gets every slot drawn. */
-const totalIn = (pool: SlotSummaryProps['pools'][number]): number => {
-  return Math.max(pool.max, pool.current);
 };
 </script>
 
@@ -41,7 +36,7 @@ const totalIn = (pool: SlotSummaryProps['pools'][number]): number => {
         {{ slotLevelLabel(pool.slotLevel) }}
       </span>
 
-      <SlotPips :spent="spentIn(pool)" :total="totalIn(pool)" />
+      <SlotPips :spent="slotSpentCount(pool)" :total="slotTotalCount(pool)" />
 
       <span class="sr-only">{{ rowLabel(pool) }}</span>
     </span>
