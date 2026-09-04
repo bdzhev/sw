@@ -11,6 +11,7 @@ import { useCharacter, useCharacterCollection } from '@entities/characters';
 import type { ResourceSubmitValues } from '../useResourceForm';
 import type { TraitSubmitValues } from '../useTraitForm';
 import { useTraitsUi } from '../useTraitsUi';
+import type { UseTraitsTab } from './useTraitsTab.types';
 
 const byPinOrder = <T extends { pinOrder: number }>(rows: T[]): T[] => {
   return [...rows].sort((first, second) => {
@@ -23,7 +24,7 @@ const byPinOrder = <T extends { pinOrder: number }>(rows: T[]): T[] => {
  * writes. Dialog state lives in `useTraitsUi`, which is a store because it has
  * to be a singleton — see the note there.
  */
-export const useTraitsTab = () => {
+export const useTraitsTab = (): UseTraitsTab => {
   const route = useRoute(RouteName.APP_CHARACTER);
   const ui = useTraitsUi();
 

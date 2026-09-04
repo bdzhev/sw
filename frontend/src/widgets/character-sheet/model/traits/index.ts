@@ -1,4 +1,5 @@
 export { useTraitsTab } from './useTraitsTab';
+export type { UseTraitsTab } from './useTraitsTab';
 export { useTraitsUi } from './useTraitsUi';
 export type { DetailPayload, PendingDelete } from './useTraitsUi';
 export { useTraitForm } from './useTraitForm';
@@ -6,5 +7,5 @@ export type { TraitSubmitValues, UseTraitFormOptions } from './useTraitForm';
 export { useResourceForm } from './useResourceForm';
 export type { ResourceSubmitValues, UseResourceFormOptions } from './useResourceForm';
 export { useResourceSpend } from './useResourceSpend';
-export type { UseResourceSpendOptions } from './useResourceSpend';
+export type { UseResourceSpend, UseResourceSpendOptions } from './useResourceSpend';
 export { useResourceMeta } from './useResourceMeta';

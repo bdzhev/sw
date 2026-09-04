@@ -1,4 +1,5 @@
 export { useEquipment } from './useEquipment';
+export type { UseEquipment } from './useEquipment';
 export { useEquipmentUi } from './useEquipmentUi';
 export type { ItemDetailPayload, PendingItemDelete } from './useEquipmentUi';
 export { useItemForm } from './useItemForm';

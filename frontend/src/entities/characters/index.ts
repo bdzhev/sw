@@ -20,6 +20,7 @@ export {
   HALF_CASTER_SLOTS,
   THIRD_CASTER_SLOTS,
   PACT_MAGIC_SLOTS,
+  type SlotTableMaxima,
 } from './lib/class-tables';
 
 export {

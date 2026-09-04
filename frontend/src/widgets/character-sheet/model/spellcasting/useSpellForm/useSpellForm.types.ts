@@ -9,3 +9,7 @@ export interface UseSpellFormOptions {
   isOpen: () => boolean;
   onSubmit: (values: SpellSubmitValues) => void;
 }
+
+export interface UseSpellForm {
+  handleSubmit: (event?: Event) => void;
+}

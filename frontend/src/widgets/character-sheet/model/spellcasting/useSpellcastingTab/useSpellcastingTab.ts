@@ -19,6 +19,8 @@ import {
 import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 
+import type { UseSpellcastingTab } from './useSpellcastingTab.types';
+
 /**
  * The data half of the spellcasting tab. Dialog state stays in the component as
  * local refs — the rows here emit rather than reaching for a store, so there is
@@ -27,7 +29,7 @@ import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
  * Slot counters and progression are autosaved; adding or deleting a spell is a
  * discrete explicit call. Those are two different channels on purpose.
  */
-export const useSpellcastingTab = () => {
+export const useSpellcastingTab = (): UseSpellcastingTab => {
   const route = useRoute(RouteName.APP_CHARACTER);
 
   const characterId = computed(() => {

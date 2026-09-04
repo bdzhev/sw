@@ -12,4 +12,5 @@ export {
   THIRD_CASTER_SLOTS,
   PACT_MAGIC_SLOTS,
   type PactMagicSlots,
+  type SlotTableMaxima,
 } from './class-tables';

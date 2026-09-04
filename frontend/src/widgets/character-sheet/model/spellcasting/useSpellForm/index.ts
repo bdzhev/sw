@@ -1,2 +1,6 @@
 export { useSpellForm } from './useSpellForm';
-export type { SpellSubmitValues, UseSpellFormOptions } from './useSpellForm.types';
+export type {
+  SpellSubmitValues,
+  UseSpellForm,
+  UseSpellFormOptions,
+} from './useSpellForm.types';

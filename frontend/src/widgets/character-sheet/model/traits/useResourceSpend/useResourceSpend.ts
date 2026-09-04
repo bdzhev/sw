@@ -5,9 +5,9 @@ import type { ResourceSubAbility } from '@widgets/character-sheet/config/traits'
 
 import { useResourceMeta } from '../useResourceMeta';
 import { spendAmountSchema } from './spendAmount.schema';
-import type { UseResourceSpendOptions } from './useResourceSpend.types';
+import type { UseResourceSpend, UseResourceSpendOptions } from './useResourceSpend.types';
 
-export const useResourceSpend = (options: UseResourceSpendOptions) => {
+export const useResourceSpend = (options: UseResourceSpendOptions): UseResourceSpend => {
   const { getResource, isOpen, onSpend } = options;
 
   const meta = useResourceMeta(getResource);
@@ -74,7 +74,12 @@ export const useResourceSpend = (options: UseResourceSpendOptions) => {
   });
 
   return {
-    ...meta,
+    label: meta.label,
+    remaining: meta.remaining,
+    subAbilities: meta.subAbilities,
+    hasSubAbilities: meta.hasSubAbilities,
+    isExhausted: meta.isExhausted,
+    isUntracked: meta.isUntracked,
     amountLabel,
     selectedAbilityName,
     selectAbility,

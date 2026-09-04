@@ -1,9 +1,9 @@
 import { storeToRefs } from 'pinia';
-import { computed, type ComputedRef, type Ref } from 'vue';
+import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { CollectionKey, MAX_ITEMS } from '@shared/api/characters';
-import type { CharacterSheet, InventoryItem, SheetPatch } from '@shared/api/characters';
+import type { InventoryItem, SheetPatch } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
 
 import {
@@ -13,28 +13,8 @@ import {
 } from '@entities/characters';
 
 import { useEquipmentUi } from '../useEquipmentUi';
-import type { ItemDetailPayload, PendingItemDelete } from '../useEquipmentUi';
 import type { ItemSubmitValues } from '../useItemForm';
-
-interface UseEquipment {
-  /** undefined until the character query resolves — the subpage renders a skeleton. */
-  sheet: ComputedRef<CharacterSheet | undefined>;
-  items: ComputedRef<InventoryItem[]>;
-  isSavingItem: ComputedRef<boolean>;
-  hasReachedItemLimit: ComputedRef<boolean>;
-  isItemDialogOpen: Ref<boolean>;
-  editedItem: Ref<InventoryItem | null>;
-  isDetailOpen: Ref<boolean>;
-  detail: Ref<ItemDetailPayload>;
-  isDeleteOpen: Ref<boolean>;
-  pendingDelete: Ref<PendingItemDelete>;
-  submitItem: (values: ItemSubmitValues) => Promise<void>;
-  toggleItemPin: (item: InventoryItem) => void;
-  toggleEquipped: (item: InventoryItem) => void;
-  spendUse: (item: InventoryItem) => void;
-  confirmDelete: () => Promise<void>;
-  patchCurrency: (patch: SheetPatch) => void;
-}
+import type { UseEquipment } from './useEquipment.types';
 
 /**
  * The data half of the equipment subpage: rows derived from the cached sheet, and

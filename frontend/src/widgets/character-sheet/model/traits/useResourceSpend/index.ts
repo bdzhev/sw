@@ -1,2 +1,2 @@
 export { useResourceSpend } from './useResourceSpend';
-export type { UseResourceSpendOptions } from './useResourceSpend.types';
+export type { UseResourceSpend, UseResourceSpendOptions } from './useResourceSpend.types';
