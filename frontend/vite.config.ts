@@ -3,8 +3,10 @@ import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 import { visualizer } from 'rollup-plugin-visualizer';
-import { defineConfig, type Plugin, type PluginOption } from 'vite';
+import type { Plugin, PluginOption } from 'vite';
 import vueDevTools from 'vite-plugin-vue-devtools';
+/** `vitest/config` re-exports vite's own `defineConfig` plus the `test` key. */
+import { defineConfig } from 'vitest/config';
 
 /**
  * The only packages on every route's critical path. Their transitive deps come
@@ -69,6 +71,16 @@ export default defineConfig({
       '@widgets': fileURLToPath(new URL('./src/widgets', import.meta.url)),
       '@pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
     },
+  },
+  /**
+   * `jsdom` rather than `node` because the pure modules under test import from
+   * barrels that also export components. `globals: false` keeps `describe`/`it`
+   * explicit imports, so nothing is added to the app's type environment.
+   */
+  test: {
+    environment: 'jsdom',
+    globals: false,
+    include: ['src/**/__tests__/**/*.test.ts'],
   },
   build: {
     rollupOptions: {

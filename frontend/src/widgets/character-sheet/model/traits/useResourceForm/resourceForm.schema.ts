@@ -26,12 +26,20 @@ const wholePoolNumber = z
 const schema = z
   .object({
     resource: z.string().min(1, 'Please pick a resource'),
+    /**
+     * `.default('')` is load-bearing: this field lives behind
+     * `v-if="isCustomResource"`, and vee-validate deletes an unmounted field's
+     * path, so picking Custom and then a known resource used to submit with
+     * `customName` absent — a `Required` error on an invisible field, which
+     * `FormInput` cannot render, so the dialog refused silently. See rules.md §4.
+     */
     customName: z
       .string()
       .trim()
       .max(RESOURCE_NAME_MAX_LENGTH, `At most ${RESOURCE_NAME_MAX_LENGTH} characters`)
       .regex(NO_CONTROL_CHARS, 'No line breaks or control characters')
-      .or(z.literal('')),
+      .or(z.literal(''))
+      .default(''),
     maxValue: wholePoolNumber,
     current: wholePoolNumber,
     resetTrigger: z.nativeEnum(ResetTrigger, { required_error: 'Please pick a trigger' }),

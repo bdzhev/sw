@@ -11,6 +11,8 @@
     "build-only": "vite build",
     "analyze": "ANALYZE=1 vite build",
     "type-check": "vue-tsc --build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "oxlint --fix",
     "format": "oxfmt --write ."
   },
@@ -40,8 +42,10 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^22.16.5",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vue/test-utils": "^2.5.0",
     "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.21",
+    "jsdom": "^30.0.1",
     "lint-staged": "^16.2.6",
     "npm-run-all2": "^8.0.4",
     "oxfmt": "^0.61.0",
@@ -52,6 +56,7 @@
     "typescript": "~5.8.0",
     "vite": "npm:rolldown-vite@latest",
     "vite-plugin-vue-devtools": "^8.0.0",
+    "vitest": "^5.0.0",
     "vue-tsc": "^3.0.4"
   }
 }

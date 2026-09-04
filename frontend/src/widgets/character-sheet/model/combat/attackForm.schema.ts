@@ -41,13 +41,20 @@ const attackSchema = z.object({
     .refine((raw) => {
       return raw === '' || raw === '-' || Math.abs(Number(raw)) <= ADDITIONAL_BONUS_LIMIT;
     }, `Between -${ADDITIONAL_BONUS_LIMIT} and ${ADDITIONAL_BONUS_LIMIT}`),
+  /**
+   * `.default('')` is load-bearing: this field lives behind `v-if="showsAmmo"`,
+   * and vee-validate deletes an unmounted field's path, so switching a thrown
+   * weapon to melee used to submit with `ammoRemaining` absent — a `Required`
+   * error on an invisible field, so the dialog refused silently. See rules.md §4.
+   */
   ammoRemaining: z
     .string()
     .trim()
     .regex(POSITIVE_WHOLE_NUMBER, 'Whole numbers only')
     .refine((raw) => {
       return raw === '' || Number(raw) <= AMMO_LIMIT;
-    }, `At most ${AMMO_LIMIT}`),
+    }, `At most ${AMMO_LIMIT}`)
+    .default(''),
   properties: z.array(z.string()),
 });
 

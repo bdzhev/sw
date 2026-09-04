@@ -1,3 +1,10 @@
+# The frontend's vitest suite. Runs on the host, not in a container, and needs
+# `bun run` rather than `bun test` — the bare form uses Bun's own runner, which
+# does not read vite.config.ts and so cannot resolve the @shared/@widgets
+# aliases. Pass extra args through, e.g. `make front-test ARGS=--watch`.
+front-test:
+	bun run --cwd frontend test $(ARGS)
+
 dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up --remove-orphans
 
@@ -36,4 +43,4 @@ clean:
 clean-dev:
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml down --rmi local --volumes
 
-.PHONY: dev prod prod-remote qr seed seed-dev down down-dev clean clean-dev
+.PHONY: front-test dev prod prod-remote qr seed seed-dev down down-dev clean clean-dev
