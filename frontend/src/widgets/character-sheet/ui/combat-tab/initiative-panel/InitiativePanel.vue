@@ -4,11 +4,7 @@ import { computed } from 'vue';
 import { CharacterStat } from '@shared/api/characters';
 import { NumberField } from '@shared/ui/number-field';
 
-import {
-  abilityModifier,
-  initiativeTotal,
-  totalAbilityScores,
-} from '@entities/characters';
+import { abilityModifier, initiativeFrom } from '@entities/characters';
 
 import { INITIATIVE_BONUS_LIMIT } from '@widgets/character-sheet/config/combat';
 import { formatSigned } from '@widgets/character-sheet/lib/format';
@@ -23,22 +19,17 @@ const props = defineProps<InitiativePanelProps>();
 
 const emit = defineEmits<{ 'update:bonus': [value: number] }>();
 
-/** The item scan, once - both numbers below are read off the same totals. */
-const totals = computed(() => {
-  return totalAbilityScores(props.sheet, props.items);
-});
-
 const total = computed(() => {
-  return initiativeTotal(totals.value, props.sheet);
+  return initiativeFrom(props.totals, props.initiativeBonus);
 });
 
 const dexModifier = computed(() => {
-  return abilityModifier(totals.value[CharacterStat.DEX]);
+  return abilityModifier(props.totals[CharacterStat.DEX]);
 });
 
 const bonus = computed({
   get: (): number => {
-    return props.sheet.initiativeBonus;
+    return props.initiativeBonus;
   },
   set: (value: number): void => {
     emit('update:bonus', value);

@@ -12,12 +12,14 @@ import { DialogRoot } from '@shared/ui/dialog';
 import { Text } from '@shared/ui/text';
 
 import {
+  proficiencyBonus,
   useCharacter,
   useCharacterCollection,
   useSheetAutosave,
 } from '@entities/characters';
 
 import type { AttackBody } from '@widgets/character-sheet/config/combat';
+import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { AttackDetailDialog } from './attack-detail-dialog';
@@ -43,6 +45,22 @@ const rows = computed(() => {
 
 const items = computed(() => {
   return character.value?.inventoryItems ?? [];
+});
+
+/**
+ * The one item scan for this tab; every child below reads its result. The local
+ * `sheet` coerces to `null` for the template guard, so the composable — which
+ * speaks `undefined` — gets its own narrow view.
+ */
+const { totals } = useAbilityTotals({
+  sheet: computed(() => {
+    return character.value?.sheet;
+  }),
+  items,
+});
+
+const bonus = computed(() => {
+  return sheet.value ? proficiencyBonus(sheet.value) : 0;
 });
 
 const isWriting = computed(() => {
@@ -139,8 +157,8 @@ const handleUpdateAmmo = async (attack: Attack, value: number): Promise<void> =>
 <template>
   <section v-if="sheet" class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <InitiativePanel
-      :sheet="sheet"
-      :items="items"
+      :totals="totals"
+      :initiative-bonus="sheet.initiativeBonus"
       @update:bonus="handleInitiativeBonus"
     />
 
@@ -162,8 +180,8 @@ const handleUpdateAmmo = async (attack: Attack, value: number): Promise<void> =>
           v-for="attack in rows"
           :key="attack.id"
           :attack="attack"
-          :sheet="sheet"
-          :items="items"
+          :totals="totals"
+          :proficiency-bonus="bonus"
           :is-busy="isWriting"
           @detail="handleDetail"
           @toggle-pin="handleTogglePin"
@@ -175,8 +193,8 @@ const handleUpdateAmmo = async (attack: Attack, value: number): Promise<void> =>
     <AttackDialog
       v-model:open="isFormOpen"
       :attack="selected"
-      :sheet="sheet"
-      :items="items"
+      :totals="totals"
+      :proficiency-bonus="bonus"
       :is-saving="isWriting"
       @submit="handleSubmitAttack"
     />
@@ -184,8 +202,8 @@ const handleUpdateAmmo = async (attack: Attack, value: number): Promise<void> =>
     <AttackDetailDialog
       v-model:open="isDetailOpen"
       :attack="selected"
-      :sheet="sheet"
-      :items="items"
+      :totals="totals"
+      :proficiency-bonus="bonus"
       @edit="handleEdit"
       @remove="handleRemove"
     />

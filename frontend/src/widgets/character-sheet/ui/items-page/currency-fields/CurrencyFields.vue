@@ -32,7 +32,7 @@ const emit = defineEmits<{ patch: [patch: SheetPatch, immediate?: boolean] }>();
 const currencyModel = (field: CurrencyField): WritableComputedRef<number> => {
   return computed({
     get: (): number => {
-      return props.sheet[field];
+      return props[field];
     },
     set: (value: number): void => {
       emit('patch', { [field]: value });

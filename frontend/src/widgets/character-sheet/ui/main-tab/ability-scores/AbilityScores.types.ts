@@ -1,7 +1,8 @@
-import type { CharacterSheet, InventoryItem } from '@shared/api/characters';
+import type { AbilityScores as AbilityScoreTotals } from '@entities/characters';
 
 export interface AbilityScoresProps {
-  sheet: CharacterSheet;
-  /** Equipped items add score bonuses; the totals are derived, never stored. */
-  items: InventoryItem[];
+  /** The stored raw scores — the editable half. */
+  rawScores: AbilityScoreTotals;
+  /** Raw plus equipped-item bonuses, scanned once by the tab. */
+  totals: AbilityScoreTotals;
 }

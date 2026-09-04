@@ -8,8 +8,9 @@ import { useBreakpoint } from '@shared/lib/ui';
 import { Separator } from '@shared/ui/separator';
 import { Skeleton } from '@shared/ui/skeleton';
 
-import { useCharacter, useSheetAutosave } from '@entities/characters';
+import { proficiencyBonus, useCharacter, useSheetAutosave } from '@entities/characters';
 
+import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { AbilityScores } from './ability-scores';
@@ -34,6 +35,9 @@ const items = computed(() => {
   return character.value?.inventoryItems ?? [];
 });
 
+/** The one item scan for this tab; both children read its result. */
+const { rawScores, totals } = useAbilityTotals({ sheet, items });
+
 const handlePatch = (patch: SheetPatch, immediate = false) => {
   autosave.patchSheet(patch, immediate);
 };
@@ -45,23 +49,29 @@ const separatorOrientation = computed(() => {
 </script>
 
 <template>
-  <!-- Skeleton hardcodes `h-full w-full`, so its size has to come from a wrapper. -->
   <div v-if="!sheet || !character" class="h-96 w-full">
     <Skeleton class="rounded-lg" />
   </div>
 
   <section v-else class="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
     <div class="grid gap-4 md:grid-cols-2 md:gap-6">
-      <AbilityScores :sheet="sheet" :items="items" @patch="handlePatch" />
+      <AbilityScores :raw-scores="rawScores" :totals="totals" @patch="handlePatch" />
 
-      <SavingThrows :sheet="sheet" :items="items" @patch="handlePatch" />
+      <SavingThrows
+        :totals="totals"
+        :proficiency-bonus="proficiencyBonus(sheet)"
+        :save-proficiencies="sheet.saveProficiencies"
+        :level="sheet.level"
+        @patch="handlePatch"
+      />
     </div>
 
     <SheetSection>
       <div class="flex flex-col gap-4 md:gap-6">
         <div class="flex flex-col gap-4 md:flex-row md:gap-6">
           <HitDice
-            :sheet="sheet"
+            :level="sheet.level"
+            :hit-dice-remaining="sheet.hitDiceRemaining"
             :character-class="character.character.characterClass"
             class="md:min-w-0 md:flex-1"
             @patch="handlePatch"

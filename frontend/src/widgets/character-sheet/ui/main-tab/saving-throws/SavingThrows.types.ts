@@ -1,7 +1,12 @@
-import type { CharacterSheet, InventoryItem } from '@shared/api/characters';
+import type { CharacterStat } from '@shared/api/characters';
+
+import type { AbilityScores } from '@entities/characters';
 
 export interface SavingThrowsProps {
-  sheet: CharacterSheet;
-  /** Equipped items feed the ability modifier the total is built from. */
-  items: InventoryItem[];
+  totals: AbilityScores;
+  /** The level-derived bonus, so the row need not be asked for the level. */
+  proficiencyBonus: number;
+  saveProficiencies: CharacterStat[];
+  /** Shown beside the bonus; the only reason this needs the level at all. */
+  level: number;
 }

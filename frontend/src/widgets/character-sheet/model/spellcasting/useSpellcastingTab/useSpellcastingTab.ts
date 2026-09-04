@@ -11,13 +11,13 @@ import {
   slotMaximaFromProgression,
   spellAttackBonus,
   spellSaveDc,
-  totalAbilityScores,
   useCharacter,
   useCharacterCollection,
   useSheetAutosave,
 } from '@entities/characters';
 
 import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
+import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 
 /**
  * The data half of the spellcasting tab. Dialog state stays in the component as
@@ -73,9 +73,7 @@ export const useSpellcastingTab = () => {
   });
 
   /** The item scan, once - the save DC and the attack bonus share it. */
-  const totals = computed(() => {
-    return sheet.value ? totalAbilityScores(sheet.value, items.value) : null;
-  });
+  const { totals } = useAbilityTotals({ sheet, items });
 
   const saveDc = computed(() => {
     return sheet.value && totals.value

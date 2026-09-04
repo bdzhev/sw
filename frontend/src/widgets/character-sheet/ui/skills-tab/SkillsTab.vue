@@ -61,7 +61,7 @@ const items = computed(() => {
  * The item scan, once for all eighteen skills plus passive perception. Each helper
  * used to redo it internally, so one hp edit walked the inventory nineteen times.
  */
-const totals = useAbilityTotals({ sheet, items });
+const { totals } = useAbilityTotals({ sheet, items });
 
 /**
  * The two other narrow reads the table is built from. Neither notifies on an

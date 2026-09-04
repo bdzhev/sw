@@ -1,2 +1,2 @@
 export { useAbilityTotals } from './useAbilityTotals';
-export type { UseAbilityTotalsParams } from './useAbilityTotals.types';
+export type { UseAbilityTotals, UseAbilityTotalsParams } from './useAbilityTotals.types';

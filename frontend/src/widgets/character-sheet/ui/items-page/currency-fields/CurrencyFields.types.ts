@@ -1,7 +1,8 @@
-import type { CharacterSheet } from '@shared/api/characters';
-
+/** The three coin columns, not the sheet row they sit on. */
 export interface CurrencyFieldsProps {
-  sheet: CharacterSheet;
+  gp: number;
+  sp: number;
+  cp: number;
 }
 
 export type CurrencyField = 'gp' | 'sp' | 'cp';

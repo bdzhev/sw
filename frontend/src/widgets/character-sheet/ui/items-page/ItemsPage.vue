@@ -110,7 +110,12 @@ const handleAddClick = (): void => {
           </Button>
         </header>
 
-        <CurrencyFields :sheet="sheet" @patch="handlePatch" />
+        <CurrencyFields
+          :gp="sheet.gp"
+          :sp="sheet.sp"
+          :cp="sheet.cp"
+          @patch="handlePatch"
+        />
 
         <InventoryGrid
           :items="items"

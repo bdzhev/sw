@@ -1,7 +1,7 @@
-import type { CharacterSheet, InventoryItem } from '@shared/api/characters';
+import type { AbilityScores } from '@entities/characters';
 
 export interface InitiativePanelProps {
-  sheet: CharacterSheet;
-  /** Equipped items shift the dex score, so the total has to see them. */
-  items: InventoryItem[];
+  /** Equipped items shift the dex score, so the tab's totals are what feed this. */
+  totals: AbilityScores;
+  initiativeBonus: number;
 }

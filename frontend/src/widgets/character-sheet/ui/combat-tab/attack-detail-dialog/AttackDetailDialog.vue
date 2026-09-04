@@ -17,8 +17,6 @@ import {
 } from '@shared/ui/dialog';
 import { Text } from '@shared/ui/text';
 
-import { totalAbilityScores } from '@entities/characters';
-
 import {
   ABILITY_LABELS,
   ATTACK_PROPERTIES,
@@ -43,16 +41,12 @@ const emit = defineEmits<{
   remove: [];
 }>();
 
-const abilityTotals = computed(() => {
-  return totalAbilityScores(props.sheet, props.items);
-});
-
 const totals = computed(() => {
   if (!props.attack) {
     return null;
   }
 
-  return attackTotals(abilityTotals.value, props.sheet, {
+  return attackTotals(props.totals, props.proficiencyBonus, {
     ability: props.attack.ability,
     proficient: props.attack.proficient,
     additionalBonus: props.attack.additionalBonus,

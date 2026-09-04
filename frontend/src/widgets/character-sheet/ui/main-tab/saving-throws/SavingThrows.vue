@@ -4,12 +4,7 @@ import { computed } from 'vue';
 import type { CharacterStat, SheetPatch } from '@shared/api/characters';
 import { Text } from '@shared/ui/text';
 
-import {
-  ABILITIES,
-  proficiencyBonus,
-  savingThrowTotal,
-  totalAbilityScores,
-} from '@entities/characters';
+import { ABILITIES, savingThrowModifier } from '@entities/characters';
 
 import { formatSigned } from '@widgets/character-sheet/lib/format';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
@@ -21,28 +16,23 @@ const props = defineProps<SavingThrowsProps>();
 
 const emit = defineEmits<{ patch: [patch: SheetPatch, immediate?: boolean] }>();
 
-const bonus = computed(() => {
-  return proficiencyBonus(props.sheet);
-});
-
 const isProficient = (stat: CharacterStat): boolean => {
-  return props.sheet.saveProficiencies.includes(stat);
+  return props.saveProficiencies.includes(stat);
 };
-
-/**
- * The item scan, once. Called from the template it ran six times per re-render, and
- * the sheet re-renders on every autosaved edit — including ones no save depends on.
- */
-const totals = computed(() => {
-  return totalAbilityScores(props.sheet, props.items);
-});
 
 const rows = computed(() => {
   return ABILITIES.map((ability) => {
+    const proficient = isProficient(ability.stat);
+
     return {
       ability,
-      isProficient: isProficient(ability.stat),
-      total: savingThrowTotal(totals.value, props.sheet, ability.stat),
+      isProficient: proficient,
+      total: savingThrowModifier(
+        props.totals,
+        ability.stat,
+        proficient,
+        props.proficiencyBonus,
+      ),
     };
   });
 });
@@ -50,10 +40,10 @@ const rows = computed(() => {
 /** Single-shot edit, so it skips the debounce and writes the whole new set. */
 const handleToggleProficiency = (stat: CharacterStat): void => {
   const saveProficiencies = isProficient(stat)
-    ? props.sheet.saveProficiencies.filter((entry) => {
+    ? props.saveProficiencies.filter((entry) => {
         return entry !== stat;
       })
-    : [...props.sheet.saveProficiencies, stat];
+    : [...props.saveProficiencies, stat];
 
   emit('patch', { saveProficiencies }, true);
 };
@@ -63,7 +53,7 @@ const handleToggleProficiency = (stat: CharacterStat): void => {
   <SheetSection title="Saving throws">
     <template #actions>
       <Text size="xs" theme="secondary">
-        Proficiency {{ formatSigned(bonus) }} · level {{ props.sheet.level }}
+        Proficiency {{ formatSigned(props.proficiencyBonus) }} · level {{ props.level }}
       </Text>
     </template>
 

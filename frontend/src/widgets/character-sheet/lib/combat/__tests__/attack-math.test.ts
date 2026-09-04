@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  AttackAbility,
-  AttackDelivery,
-  CharacterStat,
-  type CharacterSheet,
-} from '@shared/api/characters';
+import { AttackAbility, AttackDelivery, CharacterStat } from '@shared/api/characters';
 
 import type { AbilityScores } from '@entities/characters';
 
@@ -18,10 +13,8 @@ import {
   tracksAmmo,
 } from '../attack-math';
 
-/** Only `level` is read, via `proficiencyBonus`. */
-const sheetAtLevel = (level: number): CharacterSheet => {
-  return { level } as CharacterSheet;
-};
+/** Level 5's proficiency bonus, which the sheet no longer has to be asked for. */
+const BONUS_AT_LEVEL_5 = 3;
 
 const scores = (str: number, dex: number): AbilityScores => {
   return {
@@ -75,7 +68,7 @@ describe('resolveAttackStat', () => {
 
 describe('attackTotals', () => {
   it('adds proficiency to the attack roll but never to damage', () => {
-    const totals = attackTotals(scores(18, 10), sheetAtLevel(5), {
+    const totals = attackTotals(scores(18, 10), BONUS_AT_LEVEL_5, {
       ability: AttackAbility.STRENGTH,
       proficient: true,
       additionalBonus: 0,
@@ -88,7 +81,7 @@ describe('attackTotals', () => {
   });
 
   it('zeroes the proficiency term when the attack is not proficient', () => {
-    const totals = attackTotals(scores(18, 10), sheetAtLevel(5), {
+    const totals = attackTotals(scores(18, 10), BONUS_AT_LEVEL_5, {
       ability: AttackAbility.STRENGTH,
       proficient: false,
       additionalBonus: 0,
@@ -99,7 +92,7 @@ describe('attackTotals', () => {
   });
 
   it('feeds additionalBonus into both totals', () => {
-    const totals = attackTotals(scores(18, 10), sheetAtLevel(1), {
+    const totals = attackTotals(scores(18, 10), 0, {
       ability: AttackAbility.STRENGTH,
       proficient: false,
       additionalBonus: 1,
@@ -110,7 +103,7 @@ describe('attackTotals', () => {
   });
 
   it('reports which stat finesse picked', () => {
-    const totals = attackTotals(scores(10, 18), sheetAtLevel(1), {
+    const totals = attackTotals(scores(10, 18), 0, {
       ability: AttackAbility.FINESSE,
       proficient: false,
       additionalBonus: 0,
@@ -122,7 +115,7 @@ describe('attackTotals', () => {
 
 describe('attackBreakdown', () => {
   it('omits the zero terms', () => {
-    const totals = attackTotals(scores(18, 10), sheetAtLevel(1), {
+    const totals = attackTotals(scores(18, 10), 0, {
       ability: AttackAbility.STRENGTH,
       proficient: false,
       additionalBonus: 0,
@@ -132,7 +125,7 @@ describe('attackBreakdown', () => {
   });
 
   it('lists every non-zero term in order', () => {
-    const totals = attackTotals(scores(18, 10), sheetAtLevel(5), {
+    const totals = attackTotals(scores(18, 10), BONUS_AT_LEVEL_5, {
       ability: AttackAbility.STRENGTH,
       proficient: true,
       additionalBonus: 1,
@@ -143,7 +136,7 @@ describe('attackBreakdown', () => {
 
   /** A negative ability modifier still reads as one term, not a doubled sign. */
   it('keeps a negative modifier readable', () => {
-    const totals = attackTotals(scores(6, 10), sheetAtLevel(1), {
+    const totals = attackTotals(scores(6, 10), 0, {
       ability: AttackAbility.STRENGTH,
       proficient: false,
       additionalBonus: 0,

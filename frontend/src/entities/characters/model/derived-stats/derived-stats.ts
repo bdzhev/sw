@@ -103,10 +103,26 @@ export const savingThrowTotal = (
   sheet: CharacterSheet,
   stat: CharacterStat,
 ): number => {
-  const modifier = abilityModifier(totals[stat]);
-  const isProficient = sheet.saveProficiencies.includes(stat);
+  return savingThrowModifier(
+    totals,
+    stat,
+    sheet.saveProficiencies.includes(stat),
+    proficiencyBonus(sheet),
+  );
+};
 
-  return modifier + (isProficient ? proficiencyBonus(sheet) : 0);
+/**
+ * `savingThrowTotal` over the four values it reads, for a consumer that has
+ * already narrowed its dependency on the sheet. Taking the whole row here is
+ * what makes a reactive caller recompute on an unrelated edit.
+ */
+export const savingThrowModifier = (
+  totals: AbilityScores,
+  stat: CharacterStat,
+  isProficient: boolean,
+  bonus: number,
+): number => {
+  return abilityModifier(totals[stat]) + (isProficient ? bonus : 0);
 };
 
 /**
@@ -157,7 +173,15 @@ export const passivePerception = (
 
 /** Dex modifier plus the stored misc bonus (Alert feat and friends). */
 export const initiativeTotal = (totals: AbilityScores, sheet: CharacterSheet): number => {
-  return abilityModifier(totals[CharacterStat.DEX]) + sheet.initiativeBonus;
+  return initiativeFrom(totals, sheet.initiativeBonus);
+};
+
+/** `initiativeTotal` over the one sheet field it reads. */
+export const initiativeFrom = (
+  totals: AbilityScores,
+  initiativeBonus: number,
+): number => {
+  return abilityModifier(totals[CharacterStat.DEX]) + initiativeBonus;
 };
 
 export const hitDiceTotal = (sheet: CharacterSheet): number => {

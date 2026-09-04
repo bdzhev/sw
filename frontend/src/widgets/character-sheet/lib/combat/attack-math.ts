@@ -1,15 +1,6 @@
-import {
-  AttackAbility,
-  AttackDelivery,
-  CharacterStat,
-  type CharacterSheet,
-} from '@shared/api/characters';
+import { AttackAbility, AttackDelivery, CharacterStat } from '@shared/api/characters';
 
-import {
-  abilityModifier,
-  proficiencyBonus,
-  type AbilityScores,
-} from '@entities/characters';
+import { abilityModifier, type AbilityScores } from '@entities/characters';
 
 import { STAT_LABELS } from '@widgets/character-sheet/config/combat';
 import type {
@@ -60,15 +51,19 @@ export const resolveAttackStat = (
 /**
  * `additionalBonus` feeds both totals; proficiency feeds only the attack roll.
  * Extra damage *dice* have no field by design — they go in the name or a tag.
+ *
+ * Takes the bonus rather than the sheet row: `sheet.level` was the only field it
+ * ever reached for, and asking for the row made every caller recompute on any
+ * sheet edit — once per attack row, in the case of the combat list.
  */
 export const attackTotals = (
   totals: AbilityScores,
-  sheet: CharacterSheet,
+  bonus: number,
   input: AttackMathInput,
 ): AttackTotals => {
   const stat = resolveAttackStat(totals, input.ability);
   const modifier = abilityModifier(totals[stat]);
-  const proficiency = input.proficient ? proficiencyBonus(sheet) : 0;
+  const proficiency = input.proficient ? bonus : 0;
 
   return {
     stat,

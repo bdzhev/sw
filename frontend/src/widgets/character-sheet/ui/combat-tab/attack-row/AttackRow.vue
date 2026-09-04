@@ -6,8 +6,6 @@ import type { Attack } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import { NumberField } from '@shared/ui/number-field';
 
-import { totalAbilityScores } from '@entities/characters';
-
 import {
   AMMO_LIMIT,
   DAMAGE_TYPE_ICONS,
@@ -37,13 +35,8 @@ const emit = defineEmits<{
   'update-ammo': [attack: Attack, value: number];
 }>();
 
-/** The item scan, once. `attackTotals` used to do it twice per row on its own. */
-const abilityTotals = computed(() => {
-  return totalAbilityScores(props.sheet, props.items);
-});
-
 const totals = computed(() => {
-  return attackTotals(abilityTotals.value, props.sheet, {
+  return attackTotals(props.totals, props.proficiencyBonus, {
     ability: props.attack.ability,
     proficient: props.attack.proficient,
     additionalBonus: props.attack.additionalBonus,

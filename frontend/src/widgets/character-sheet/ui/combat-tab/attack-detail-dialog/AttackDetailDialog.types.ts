@@ -1,9 +1,12 @@
-import type { Attack, CharacterSheet, InventoryItem } from '@shared/api/characters';
+import type { Attack } from '@shared/api/characters';
+
+import type { AbilityScores } from '@entities/characters';
 
 export interface AttackDetailDialogProps {
   open: boolean;
   /** Null while closed — the dialog holds no copy of the row. */
   attack: Attack | null;
-  sheet: CharacterSheet;
-  items: InventoryItem[];
+  /** Scanned once by the tab; the dialog only reads the breakdown off it. */
+  totals: AbilityScores;
+  proficiencyBonus: number;
 }
