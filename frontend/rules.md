@@ -38,11 +38,37 @@ Imports point **down** that list only. `@shared` imports nothing from the others
 Inside a slice, segment by purpose:
 
 ```
-model/    composables, stores, form state
+model/    composables, stores, form state, domain computation
 ui/       components
-lib/      pure helpers
+lib/      rules data and pure formatting
+config/   static data — option lists, label maps, limits
 api/      queries, mutations, transport
 ```
+
+`config/` is a fifth segment, for static data — option lists, label maps, limits, and the local `types.ts` that describes them.
+
+**`lib/` vs `model/`: ask what it operates on, not whether it holds state.** "Pure helpers" reads as "anything without reactivity", which pulls domain logic into `lib/` and leaves `model/` holding only the composables. The line is: `lib/` is rules _data_ and formatting that could belong to any app; `model/` is anything that computes over this app's domain, or touches a side-effecting surface (`localStorage`, the query client) — including plain exported functions.
+
+`entities/characters` is the worked example. `lib/class-tables`, `lib/skills` and `lib/abilities` are rules data. `model/derived-stats` is the 5e arithmetic over that data; `model/sheet-buffer` owns a `localStorage` key; `model/sheet-cache` owns three `setQueryData` calls. None of the last three is a composable, and all three are `model/`.
+
+**Segments are siblings. A segment never nests inside another segment.** There is no `ui/some-tab/model/`, no `ui/some-tab/config/`. If a slice is big enough that its composables need grouping, group them _inside_ the segment by area:
+
+```
+widgets/character-sheet/
+  index.ts
+  ui/       sheet-header/  main-tab/  skills-tab/  combat-tab/  traits-tab/
+  model/    sheet-tabs/  traits/  combat/
+  config/   main/  skills/  combat/  traits/
+  lib/      main/formatters.ts   combat/attack-math.ts
+```
+
+`model/traits/useTraitForm/` is right; `ui/traits-tab/model/useTraitForm/` is not. Inside a slice, cross-segment imports use the slice's own alias path (`@widgets/character-sheet/config/traits`) rather than climbing `../../../` — a deep relative breaks the moment anything moves.
+
+**Logic lives in `model/`, not in the `.vue`.** A component is a template plus a call into its composable or store.
+
+**A page slice that grows into a real surface becomes a widget.** `pages/character` is a six-line shell that renders `@widgets/character-sheet`; the sheet itself — seven tabs, a header, its own stores and rules data — is the widget. A page's job is routing and composition, not holding a feature.
+
+This is a rule because four tabs of the character sheet were written in parallel and produced four different answers — `constants.ts` + `lib.ts`, `constants.ts` + `types.ts`, a bare `<domain>-math.ts`, and a segment nested inside `ui/`. The last one was the most organised and still wrong.
 
 ---
 
@@ -65,12 +91,13 @@ src/shared/ui/scroll-area/
 
 Rules, stated individually so none of them get skimmed past:
 
-1. **No `components/` wrapper folder.** A sub-component folder sits directly inside its parent's folder. `scroll-area/scroll-bar/` — never `scroll-area/components/scroll-bar/`.
-2. **No `Base` prefix.** The file is `ScrollArea.vue`, not `BaseScrollArea.vue`. The PascalCase filename is the kebab-case folder name.
-3. **Types go in `<Component>.types.ts`**, never `.props.ts`. It exports `interface <Component>Props`. Import it with `import type`.
-4. **Every folder has an `index.ts`**, and it is the only thing outsiders may import. Consumers write `@shared/ui/scroll-area` — never `@shared/ui/scroll-area/ScrollArea.vue`, never `@shared/ui/scroll-area/scroll-bar/ScrollBar.vue`.
-5. **Nesting is recursive.** A sub-component with its own sub-component repeats the same shape, one level deeper. There is no special case at any depth.
-6. **No top-level `src/shared/ui/index.ts` barrel.** Don't add one — it defeats code splitting and creates import cycles.
+1. **No `Base` prefix.** The file is `ScrollArea.vue`, not `BaseScrollArea.vue`. The PascalCase filename is the kebab-case folder name.
+2. **Types go in `<Component>.types.ts`**, never `.props.ts`. It exports `interface <Component>Props`. Import it with `import type`.
+3. **Every folder has an `index.ts`**, and it is the only thing outsiders may import. Consumers write `@shared/ui/scroll-area` — never `@shared/ui/scroll-area/ScrollArea.vue`, never `@shared/ui/scroll-area/scroll-bar/ScrollBar.vue`.
+4. **Nesting is recursive.** A sub-component with its own sub-component repeats the same shape, one level deeper. There is no special case at any depth.
+5. **No top-level `src/shared/ui/index.ts` barrel.** Don't add one — it defeats code splitting and creates import cycles.
+6. **A segment is not a folder with an `index.ts`.** `ui/`, `model/`, `lib/` and `config/` never get one. The barrels live one level in, on the **group** folder — `lib/format/index.ts`, `config/combat/index.ts`, `model/traits/index.ts` — and that group path is what an importer writes: `@widgets/character-sheet/lib/format`, never `.../lib/format/numbers`. The slice's own root `index.ts` reaches for the component file directly (`export { default as CharacterSheet } from './ui/CharacterSheet.vue'`), because there is no `./ui` to import from.
+7. **Barrels re-export by name.** No `export *` — it hides what a folder publishes, and two files exporting the same name collide silently.
 
 `index.ts` shape — default-import the `.vue`, re-export named, re-export the sub-folder:
 
@@ -102,13 +129,15 @@ import { ScrollBar } from './scroll-bar';
 
 Much of `src/shared/ui` predates these rules. Three dead patterns you will encounter:
 
-| Legacy                        | Current             |
-| ----------------------------- | ------------------- |
-| `BaseCard.vue`                | `Card.vue`          |
-| `card/components/CardHeader/` | `card/card-header/` |
-| `BaseCard.props.ts`           | `Card.types.ts`     |
+| Legacy                        | Current            |
+| ----------------------------- | ------------------ |
+| `BaseText.vue`                | `Text.vue`         |
+| `some-part/components/Child/` | `some-part/child/` |
+| `BaseText.props.ts`           | `Text.types.ts`    |
 
-These are being migrated branch by branch. When you touch such a folder: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do. Never add a new file _into_ a legacy `components/` folder — create the properly-placed folder instead.
+What still carries the `Base` prefix and a `.props.ts` is `shared/ui/{image,progress-bar,skeleton,text}` plus `widgets/try-again-card` (whose `TryAgainCard.vue` also sits in the widget root with no `ui/` segment).
+
+When you touch one of those: **write new files the current way; do not rewrite the surrounding legacy files** unless the migration is the task you were asked to do.
 
 ### Compound components
 
@@ -137,9 +166,74 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   ```
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
+- **Every event handler is named `handle*`.** `handleClick`, `handleSubmit`, `handleSpendClick`, `handleToggleLanguage`. Not `onInput`, not `onBonusInput`, and not a bare verb like `toggle` / `submitTrait` / `openAdd`. The `handle` prefix is what makes a handler greppable and tells you at the binding site that you are looking at one.
+- **An `@event` is a bare handler reference. Never a call, never an expression.**
+
+  ```vue
+  <!-- no -->
+  <button @click="setRemaining(remaining - 1)">
+  <button @click="stepAmmo(-1)">
+  <button @click="emit('detail')">
+  <button @click="handleSelectLanguage(language)">
+
+  <!-- yes -->
+  <button @click="handleSpendClick">
+  ```
+
+  This has no exceptions, including emit forwarding, and including a `v-for`.
+  **If a handler needs to know which item was acted on, the item is a component
+  that emits it** — the parent then binds `@select="handleSelect"` and reads the
+  payload. A row that needs a callback is a row that wants to be a component;
+  passing the item down through the template is the shortcut that avoids
+  writing one, and it is what leaves list logic smeared across the parent.
+
+  The same applies to a group control: `ToggleChipGroup` emits the value that
+  changed, so its consumer binds a bare handler rather than closing over the
+  item in the template.
+
+- **A variant map lives in `<Component>.themes.ts` and is typed against its union.** An untyped map lets a variant be half-added — declared in the union, missing from the classes — and it still compiles:
+
+  ```ts
+  export const variantClasses: Record<ButtonVariant, string> = { ... };
+  ```
+
+- **Resolve a theme map inside a `computed`, never at setup scope.** `const theme = themes[props.variant]` runs once, so the class never updates when the prop changes. The old `icon-button/IconButton.vue` did exactly this.
+- **Comments are block JSDoc — `/** … */` — everywhere in `.ts` and `<script setup>`, including one-liners.** Not `//`. There is no oxlint rule for this, so unlike `curly` and `arrow-body-style` it is a convention you have to hold yourself. Keep them to one or two lines; the long reasoning belongs in the vault doc, and a module whose _operation_ needs explaining gets a `README.md` beside it (see `entities/characters/model/useSheetAutosave/`).
 - **Do not comment templates.** No prose restating a class list, and no notes on what a change fixed — that belongs in the design docs, not the markup. The rare exception is a line someone would otherwise "simplify" and break: a browser or library behaviour the code cannot show. Keep it to one line.
 - Icons come from `lucide-vue-next`.
-- Headless primitives come from `reka-ui`. **Overlays are already wrapped: `@shared/ui/dialog` (centred, with `DialogHeader`/`Body`/`Footer`/`CloseButton`), `@shared/ui/drawer` (off-canvas, swipe-to-close), `@shared/ui/select` (field-bound, portalled), `@shared/ui/slider`, `@shared/ui/tooltip` (needs one `TooltipProvider` at the app root, already in `App.vue`), `@shared/ui/confirm-dialog` on top of them.** **Any overlay must escape its container through a portal** — an ancestor with non-`visible` overflow clips an absolutely-positioned descendant, and `z-index` cannot undo that. This is what broke the old `shared/ui/select` inside a dialog. `shared/ui/dropdown-menu` is the one overlay still hand-rolled and is slated for the same migration; do not copy its shape. **Do not let a reka part derive displayed state from its children's mount lifecycle** — `SelectValue`'s label comes from a registry `SelectItemText` fills on mount, and closing the list remounts every item, so it blanks for a frame; derive that display from your own props instead (as `select/Select.vue` does). The hand-rolled `shared/ui/modal` they replaced is gone — do not rebuild that pattern: it had no focus trap, no Escape, no scroll lock, and positioned itself `absolute` inside `body`. Enter/leave animation for these is CSS keyframes keyed off `data-[state=open]`/`data-[state=closed]`, because reka's `Presence` holds the element mounted until the animation ends; a Vue `<Transition>` would need `forceMount` and manual presence. A dialog with no `DialogDescription` must pass `:aria-describedby="undefined"` — the JS value, not the string `"undefined"`, since reka reads the rendered attribute. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
+- **Check `src/shared/ui/` before hand-rolling a control.** A raw `<button>` carrying `role="switch"`, `role="checkbox"` or `aria-pressed`, or a raw `<input type="number">`, means you are rebuilding one of these:
+
+  | want                              | use                                                                                                                                                                  |
+  | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | text entry                        | `@shared/ui/input` (`v-model`) · `@shared/ui/form-input` (vee-validate `name`)                                                                                       |
+  | two-state toggle                  | `@shared/ui/switch` (`v-model`) · `@shared/ui/form-switch` (vee-validate `name`)                                                                                     |
+  | tick box                          | `@shared/ui/checkbox`                                                                                                                                                |
+  | number entry, with or without −/+ | `@shared/ui/number-field` — it owns clamping and parsing, so do not write another `clamp`                                                                            |
+  | multi-select chips                | `@shared/ui/toggle-chip-group` — emits the value that changed                                                                                                        |
+  | any button, including icon-only   | `@shared/ui/button` with `is-icon-only` — the box is `size`-driven (`xs` hugs the glyph, `sm`+ keep a 44px touch floor below md). There is no separate `IconButton`. |
+  | a label above a field             | the control's own `label` prop — never a `<span>` above it, and never a wrapper component                                                                            |
+
+  **A field's label is the control's `label` prop.** Every field renders it through
+  `@shared/ui/field-label`, which owns the only field-label style —
+  `text-xs text-secondary uppercase` — and wires `for` to the control's id so
+  clicking the label focuses it. A `<span>` above an input has no `for`, so the
+  control ends up with no accessible name; that is what `AttackField` and nine
+  copies of it were doing. `toggle-chip-group` is the one exception and uses
+  `FIELD_LABEL_CLASSES` on a real `<legend>`, because a `<fieldset>`'s caption
+  cannot be a `<label>`. A caption over a _value_ rather than a control (the
+  initiative tiles, `SkillSummary`) is not a label and stays a `<span>`.
+
+  **Anything Button already decides, pass as a prop — never as a `class`.** `variant`, `size`, `width`, `align` and `is-unpadded` exist because the thing they set is a plain utility: a consumer's `justify-start` loses to the base `justify-center`, and `px-0` loses to `px-4`, on stylesheet order rather than on the order you wrote them. That failure is silent. `class` is for layout the button does not own — `flex-1`, `shrink-0`, a margin.
+
+  **A button's label never wraps and the button never shrinks below it.** The base carries `whitespace-nowrap`, which does both: a flex item's automatic minimum is its min-content width, and for unbreakable text that is the whole label, so the button holds its width in a tight row instead of squeezing the text onto two lines. A button that _should_ shrink opts out with `min-w-0` and truncates its own content — `AttackRow`'s title button is the one place that wants this, and it is why `shrink-0` is **not** in the base: it would have won over that consumer's `flex-1` on stylesheet order, silently.
+
+  **A control that a form binds and the sheet does not is two components, not one optional `name` prop** — `useField` cannot be called conditionally. The presentational half owns the look and a `v-model`; the `form-*` half wraps it with `useField`, the label, and the error line. `input`/`form-input`, `switch`/`form-switch`, `select`/`form-select` and `number-field`/`form-number-field` are the pattern; `textarea` is still field-only because nothing outside a form uses it yet. The autosaving sheet has no form, which is why every inline field there is the presentational half.
+
+  **vee-validate deletes a field's path from the form values when its component unmounts, so every conditionally-rendered field needs `.default()` in the schema.** A `v-if` block of form fields is a normal thing to build — reveal the ability boxes behind a switch, reveal the uses fields behind another. Toggle that switch on and then off and the fields inside unmount, vee-validate drops their paths, and a bare `z.boolean()` or `z.string()` then fails `Required` on a field that is no longer on screen. `handleSubmit` refuses, no request is made, and **the user sees nothing at all** — this cost a debugging session on the item dialog, where `resetOnLongRest` lived behind a `v-if`. Give every such field `.default(false)` / `.default('')`: the parsed output stays non-optional, so the submit callback needs no coercion. And a `form-*` component **must render its own `errorMessage`** — `form-switch` did not, which is the only reason the failure was invisible rather than merely annoying.
+
+  A control that genuinely has no primitive is a signal to add one, not to hand-roll it in a page slice. `traits-tab/pin-field` was a correct switch trapped where no other tab could import it, so two other tabs each built their own — one of them redrawing the track and thumb from scratch.
+
+- Headless primitives come from `reka-ui`. **Overlays are already wrapped: `@shared/ui/dialog` (centred, with `DialogHeader`/`Body`/`Footer`/`CloseButton`), `@shared/ui/drawer` (off-canvas, swipe-to-close), `@shared/ui/select` (field-bound, portalled), `@shared/ui/slider`, `@shared/ui/tooltip` (needs one `TooltipProvider` at the app root, already in `App.vue`), `@shared/ui/confirm-dialog` on top of them.** **Any overlay must escape its container through a portal** — an ancestor with non-`visible` overflow clips an absolutely-positioned descendant, and `z-index` cannot undo that. This is what broke the old `shared/ui/select` inside a dialog. `@shared/ui/dropdown-menu` wraps reka's menu too — its root is **modal by default, and that is what locks body scroll**, so don't reach for `:modal="false"` to fix a positioning problem. Below `md` the character card skips the menu entirely and lays its two actions out as icon buttons: a menu costs a touch user an extra tap, and two actions do not need one. **Do not let a reka part derive displayed state from its children's mount lifecycle** — `SelectValue`'s label comes from a registry `SelectItemText` fills on mount, and closing the list remounts every item, so it blanks for a frame; derive that display from your own props instead (as `select/Select.vue` does). The hand-rolled `shared/ui/modal` they replaced is gone — do not rebuild that pattern: it had no focus trap, no Escape, no scroll lock, and positioned itself `absolute` inside `body`. Enter/leave animation for these is CSS keyframes keyed off `data-[state=open]`/`data-[state=closed]`, because reka's `Presence` holds the element mounted until the animation ends; a Vue `<Transition>` would need `forceMount` and manual presence. A dialog with no `DialogDescription` must pass `:aria-describedby="undefined"` — the JS value, not the string `"undefined"`, since reka reads the rendered attribute. **`shadcn-vue` is not installed and must not be initialized** — its CLI would write a `components.json`, a `cn` util, and its own CSS variables that collide with the `@theme` tokens below. Pull the underlying reka-ui primitive and wrap it in a folder following section 3, as `scroll-area/` does.
 
 ---
 
@@ -150,6 +244,9 @@ All configuration is **CSS-side, in `src/main.css`**: `@theme` for design tokens
 There is **no `tailwind.config.js`** — it was an empty stub that existed only so the old ESLint plugin had something to point at, and it is gone. Do not recreate it. Tooling that needs to know the design system reads `src/main.css` directly (see `sortTailwindcss.stylesheet` in `.oxfmtrc.json`).
 
 - Use theme tokens — `bg-border`, `text-secondary`, `bg-accent-primary` — not raw palette values like `bg-slate-600`.
+- **There is one colour vocabulary, and this is all of it**: `bg-primary`, `bg-secondary`, `bg-raised`, `bg-raised-hover`, `fg`, `muted`, `border`, `primary`, `secondary`, `accent-primary`, `accent-secondary`, `branding`, `danger`, `warning`. A second, older set (`primary-bg`, `primary-fg`, `secondary-bg`, `secondary-fg`, `primary-muted`, `primary-button*`, `secondary-button*`, `button-disabled`, `accent`, `accent-muted`, `error`) was deleted — if you find one in a snippet or an old branch, map it onto the list above rather than reviving it.
+- **A multi-line value in `@theme` does not parse.** `--color-bg-raised-hover` was originally written as a `color-mix()` spread over four lines; Tailwind silently failed to register the token, so `hover:bg-secondary-button-hover` generated **no CSS at all** and the secondary button had no hover state for as long as it existed. Keep `@theme` values on one line.
+- **A class naming a token that does not exist generates nothing — silently.** There is no error, no warning, and no failed build; the element just renders unstyled. After renaming or deleting a token, build and grep the emitted stylesheet (`dist/assets/*.css`) for the classes you expect, because neither `vue-tsc` nor `oxlint` can see this.
 - Custom utilities already defined: `page-x`, `fade-bottom`, `fade-scroll-top`, `fade-scroll-bottom`, `fade-scroll-y`, `shimmer`, `shimmer-animate`, `loading-animation`, `bg-radial`.
 - **Native scrollbars are hidden globally** by `::-webkit-scrollbar { display: none }` in `main.css`. Anything that needs a visible scroll affordance must render its own — use `@shared/ui/scroll-area`.
 - Scrolling inside a flex column needs `min-h-0` on the scrolling child, otherwise it stretches to content height and never scrolls. `overflow-hidden` on an ancestor (e.g. `Card`) clips instead of scrolling — put the scroll container inside it.
@@ -191,6 +288,16 @@ oxlint covers correctness (its `correctness` category is on) plus the house rule
 - `padding-line-between-statements` (deprecated stylistic rule, no oxlint equivalent).
 - `no-unused-vars` does **not** apply to `.vue` files in oxlint. `noUnusedLocals`/`noUnusedParameters` in `tsconfig.app.json` cover it instead, and `vue-tsc` understands template usage, so this is better coverage than before.
 
+### Typed routes
+
+`shared/lib/router/routeMap.ts` declares a `RouteNamedMap` and augments vue-router's `TypesConfig`, so route names and params are checked types rather than strings. **It is the twin of `app/providers/router/routes.ts` — add, rename or re-path a route in one and you must do it in the other**, or the compiler is describing a router that no longer exists.
+
+- **Read params through the route name**: `useRoute(RouteName.APP_CHARACTER).params.id` is `string`. A bare `useRoute()` returns the union of every route, so `params.id` does not exist on it — that is the map working, not a bug to cast away. Where one composable serves several routes that share a param, name the union (`useRoute<CharacterRouteName>()`).
+- **`as string` on a param is now a lie with no purpose.** Nine sites had one; the cast was hiding `string[] | undefined` and, worse, an unnamed route. There is no reason to write one again — and `Array.isArray(route.params.x)` is likewise dead, the map already says whether a param is an array.
+- **A location built in a `computed` needs an explicit `RouteLocationRaw`.** In an object literal an enum member widens from `RouteName.APP_HOME` to `RouteName`, which matches no single entry in the map; the annotation pins it back. Symptom is a wall of "not assignable to `RouteLocationAsRelativeTyped<...>`".
+- **In a `beforeEnter`, narrow on `to.name` before touching `to.params`** — the name is a literal in the map, so `if (to.name !== RouteName.X)` narrows the params for the rest of the guard. Do not cast `to.params`.
+- What the map catches: an unknown route name, an unknown param, a wrong param type, and a param read that the route does not have. What it does not: an **omitted** `params` object, which vue-router types optional.
+
 Run before committing:
 
 ```sh
@@ -207,3 +314,51 @@ husky + lint-staged gate every commit. The hook lives at the **repo root** (`.hu
 Consequence: a type error **anywhere** blocks **any** commit, not just in the files you staged. That is intentional. A full forced rebuild is ~2s, so the cost is small.
 
 Anything auto-fixable is fixed and re-staged; anything left — an oxlint error **or warning**, or any type error — fails the hook, and lint-staged reverts the working tree to its pre-hook state.
+
+---
+
+### Render profiler (dev only)
+
+`app/providers/dev/renderProfiler/` flashes a box over every component as it re-renders, coloured by decayed render frequency, with the triggering call site logged. Turn it on by **uncommenting two lines** in `app/index.ts` — the import and the `app.use`. There is no runtime toggle on purpose.
+
+- **`import.meta.env.DEV` must stay the first statement in `install`.** That is what lets rolldown prove the body unreachable and drop all five modules from a production build — measured: uncommented, a prod build contains zero occurrences of `renderProfiler`. Move the guard down and the module ships.
+- **Never re-export it through `app/providers/index.ts`.** That barrel is imported unconditionally.
+- **Do not "simplify" it into `el.style.outline` on `this.$el`.** `$el` is `vnode.el`, which is a **Text** node for every Fragment root — 60 of 205 components here, including any SFC whose template merely starts with a comment — and an outline is clipped by the `overflow-hidden` that `Card` and `DialogContent` apply to their slots. The overlay lives at `document.body` for a related reason: `backdrop-filter` in `Card`, `Drawer`, `DesktopHeader` and `MobileNavHeader` creates containing blocks that would reparent a fixed child.
+- It reads unexported Vue internals (`subTree`, `vnode.anchor`, `vnode.targetAnchor`, `shapeFlag`, `type.__file`), verified against **3.5.18** and pinned in a comment in `constants.ts`. Re-check on a Vue bump. The full reasoning is in the vault: `dev-tooling/render-profiler.md`.
+
+---
+
+## 7. Bundle size & tree shaking
+
+**Barrels are not the problem, and never were.** The bundler drops unused named re-exports. This was checked against a real build, not assumed: `pages/dashboard` imports only `useCharacterSummaries` from the 58-line `entities/characters` barrel, and `passivePerception` / `proficiencyBonus` — exported from that same barrel — appear only in the character-sheet chunk, never in the dashboard one. Keep writing barrels.
+
+What _would_ break it, stated as rules:
+
+1. **No `export *`.** Already §3.7. The reason is tree shaking: a star re-export forces the bundler to evaluate the whole target module to learn what it publishes.
+2. **No `import * as X from`.** A namespace object is opaque — every export is retained.
+3. **No side effects at barrel top level.** A barrel is re-exports only: no `console`, no `document`, no registry `.push()`, no CSS import. One statement pins every module the barrel re-exports.
+4. **No CSS imports in `.ts`.** CSS has no exports, so the import is unconditionally side-effectful.
+
+Known side-effectful modules — do not re-export these through a wider barrel: `app/providers/router` (top-level `router.beforeEach`), `app/providers/i18n` (top-level `useStorage`, so `localStorage` is read at import), `app/providers/queryClient` (`new QueryClient()`), and `shared/lib/assets` (an `AssetsService` singleton that reads `window.location`).
+
+**Pinia: safe, but by inference rather than by construction.** `pinia.mjs` ships **zero** `/*#__PURE__*/` annotations, so `export const useX = defineStore(...)` is an unannotated top-level call that a bundler may only drop if it can prove the body is pure. Rolldown currently does. Keep one `defineStore` per module — that is already the shape of all six — so that if a bundler bump ever changes this, a wrongly-retained store is a few hundred bytes in its own chunk. The one-line escape hatch is `build.rollupOptions.treeshake.manualPureFunctions: ['defineStore']`.
+
+### Chunking
+
+`vite.config.ts` declares exactly **one** `advancedChunks` group, `framework` (vue, vue-router, pinia, `@tanstack/vue-query`). Everything else is left to rolldown's per-reachability splitting.
+
+**Never add a `node_modules` catch-all.** The previous config had `case id.includes('node_modules'): return 'vendor'`, which glued every surviving module into one 359 KB chunk that `index.html` preloaded on every route — tree shaking working perfectly per module, then undone by chunking. Together with a blanket `tanstack` arm (which fused `vue-query` with `vue-table` and `vue-virtual`, both single-route), the critical path was 577 KB. It is now 369 KB.
+
+**Naming a group is not free either** — Vite preloads shared group chunks from `index.html`. An explicit `zod`/`vee-validate` group put 98 KB on every route; removing it pushed zod down into only the routes with forms. An explicit `gsap` group cost the builder route 62 KB versus letting rolldown split gsap by reachability. Measure before adding a group.
+
+Match on `node_modules[\\/]<pkg>[\\/]`, never a bare substring: the old `id.includes('zod')` also caught `@vee-validate/zod`, and library arms were tested before the `node_modules` arm, so a `src/` folder named `ogl-shaders/` would have silently teleported app code into the `ogl` chunk.
+
+**A slot that a layout never renders still ships.** `App.vue` hands `header`, `navigation` and `footer` to every layout, and each layout renders at most one of them — so Vue never _creates_ the unused ones, but a static `import` still puts the code in the eagerly-preloaded entry chunk. `LandingHeader` and `SidebarNavigation` are therefore `defineAsyncComponent`; that alone cut the entry from 190 KB to 127 KB. `LandingFooter` stays static on purpose — 20 lines with no dependencies is not worth a request. Anything added to the app shell should follow the same test: defer it if a layout renders it conditionally and it carries real dependencies.
+
+**A `@shared` module used by exactly one route is not shared.** `shared/ui/data-table` (only `SkillsTab.vue`) and `shared/lib/ui/useVirtualGrid` (only `CharactersList.vue`) each drag a 40–60 KB dependency. Living in `@shared` is fine; putting them on the critical path is not.
+
+To inspect the real chunk graph:
+
+```sh
+bun run analyze     # ANALYZE=1 vite build → stats.html treemap
+```

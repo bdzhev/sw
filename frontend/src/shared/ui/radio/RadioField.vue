@@ -3,7 +3,7 @@ import { useField } from 'vee-validate';
 import { provide } from 'vue';
 
 import { RADIO_CTX_KEY } from './constants';
-import type { RadioFieldProps } from './RadioField.props';
+import type { RadioFieldProps } from './RadioField.types';
 import type { RadioContext } from './types';
 
 const props = defineProps<RadioFieldProps>();

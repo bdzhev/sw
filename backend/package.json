@@ -3,19 +3,23 @@
   "author": "bdzhev",
   "type": "module",
   "scripts": {
-    "dev": "bun run --env-file ../.env --watch src/index.ts",
+    "dev": "bun run --env-file ../.env --watch src/app/server.ts",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix",
     "format": "oxfmt --write .",
     "typecheck": "tsc --noEmit",
     "db:generate": "bunx drizzle-kit generate",
-    "db:migrate": "bunx drizzle-kit migrate"
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:seed": "bun run --env-file ../.env src/modules/spells/spells.seed.ts",
+    "spells:refresh": "bun run src/modules/spells/spells.refresh.ts"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.9.0",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.11.9",
     "jose": "^6.2.1",
-    "pg": "^8.18.0"
+    "pg": "^8.18.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/bun": "latest",

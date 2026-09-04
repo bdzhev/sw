@@ -1,30 +1,25 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 
-import { useAddCharacter } from '@entities/characters';
+import { DialogBody, DialogFooter } from '@shared/ui/dialog';
+import { FormInput } from '@shared/ui/form-input';
+
+import { useCreateCharacter } from '@entities/characters';
 
 import {
-  CfProvider,
-  CfBody,
-  CfContent,
-  CfFooter,
-  CfHeader,
-  CfInput,
-  CfClassSelect,
-  CfRaceSelect,
-  CfHeaderTitle,
-  CfHeaderDescription,
-  CfFooterCancelButton,
-  CfFooterSubmitButton,
+  CancelButton,
+  CharacterFormProvider,
+  ClassSelect,
+  RaceSelect,
+  SubmitButton,
 } from '@features/character-form';
 
 import { initialValues } from '../../config';
 import { createCharacterSchema } from '../../model/schema';
-import type { CreateCharacterFormProps } from './CreateCharacterForm.types';
 
-const props = defineProps<CreateCharacterFormProps>();
+const emit = defineEmits<{ submit: []; cancel: [] }>();
 
-const { addCharacter, isAddingCharacter } = useAddCharacter();
+const { createCharacter, isCreatingCharacter } = useCreateCharacter();
 
 const form = useForm({
   validationSchema: createCharacterSchema,
@@ -32,53 +27,50 @@ const form = useForm({
   keepValuesOnUnmount: true,
 });
 
-const handleSubmit = form.handleSubmit((values) => {
-  addCharacter(values);
+/**
+ * Awaited on purpose: firing and closing immediately discards the rejection,
+ * so a rejected create looked identical to a successful one.
+ */
+const submitCharacter = form.handleSubmit(async (values) => {
+  try {
+    await createCharacter(values);
+  } catch {
+    return;
+  }
+
   form.resetForm();
-  props.onSubmit?.();
+  emit('submit');
 });
 
-const { meta } = form;
+const handleSubmit = (event?: Event) => {
+  void submitCharacter(event);
+};
+
+const handleCancel = () => {
+  emit('cancel');
+};
 </script>
 
 <template>
-  <CfProvider :form-context="form" :on-submit="handleSubmit">
-    <CfContent>
-      <CfHeader>
-        <CfHeaderTitle>{{ 'Create a new character' }}</CfHeaderTitle>
+  <CharacterFormProvider :form-context="form" @submit="handleSubmit">
+    <DialogBody>
+      <div class="flex flex-col gap-4">
+        <FormInput name="name" label="Name" placeholder="Character's name" />
 
-        <CfHeaderDescription>
-          {{
-            "Enter a name, race and class for you new character. You won't be able to change the class or the race."
-          }}
-        </CfHeaderDescription>
-      </CfHeader>
+        <ClassSelect name="characterClass" />
 
-      <CfBody class="gap-1">
-        <CfInput name="name" :validate-on-change="false" placeholder="Character's name" />
+        <RaceSelect name="race" />
+      </div>
+    </DialogBody>
 
-        <CfClassSelect name="characterClass" />
+    <DialogFooter>
+      <div class="flex flex-row justify-end gap-2">
+        <CancelButton :is-loading="isCreatingCharacter" @cancel="handleCancel">
+          Cancel
+        </CancelButton>
 
-        <CfRaceSelect name="race" />
-      </CfBody>
-
-      <CfFooter class="items-center justify-end">
-        <div class="flex flex-row gap-2">
-          <CfFooterCancelButton
-            :is-loading="isAddingCharacter"
-            v-on:cancel-click="props?.onCancel"
-          >
-            Cancel
-          </CfFooterCancelButton>
-
-          <CfFooterSubmitButton
-            :is-disabled="!meta.dirty || !meta.valid"
-            :is-loading="isAddingCharacter"
-          >
-            Create
-          </CfFooterSubmitButton>
-        </div>
-      </CfFooter>
-    </CfContent>
-  </CfProvider>
+        <SubmitButton :is-loading="isCreatingCharacter">Create</SubmitButton>
+      </div>
+    </DialogFooter>
+  </CharacterFormProvider>
 </template>

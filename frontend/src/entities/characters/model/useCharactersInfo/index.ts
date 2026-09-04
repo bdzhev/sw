@@ -1,1 +1,0 @@
-export { useCharactersInfo } from './useCharactersInfo';

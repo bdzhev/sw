@@ -6,5 +6,5 @@ import { HeaderMenu } from './header-menu';
 <template>
   <HeaderMenu />
 
-  <CharactersList class="py-6 md:py-12" />
+  <CharactersList class="pt-4 pb-6 md:pt-6 md:pb-12" />
 </template>

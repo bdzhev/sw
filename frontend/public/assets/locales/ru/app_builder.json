@@ -1,6 +1,8 @@
 {
+  "Back to your characters": "К списку персонажей",
   "Create character": "Создать персонажа",
   "Failed to create character": "Не удалось создать персонажа",
   "Something went wrong. Please try again.": "Что-то пошло не так. Попробуйте ещё раз.",
-  "Try again": "Попробовать снова"
+  "Try again": "Попробовать снова",
+  "{answered} out of {total} questions answered": "Отвечено {answered} из {total}"
 }

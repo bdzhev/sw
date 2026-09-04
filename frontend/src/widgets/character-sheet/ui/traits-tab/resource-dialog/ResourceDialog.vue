@@ -1,0 +1,153 @@
+<script setup lang="ts">
+import { Pin } from 'lucide-vue-next';
+
+import { Button } from '@shared/ui/button';
+import {
+  DialogBody,
+  DialogClose,
+  DialogCloseButton,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+} from '@shared/ui/dialog';
+import { FormInput } from '@shared/ui/form-input';
+import { FormNumberField } from '@shared/ui/form-number-field';
+import { FormSelect } from '@shared/ui/form-select';
+import { FormSwitch } from '@shared/ui/form-switch';
+import { Text } from '@shared/ui/text';
+import { Textarea } from '@shared/ui/textarea';
+
+import {
+  RESET_TRIGGER_OPTIONS,
+  RESOURCE_OPTIONS,
+  RESOURCE_VALUE_LIMIT,
+} from '@widgets/character-sheet/config/traits';
+import {
+  useResourceForm,
+  type ResourceSubmitValues,
+} from '@widgets/character-sheet/model/traits';
+
+import type { ResourceDialogProps } from './ResourceDialog.types';
+
+const props = withDefaults(defineProps<ResourceDialogProps>(), { isSaving: false });
+
+const open = defineModel<boolean>('open', { required: true });
+
+const emit = defineEmits<{
+  submit: [values: ResourceSubmitValues];
+}>();
+
+const { title, isEditing, isCustomResource, maxHint, sourcedTriggerHint, handleSubmit } =
+  useResourceForm({
+    getResource: () => {
+      return props.resource;
+    },
+    isOpen: () => {
+      return open.value;
+    },
+    onSubmit: (values) => {
+      emit('submit', values);
+    },
+  });
+</script>
+
+<template>
+  <DialogRoot v-model:open="open">
+    <DialogPortal>
+      <DialogOverlay />
+
+      <DialogContent
+        :disable-outside-close="props.isSaving"
+        :aria-describedby="undefined"
+      >
+        <form @submit.prevent="handleSubmit">
+          <DialogHeader>
+            <DialogTitle>{{ title }}</DialogTitle>
+
+            <DialogCloseButton />
+          </DialogHeader>
+
+          <DialogBody>
+            <div class="flex flex-col gap-2">
+              <FormSelect
+                name="resource"
+                :options="RESOURCE_OPTIONS"
+                placeholder="Which resource?"
+              />
+
+              <FormInput
+                v-if="isCustomResource"
+                name="customName"
+                placeholder="Resource name"
+              />
+
+              <div class="flex flex-col">
+                <FormNumberField
+                  name="maxValue"
+                  label="Max"
+                  has-stepper
+                  :min="0"
+                  :max="RESOURCE_VALUE_LIMIT"
+                  decrement-label="Lower the max"
+                  increment-label="Raise the max"
+                />
+
+                <Text size="xs" theme="secondary" class="pb-2">{{ maxHint }}</Text>
+              </div>
+
+              <FormNumberField
+                v-if="isEditing"
+                name="current"
+                label="Current"
+                has-stepper
+                :min="0"
+                :max="RESOURCE_VALUE_LIMIT"
+                decrement-label="Spend one"
+                increment-label="Regain one"
+              />
+
+              <div class="flex flex-col">
+                <FormSelect
+                  name="resetTrigger"
+                  :options="RESET_TRIGGER_OPTIONS"
+                  placeholder="Resets on…"
+                />
+
+                <Text v-if="sourcedTriggerHint" size="xs" theme="secondary" class="pb-2">
+                  {{ sourcedTriggerHint }}
+                </Text>
+              </div>
+
+              <Textarea
+                name="description"
+                label="Description"
+                :rows="4"
+                placeholder="What does this resource do? Your own words are fine."
+              />
+
+              <FormSwitch name="quickReference" label="Pin to quick reference">
+                <template #icon>
+                  <Pin :size="16" aria-hidden="true" />
+                </template>
+              </FormSwitch>
+            </div>
+          </DialogBody>
+
+          <DialogFooter>
+            <div class="flex flex-row flex-wrap items-center justify-end gap-2">
+              <DialogClose as-child>
+                <Button variant="secondary" :is-disabled="props.isSaving">Cancel</Button>
+              </DialogClose>
+
+              <Button type="submit" :is-loading="props.isSaving">Save</Button>
+            </div>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </DialogPortal>
+  </DialogRoot>
+</template>

@@ -1,63 +1,88 @@
 import { http } from '@shared/lib/http';
 
 import type {
-  BaseCharacterData,
-  CharacterData,
-  AddCharacterPayload,
+  CharacterDetail,
+  CharacterIdentity,
+  CharacterSheet,
+  CharactersPage,
+  CreateCharacterPayload,
+  SheetPatch,
   UpdateCharacterPayload,
-  RawCharacterData,
-  RawBaseCharacterData,
 } from './types';
 
 export const PAGE_SIZE = 10;
 
-const mapBaseData = (raw: RawBaseCharacterData) => {
-  const { class: characterClass, ...rest } = raw;
+/** Mirrors MAX_CHARACTERS_PER_USER in the backend's characters.routes.ts. */
+export const MAX_CHARACTERS = 50;
 
-  return { ...rest, characterClass };
+/**
+ * Mirrors MAX_ITEMS_PER_CHARACTER in the backend's
+ * collections/items/items.routes.ts. Mirrored so the Add control can disable
+ * itself rather than firing a request the server will answer with a 409; the
+ * server check stays as the backstop for a client that got there anyway.
+ */
+export const MAX_ITEMS = 200;
+
+/**
+ * Two mount points, one rule: `/characters` (plural) is collection-level — the
+ * paginated list and create. `/character/:id` (singular) is one character and
+ * everything scoped to it.
+ */
+export const getCharacterSummaries = (offset: number): Promise<CharactersPage> => {
+  return http.get<CharactersPage>(`/characters?offset=${offset}&limit=${PAGE_SIZE}`);
 };
 
-const mapFullData = (raw: RawCharacterData) => {
-  const { class: characterClass, ...rest } = raw;
-
-  return { ...rest, characterClass };
+export const getCharacter = (id: string): Promise<CharacterDetail> => {
+  return http.get<CharacterDetail>(`/character/${id}`);
 };
 
-export const getCharactersInfo = async (offset: number): Promise<BaseCharacterData[]> => {
-  const data = await http.get<RawBaseCharacterData[]>(
-    `/characters?offset=${offset}&limit=${PAGE_SIZE}`,
-  );
-
-  return data.map(mapBaseData);
+export const createCharacter = (
+  payload: CreateCharacterPayload,
+): Promise<CharacterIdentity> => {
+  return http.post<CharacterIdentity>('/characters', payload);
 };
 
-export const getCharacter = async (id: string): Promise<CharacterData> => {
-  const data = await http.get<RawCharacterData>(`/character/${id}`);
-
-  return mapFullData(data);
+export const updateCharacter = ({
+  id,
+  ...patch
+}: UpdateCharacterPayload): Promise<CharacterIdentity> => {
+  return http.patch<CharacterIdentity>(`/character/${id}`, patch);
 };
 
-export const addCharacter = async (
-  payload: AddCharacterPayload,
-): Promise<CharacterData> => {
-  const data = await http.post<RawCharacterData>('/characters', {
-    ...payload,
-    class: payload.characterClass,
+/** The autosave controller's target. Absolute values, never deltas. */
+export const updateCharacterSheet = (
+  id: string,
+  patch: SheetPatch,
+): Promise<CharacterSheet> => {
+  return http.patch<CharacterSheet>(`/character/${id}/sheet`, patch);
+};
+
+/**
+ * The same write, as a best-effort during page teardown. `keepalive` is what lets
+ * it outlive the document; `navigator.sendBeacon` cannot stand in because it is
+ * POST-only and every autosave target is a PATCH. Rejections are swallowed on
+ * purpose - there is no one left to tell, and the localStorage buffer is the real
+ * durability net.
+ */
+export const sendSheetPatchOnTeardown = (id: string, patch: SheetPatch): void => {
+  http.patch(`/character/${id}/sheet`, patch, { keepalive: true }).catch(() => {
+    /* the document is going away */
   });
-
-  return mapFullData(data);
 };
 
-export const updateCharacter = async (
-  payload: UpdateCharacterPayload,
-): Promise<CharacterData> => {
-  const data = await http.patch<RawCharacterData>(`/character/${payload.id}`, {
-    name: payload.name,
-  });
-
-  return mapFullData(data);
+/**
+ * The three atomic actions - rest, level-up, setup. Each returns the full new
+ * state for the controller to adopt, rather than a partial the client has to
+ * reconcile.
+ */
+export const runCharacterAction = <T>(
+  id: string,
+  endpoint: string,
+  body: unknown,
+): Promise<T> => {
+  return http.post<T>(`/character/${id}/${endpoint}`, body);
 };
 
 export const deleteCharacter = async (id: string): Promise<void> => {
-  await http.delete<RawCharacterData>(`/character/${id}`);
+  await http.delete(`/character/${id}`);
 };

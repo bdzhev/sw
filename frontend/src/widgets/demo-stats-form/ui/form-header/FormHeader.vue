@@ -18,7 +18,7 @@ const handleResetClick = () => {
 <template>
   <div
     class="
-      flex flex-row items-center justify-between gap-4 bg-secondary-fg/30 px-5
+      flex flex-row items-center justify-between gap-4 bg-muted/30 px-5
       py-4
       md:px-8 md:py-6
     "

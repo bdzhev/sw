@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { ImageFolder } from '@shared/lib/assets';
 import { fmt } from '@shared/lib/format';
-import { Card, CardHeader, HeaderTitle } from '@shared/ui/card';
-import { Image } from '@shared/ui/image';
-import { RadioGroup, RadioInput, RadioField } from '@shared/ui/radio';
+import { useBreakpoint } from '@shared/lib/ui';
+import { Card } from '@shared/ui/card';
+import { RadioField } from '@shared/ui/radio';
 import { ScrollArea } from '@shared/ui/scroll-area';
-import { Text } from '@shared/ui/text';
 
 import { useCharacter } from '@entities/characters';
 
 import { useBuilderProvider } from '../../../../model/useBuilderProvider';
+import { AnswerList } from './answer-list';
+import { CardIntro } from './card-intro';
 import type { QuizCardProps } from './QuizCard.types';
 
 const props = defineProps<QuizCardProps>();
 
 const ctx = useBuilderProvider()!;
+
+/** Which element is the scroller is not something a Tailwind variant can say. */
+const { isMobile } = useBreakpoint();
 
 const { character } = useCharacter({ id: ctx.characterId });
 
@@ -24,11 +27,19 @@ if (!character.value) {
   throw new Error('Quiz Card requires character data');
 }
 
+const characterName = computed(() => {
+  return character.value.character.name;
+});
+
+const description = computed(() => {
+  return fmt(props.quizItem.description.ru, { characterName: characterName.value });
+});
+
 const formattedInputItems = computed(() => {
   return props.quizItem.answers.ru.map((answer) => {
     return {
       ...answer,
-      label: fmt(answer.label, { characterName: character.value.name }),
+      label: fmt(answer.label, { characterName: characterName.value }),
     };
   });
 });
@@ -42,35 +53,25 @@ const formattedInputItems = computed(() => {
     ]"
     variant="outline"
   >
-    <div class="flex shrink-0 flex-col gap-4 overflow-hidden md:w-2/5">
-      <Image
-        :folder="ImageFolder.Quiz"
-        name="test-image-carousel"
-        class="h-40 w-full shrink-0 object-cover md:h-1/2"
-      />
+    <!-- Above the branch on purpose: vee-validate drops an unmounted field's path. -->
+    <RadioField :name="props.quizItem.id" :items="formattedInputItems">
+      <ScrollArea v-if="isMobile" class="min-h-0 flex-1" should-fade>
+        <div class="flex flex-col gap-4">
+          <CardIntro :title="props.quizItem.title.ru" :description="description" />
 
-      <CardHeader>
-        <HeaderTitle>{{ props.quizItem.title.ru }}</HeaderTitle>
-      </CardHeader>
+          <AnswerList :answers="formattedInputItems" />
+        </div>
+      </ScrollArea>
 
-      <Text>
-        {{ fmt(props.quizItem.description.ru, { characterName: character.name }) }}
-      </Text>
-    </div>
+      <template v-else>
+        <CardIntro :title="props.quizItem.title.ru" :description="description" />
 
-    <div class="flex min-h-0 flex-1 flex-col">
-      <RadioField :name="props.quizItem.id" :items="formattedInputItems">
-        <ScrollArea class="h-full" should-fade>
-          <RadioGroup class="flex flex-col gap-4 p-2">
-            <RadioInput
-              v-for="answer in formattedInputItems"
-              :key="answer.value"
-              :name="answer.value"
-              class="min-h-12 p-4"
-            />
-          </RadioGroup>
-        </ScrollArea>
-      </RadioField>
-    </div>
+        <div class="flex min-h-0 flex-1 flex-col">
+          <ScrollArea class="h-full" should-fade>
+            <AnswerList :answers="formattedInputItems" />
+          </ScrollArea>
+        </div>
+      </template>
+    </RadioField>
   </Card>
 </template>

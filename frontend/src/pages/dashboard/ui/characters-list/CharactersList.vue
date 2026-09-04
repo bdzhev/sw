@@ -1,64 +1,84 @@
 <script setup lang="ts">
-import { useCharactersInfo } from '@entities/characters';
+import { useTemplateRef } from 'vue';
 
-import {
-  CharCardRoot,
-  CharCardHeader,
-  CharCardFooter,
-  CoreInfoLine,
-  CtaButton,
-  CharacterCardSkeleton,
-  DeleteActionItem,
-  DropdownActionsList,
-  EditActionItem,
-} from '@features/character-card';
+import { useBreakpoint, useVirtualGrid } from '@shared/lib/ui';
 
+import { useCharacterSummaries } from '@entities/characters';
+
+import { CharacterCardSkeleton } from '@features/character-card';
+
+import { CharacterCard } from './character-card';
 import { EmptyState } from './empty-state';
 
 const SKELETON_CARD_COUNT = 4;
 
-const { characters, isCharInfoLoading, isCharInfoRefetching } = useCharactersInfo();
+const ROW_HEIGHT = 216;
+const ROW_HEIGHT_LG = 232;
+
+const ROW_CLASSES =
+  'grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8';
+
+const {
+  characters,
+  isLoadingCharacterSummaries,
+  isRefetchingCharacterSummaries,
+  isFetchingNextCharacterSummaries,
+  hasMoreCharacterSummaries,
+  loadNextCharacterSummaries,
+} = useCharacterSummaries();
+
+const { isDesktop } = useBreakpoint();
+
+const listRef = useTemplateRef<HTMLElement>('list');
+const sentinelRef = useTemplateRef<HTMLElement>('sentinel');
+
+const { columns, visibleRows, totalHeight } = useVirtualGrid({
+  items: characters,
+  container: listRef,
+  sentinel: sentinelRef,
+  rowHeight: () => {
+    return isDesktop.value ? ROW_HEIGHT_LG : ROW_HEIGHT;
+  },
+  onEndReached: () => {
+    if (hasMoreCharacterSummaries.value && !isFetchingNextCharacterSummaries.value) {
+      loadNextCharacterSummaries();
+    }
+  },
+});
 </script>
 
 <template>
-  <div
-    v-if="isCharInfoLoading"
-    class="grid grid-cols-1 gap-4 page-x sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-  >
-    <CharacterCardSkeleton class="min-h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
+  <div v-if="isLoadingCharacterSummaries" :class="[ROW_CLASSES, 'page-x']">
+    <CharacterCardSkeleton class="h-50" v-for="n in SKELETON_CARD_COUNT" :key="n" />
   </div>
 
-  <EmptyState v-else-if="!characters?.length" />
+  <EmptyState v-else-if="!characters.length" />
 
   <div
     v-else
-    class="grid grid-cols-1 gap-4 page-x transition-opacity sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-    :class="{ 'opacity-60': isCharInfoRefetching }"
-    id="characterInfoList"
+    class="page-x transition-opacity"
+    :class="{ 'opacity-60': isRefetchingCharacterSummaries }"
   >
-    <CharCardRoot
-      v-for="char in characters"
-      :key="char.id"
-      v-bind="char"
-      class="min-h-50"
+    <div
+      ref="list"
+      class="relative w-full"
+      :style="{ height: `${totalHeight}px` }"
+      id="characterInfoList"
     >
-      <CharCardHeader>
-        <CoreInfoLine label="Class" field="characterClass" />
+      <div
+        v-for="row in visibleRows"
+        :key="row.index"
+        :class="[ROW_CLASSES, 'absolute top-0 left-0 pb-4 lg:pb-8']"
+        :style="{ transform: `translateY(${row.offset}px)` }"
+      >
+        <CharacterCard v-for="char in row.items" :key="char.id" :character="char" />
+      </div>
+    </div>
 
-        <CoreInfoLine label="Race" field="race" />
-      </CharCardHeader>
+    <div ref="sentinel" aria-hidden="true" class="h-px w-full" />
 
-      <CharCardFooter class="mt-auto">
-        <div class="flex flex-row items-center justify-between">
-          <DropdownActionsList>
-            <DeleteActionItem />
-
-            <EditActionItem />
-          </DropdownActionsList>
-
-          <CtaButton />
-        </div>
-      </CharCardFooter>
-    </CharCardRoot>
+    <div v-if="isFetchingNextCharacterSummaries" :class="ROW_CLASSES">
+      <CharacterCardSkeleton class="h-50" v-for="n in columns" :key="`next-${n}`" />
+    </div>
   </div>
 </template>

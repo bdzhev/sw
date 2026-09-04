@@ -12,7 +12,6 @@ import { HorizontalScrollSection } from './horizontal-scroll-section';
  */
 useHorizontalScrollAnimation({
   wrapperSelector: '#horizontalWrapper',
-  rowSelector: '#painSectionScroll',
   childrenSelector: '#painSectionScroll article',
 });
 
@@ -22,7 +21,7 @@ const { t } = useI18n();
 <template>
   <section
     id="horizontalWrapper"
-    class="relative w-full overflow-hidden bg-primary-bg/70 pb-16 backdrop-blur-3xl md:pb-0"
+    class="relative w-full overflow-hidden bg-bg-primary/70 pb-16 backdrop-blur-3xl md:pb-0"
   >
     <div id="painSectionScroll" class="relative flex flex-col md:flex-row md:flex-nowrap">
       <span

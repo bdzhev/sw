@@ -1,6 +1,8 @@
 {
+  "Back to your characters": "Back to your characters",
   "Create character": "Create character",
   "Failed to create character": "Failed to create character",
   "Something went wrong. Please try again.": "Something went wrong. Please try again.",
-  "Try again": "Try again"
+  "Try again": "Try again",
+  "{answered} out of {total} questions answered": "{answered} out of {total} questions answered"
 }

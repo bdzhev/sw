@@ -2,26 +2,34 @@
 import { Eye, EyeOff } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-import { Input, type InputProps } from '../input';
+import { Button } from '@shared/ui/button';
+import { FormInput, type FormInputProps } from '@shared/ui/form-input';
 
-type SensitiveInputProps = Omit<InputProps, 'type'>;
+type SensitiveInputProps = Omit<FormInputProps, 'type'>;
 
-defineProps<SensitiveInputProps>();
+const props = defineProps<SensitiveInputProps>();
 
 const isVisible = ref(false);
+
+const handleToggleVisibility = (): void => {
+  isVisible.value = !isVisible.value;
+};
 </script>
 
 <template>
-  <Input v-bind="$props" :type="isVisible ? 'text' : 'password'">
+  <FormInput v-bind="props" :type="isVisible ? 'text' : 'password'">
     <template #right>
-      <button
-        type="button"
-        class="mr-2 flex min-h-11 min-w-11 cursor-pointer items-center justify-center text-secondary md:min-h-0 md:min-w-0"
-        @click="isVisible = !isVisible"
+      <Button
+        variant="transparent"
+        is-icon-only
+        class="mr-1 text-secondary"
+        :aria-label="isVisible ? 'Hide password' : 'Show password'"
+        @click="handleToggleVisibility"
       >
         <EyeOff v-if="isVisible" class="size-4" />
+
         <Eye v-else class="size-4" />
-      </button>
+      </Button>
     </template>
-  </Input>
+  </FormInput>
 </template>
