@@ -26,7 +26,11 @@ const handleCycle = (skillKey: string): void => {
     <SkillRow
       v-for="skill in props.group.skills"
       :key="skill.key"
-      :skill="skill"
+      :skill-key="skill.key"
+      :label="skill.label"
+      :ability-label="skill.abilityLabel"
+      :modifier="skill.modifier"
+      :proficiency="skill.proficiency"
       @cycle="handleCycle"
     />
   </tbody>

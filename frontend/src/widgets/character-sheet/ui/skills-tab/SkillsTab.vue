@@ -12,9 +12,8 @@ import {
   ABILITY_SHORT_LABELS,
   passivePerception,
   proficiencyBonus,
-  skillTotal,
+  skillModifier,
   SKILLS,
-  totalAbilityScores,
   useCharacter,
   useSheetAutosave,
 } from '@entities/characters';
@@ -28,6 +27,7 @@ import type {
   SkillProficiencyLevel,
   SkillRowView,
 } from '@widgets/character-sheet/config/skills';
+import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { LanguagePicker } from './language-picker';
@@ -36,6 +36,9 @@ import { SkillSummary } from './skill-summary';
 
 const TABLE_CAPTION =
   'Skills grouped by governing ability. Each proficiency button cycles none, proficient, expertise.';
+
+/** A stable fallback: a fresh `[]` per read would defeat the narrowing below. */
+const EMPTY_LANGUAGES: string[] = [];
 
 /** The modifier column's header follows its numbers to the right. */
 const HEADER_CLASSES = { modifier: 'text-right' };
@@ -58,15 +61,31 @@ const items = computed(() => {
  * The item scan, once for all eighteen skills plus passive perception. Each helper
  * used to redo it internally, so one hp edit walked the inventory nineteen times.
  */
-const totals = computed(() => {
-  return sheet.value ? totalAbilityScores(sheet.value, items.value) : null;
+const totals = useAbilityTotals({ sheet, items });
+
+/**
+ * The two other narrow reads the table is built from. Neither notifies on an
+ * unrelated edit: `skillProficiencies` keeps its identity through vue-query's
+ * structural sharing, and a bonus is a number.
+ */
+const proficiencies = computed(() => {
+  return sheet.value?.skillProficiencies;
 });
 
-const groups = computed<SkillGroupView[]>(() => {
-  const current = sheet.value;
-  const scores = totals.value;
+const bonus = computed(() => {
+  return sheet.value ? proficiencyBonus(sheet.value) : 0;
+});
 
-  if (!current || !scores) {
+/**
+ * Reads only the narrowed values above — never `sheet` — so it holds its identity
+ * across an edit that cannot change a skill, and every `SkillGroup` skips its
+ * render with it.
+ */
+const groups = computed<SkillGroupView[]>(() => {
+  const scores = totals.value;
+  const levels = proficiencies.value;
+
+  if (!levels) {
     return [];
   }
 
@@ -81,9 +100,13 @@ const groups = computed<SkillGroupView[]>(() => {
           key: skill.key,
           label: skill.label,
           abilityLabel: ABILITY_SHORT_LABELS[skill.ability],
-          modifier: skillTotal(scores, current, skill.key),
-          proficiency: (current.skillProficiencies[skill.key] ??
-            0) as SkillProficiencyLevel,
+          modifier: skillModifier(
+            scores,
+            skill.ability,
+            levels[skill.key] ?? 0,
+            bonus.value,
+          ),
+          proficiency: (levels[skill.key] ?? 0) as SkillProficiencyLevel,
         };
       }),
     };
@@ -103,16 +126,26 @@ const skillRows = computed<SkillRowView[]>(() => {
 
 const passive = computed(() => {
   const current = sheet.value;
-  const scores = totals.value;
 
-  return current && scores ? passivePerception(scores, current) : 0;
+  return current ? passivePerception(totals.value, current) : 0;
+});
+
+/**
+ * Narrowed the same way: the normalising literal is a new object every time, so
+ * reading `sheet` for it re-rendered the picker on every unrelated edit. The
+ * stored array keeps its identity through structural sharing, and `other` is a
+ * string, so neither read notifies unless a language actually changed.
+ */
+const standardLanguages = computed(() => {
+  return sheet.value?.languages?.standard ?? EMPTY_LANGUAGES;
+});
+
+const otherLanguages = computed(() => {
+  return sheet.value?.languages?.other ?? '';
 });
 
 const languages = computed<Languages>(() => {
-  return {
-    standard: sheet.value?.languages?.standard ?? [],
-    other: sheet.value?.languages?.other ?? '',
-  };
+  return { standard: standardLanguages.value, other: otherLanguages.value };
 });
 
 /** none → proficient → expertise → none. Absent means neither, never a stored 0. */

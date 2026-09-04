@@ -20,7 +20,7 @@ const emit = defineEmits<{ patch: [patch: SheetPatch, immediate?: boolean] }>();
 const statModel = (field: SheetStatField): WritableComputedRef<number> => {
   return computed({
     get: (): number => {
-      return props.sheet[field];
+      return props[field];
     },
     set: (value: number): void => {
       emit('patch', { [field]: value });
@@ -36,7 +36,7 @@ const speed = statModel('speed');
 
 /** Current HP cannot exceed a maximum that has not been entered yet. */
 const hpCeiling = computed(() => {
-  return props.sheet.hpMax || MAX_STAT;
+  return props.hpMax || MAX_STAT;
 });
 </script>
 

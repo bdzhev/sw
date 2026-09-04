@@ -317,6 +317,17 @@ Anything auto-fixable is fixed and re-staged; anything left — an oxlint error 
 
 ---
 
+### Render profiler (dev only)
+
+`app/providers/dev/renderProfiler/` flashes a box over every component as it re-renders, coloured by decayed render frequency, with the triggering call site logged. Turn it on by **uncommenting two lines** in `app/index.ts` — the import and the `app.use`. There is no runtime toggle on purpose.
+
+- **`import.meta.env.DEV` must stay the first statement in `install`.** That is what lets rolldown prove the body unreachable and drop all five modules from a production build — measured: uncommented, a prod build contains zero occurrences of `renderProfiler`. Move the guard down and the module ships.
+- **Never re-export it through `app/providers/index.ts`.** That barrel is imported unconditionally.
+- **Do not "simplify" it into `el.style.outline` on `this.$el`.** `$el` is `vnode.el`, which is a **Text** node for every Fragment root — 60 of 205 components here, including any SFC whose template merely starts with a comment — and an outline is clipped by the `overflow-hidden` that `Card` and `DialogContent` apply to their slots. The overlay lives at `document.body` for a related reason: `backdrop-filter` in `Card`, `Drawer`, `DesktopHeader` and `MobileNavHeader` creates containing blocks that would reparent a fixed child.
+- It reads unexported Vue internals (`subTree`, `vnode.anchor`, `vnode.targetAnchor`, `shapeFlag`, `type.__file`), verified against **3.5.18** and pinned in a comment in `constants.ts`. Re-check on a Vue bump. The full reasoning is in the vault: `dev-tooling/render-profiler.md`.
+
+---
+
 ## 7. Bundle size & tree shaking
 
 **Barrels are not the problem, and never were.** The bundler drops unused named re-exports. This was checked against a real build, not assumed: `pages/dashboard` imports only `useCharacterSummaries` from the 58-line `entities/characters` barrel, and `passivePerception` / `proficiencyBonus` — exported from that same barrel — appear only in the character-sheet chunk, never in the dashboard one. Keep writing barrels.

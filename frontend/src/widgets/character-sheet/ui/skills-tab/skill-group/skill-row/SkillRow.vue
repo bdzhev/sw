@@ -5,6 +5,7 @@ import { computed } from 'vue';
 import { Button } from '@shared/ui/button';
 
 import type { SkillProficiencyLevel } from '@widgets/character-sheet/config/skills';
+import { formatSigned } from '@widgets/character-sheet/lib/format';
 
 import type { SkillRowProps } from './SkillRow.types';
 
@@ -26,31 +27,27 @@ const PROFICIENCY_ICON_CLASSES: Record<SkillProficiencyLevel, string> = {
   2: 'text-warning',
 };
 
-const modifier = computed(() => {
-  return `${props.skill.modifier >= 0 ? '+' : ''}${props.skill.modifier}`;
-});
-
 const stateLabel = computed(() => {
-  return PROFICIENCY_LABELS[props.skill.proficiency];
+  return PROFICIENCY_LABELS[props.proficiency];
 });
 
 const iconClasses = computed(() => {
-  return PROFICIENCY_ICON_CLASSES[props.skill.proficiency];
+  return PROFICIENCY_ICON_CLASSES[props.proficiency];
 });
 
 const handleCycleClick = (): void => {
-  emit('cycle', props.skill.key);
+  emit('cycle', props.skillKey);
 };
 </script>
 
 <template>
   <tr class="border-b border-border last:border-0">
     <th scope="row" class="px-2 py-1 text-left text-sm font-normal whitespace-nowrap">
-      {{ props.skill.label }}
+      {{ props.label }}
     </th>
 
     <td class="px-2 py-1 text-xs whitespace-nowrap text-secondary">
-      {{ props.skill.abilityLabel }}
+      {{ props.abilityLabel }}
     </td>
 
     <td class="px-2 py-1">
@@ -58,12 +55,12 @@ const handleCycleClick = (): void => {
         variant="transparent"
         size="xs"
         is-icon-only
-        :title="`${props.skill.label}: ${stateLabel}`"
-        :aria-label="`${props.skill.label} — ${stateLabel}. Activate to cycle.`"
+        :title="`${props.label}: ${stateLabel}`"
+        :aria-label="`${props.label} — ${stateLabel}. Activate to cycle.`"
         @click="handleCycleClick"
       >
         <component
-          :is="PROFICIENCY_ICONS[props.skill.proficiency]"
+          :is="PROFICIENCY_ICONS[props.proficiency]"
           :size="20"
           :class="iconClasses"
           aria-hidden="true"
@@ -74,7 +71,7 @@ const handleCycleClick = (): void => {
     <td
       class="px-2 py-1 text-right text-base font-semibold whitespace-nowrap text-primary tabular-nums"
     >
-      {{ modifier }}
+      {{ formatSigned(props.modifier) }}
     </td>
   </tr>
 </template>

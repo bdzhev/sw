@@ -72,7 +72,18 @@ export const totalAbilityScores = (
   sheet: CharacterSheet,
   items: InventoryItem[] = [],
 ): AbilityScores => {
-  const base = abilityScores(sheet);
+  return withItemBonuses(abilityScores(sheet), items);
+};
+
+/**
+ * The summing half of `totalAbilityScores`, for a reactive consumer that already
+ * holds the base scores. Taking the sheet row instead is what makes such a
+ * consumer recompute on every unrelated edit.
+ */
+export const withItemBonuses = (
+  base: AbilityScores,
+  items: InventoryItem[] = [],
+): AbilityScores => {
   const bonuses = bonusesFromItems(items);
 
   return Object.entries(base).reduce((totals, [stat, score]) => {
@@ -115,10 +126,26 @@ export const skillTotal = (
     return 0;
   }
 
-  const modifier = abilityModifier(totals[skill.ability]);
-  const multiplier = sheet.skillProficiencies[skillKey] ?? 0;
+  return skillModifier(
+    totals,
+    skill.ability,
+    sheet.skillProficiencies[skillKey] ?? 0,
+    proficiencyBonus(sheet),
+  );
+};
 
-  return modifier + proficiencyBonus(sheet) * multiplier;
+/**
+ * `skillTotal` over the four values it actually reads, for a consumer that has
+ * already narrowed its dependency on the sheet. Taking the whole row here is what
+ * makes a reactive caller recompute on a languages edit.
+ */
+export const skillModifier = (
+  totals: AbilityScores,
+  ability: CharacterStat,
+  proficiencyMultiplier: number,
+  bonus: number,
+): number => {
+  return abilityModifier(totals[ability]) + bonus * proficiencyMultiplier;
 };
 
 export const passivePerception = (

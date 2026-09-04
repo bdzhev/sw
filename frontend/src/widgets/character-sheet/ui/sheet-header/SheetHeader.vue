@@ -92,7 +92,14 @@ const handlePatch = (patch: SheetPatch, immediate = false): void => {
         </Button>
       </div>
 
-      <StatFields :sheet="props.sheet" @patch="handlePatch" />
+      <StatFields
+        :hp-current="props.sheet.hpCurrent"
+        :hp-max="props.sheet.hpMax"
+        :temp-hp="props.sheet.tempHp"
+        :ac="props.sheet.ac"
+        :speed="props.sheet.speed"
+        @patch="handlePatch"
+      />
     </div>
 
     <DeathSaves
