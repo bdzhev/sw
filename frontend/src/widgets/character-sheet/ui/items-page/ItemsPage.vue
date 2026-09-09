@@ -3,14 +3,13 @@ import { Plus } from 'lucide-vue-next';
 import { computed } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
+import type { SheetPatch } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
 import { BackButton } from '@shared/ui/back-button';
 import { Button } from '@shared/ui/button';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
 import { Skeleton } from '@shared/ui/skeleton';
-
-import { useSheetAutosave } from '@entities/characters';
 
 import { useEquipment, useEquipmentUi } from '@widgets/character-sheet/model/equipment';
 import { useSheetShell } from '@widgets/character-sheet/model/sheet-shell';
@@ -27,8 +26,20 @@ import { ItemDialog } from './item-dialog';
  * own the autosave lifecycle without duplicating it — currency is a
  * `character_sheets` column, so this page writes the same row the sheet does.
  */
-const { characterId, character, isFetchingCharacter, sheet, handlePatch } =
-  useSheetShell();
+const {
+  characterId,
+  character,
+  isFetchingCharacter,
+  sheet,
+  patchSheet,
+  saveState,
+  hasUnsavedChanges,
+} = useSheetShell();
+
+/** The event handler; the seam itself is a method, so the component names this. */
+const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  patchSheet(patch, immediate);
+};
 
 const {
   items,
@@ -48,7 +59,6 @@ const {
 } = useEquipment();
 
 const ui = useEquipmentUi();
-const autosave = useSheetAutosave();
 
 const sheetLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER, params: { id: characterId, tab: 'main' } };
@@ -153,9 +163,6 @@ const handleAddClick = (): void => {
       </DialogRoot>
     </div>
 
-    <StatusBar
-      :save-state="autosave.saveState"
-      :has-unsaved-changes="autosave.hasUnsavedChanges"
-    />
+    <StatusBar :save-state="saveState" :has-unsaved-changes="hasUnsavedChanges" />
   </div>
 </template>

@@ -1,12 +1,12 @@
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 
 import { CollectionKey } from '@shared/api/characters';
 import type { ClassResource, Trait } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
 
-import { useCharacter, useCharacterCollection } from '@entities/characters';
+import { useCharacterCollection } from '@entities/characters';
+
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 
 import type { ResourceSubmitValues } from '../useResourceForm';
 import type { TraitSubmitValues } from '../useTraitForm';
@@ -25,12 +25,8 @@ const byPinOrder = <T extends { pinOrder: number }>(rows: T[]): T[] => {
  * to be a singleton — see the note there.
  */
 export const useTraitsTab = (): UseTraitsTab => {
-  const route = useRoute(RouteName.APP_CHARACTER);
   const ui = useTraitsUi();
-
-  const characterId = route.params.id;
-
-  const { character } = useCharacter({ id: characterId });
+  const { characterId, character } = useSheetContext();
 
   const traits = useCharacterCollection(CollectionKey.TRAITS, {
     characterId: characterId,

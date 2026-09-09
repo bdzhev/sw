@@ -41,7 +41,7 @@ const {
   selectAbility,
   isAbilityDisabled,
   spend,
-  handleSubmit,
+  submit,
 } = useResourceSpend({
   getResource: () => {
     return props.resource;
@@ -54,6 +54,11 @@ const {
     open.value = false;
   },
 });
+
+/** The form's own submit; the composable publishes a method, not a handler. */
+const handleSubmit = (event?: Event): void => {
+  submit(event);
+};
 
 const handleSelectAbility = (ability: ResourceSubAbility): void => {
   selectAbility(ability);

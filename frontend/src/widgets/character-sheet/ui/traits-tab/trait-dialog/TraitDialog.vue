@@ -35,7 +35,7 @@ const emit = defineEmits<{
   submit: [values: TraitSubmitValues];
 }>();
 
-const { title, handleSubmit } = useTraitForm({
+const { title, submit } = useTraitForm({
   getTrait: () => {
     return props.trait;
   },
@@ -46,6 +46,11 @@ const { title, handleSubmit } = useTraitForm({
     emit('submit', values);
   },
 });
+
+/** The form's own submit; the composable publishes a method, not a handler. */
+const handleSubmit = (event?: Event): void => {
+  submit(event);
+};
 </script>
 
 <template>

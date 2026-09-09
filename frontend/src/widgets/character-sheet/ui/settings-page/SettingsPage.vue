@@ -25,7 +25,7 @@ const { characterId, character, isFetchingCharacter } = useSheetShell();
 
 const { showToast } = useToast();
 
-const { isSaving, isDirty, handleSubmit } = useSettingsForm({
+const { isSaving, isDirty, submit } = useSettingsForm({
   getCharacter: () => {
     return character.value?.character;
   },
@@ -33,6 +33,11 @@ const { isSaving, isDirty, handleSubmit } = useSettingsForm({
     showToast({ title: 'Saved', description: 'Your character details are up to date.' });
   },
 });
+
+/** The form's own submit; the composable publishes a method, not a handler. */
+const handleSubmit = (event?: Event): void => {
+  submit(event);
+};
 
 const sheetLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER, params: { id: characterId, tab: 'main' } };

@@ -16,5 +16,5 @@ export interface UseSettingsFormOptions {
 export interface UseSettingsForm {
   isSaving: ComputedRef<boolean>;
   isDirty: ComputedRef<boolean>;
-  handleSubmit: (event?: Event) => void;
+  submit: (event?: Event) => void;
 }

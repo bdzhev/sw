@@ -1,9 +1,6 @@
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 
 import { CollectionKey, SpellcastingProgression } from '@shared/api/characters';
-import type { SheetPatch } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
 
 import {
   availableSlotLevels,
@@ -11,14 +8,13 @@ import {
   slotMaximaFromProgression,
   spellAttackBonus,
   spellSaveDc,
-  useCharacter,
   useCharacterCollection,
-  useSheetAutosave,
 } from '@entities/characters';
 
 import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
 import { withSlotSpent } from '@widgets/character-sheet/lib/spellcasting';
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 
 import type { UseSpellcastingTab } from './useSpellcastingTab.types';
 
@@ -31,19 +27,10 @@ import type { UseSpellcastingTab } from './useSpellcastingTab.types';
  * discrete explicit call. Those are two different channels on purpose.
  */
 export const useSpellcastingTab = (): UseSpellcastingTab => {
-  const route = useRoute(RouteName.APP_CHARACTER);
-
-  const characterId = route.params.id;
-
-  const { character } = useCharacter({ id: characterId });
-  const autosave = useSheetAutosave();
+  const { characterId, character, sheet, patchSheet } = useSheetContext();
 
   const spells = useCharacterCollection(CollectionKey.SPELLS, {
     characterId: characterId,
-  });
-
-  const sheet = computed(() => {
-    return character.value?.sheet;
   });
 
   const items = computed(() => {
@@ -127,10 +114,6 @@ export const useSpellcastingTab = (): UseSpellcastingTab => {
   const isSavingSpell = computed(() => {
     return spells.isCreating.value || spells.isDeleting.value;
   });
-
-  const patchSheet = (patch: SheetPatch, immediate = false) => {
-    autosave.patchSheet(patch, immediate);
-  };
 
   const addSpell = async (body: SpellBody): Promise<boolean> => {
     try {

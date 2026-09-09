@@ -11,5 +11,5 @@ export interface UseSpellFormOptions {
 }
 
 export interface UseSpellForm {
-  handleSubmit: (event?: Event) => void;
+  submit: (event?: Event) => void;
 }

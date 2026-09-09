@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 
 import type { SheetPatch } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
 import { useBreakpoint } from '@shared/lib/ui';
 import { Separator } from '@shared/ui/separator';
 import { Skeleton } from '@shared/ui/skeleton';
 
-import { proficiencyBonus, useCharacter, useSheetAutosave } from '@entities/characters';
+import { proficiencyBonus } from '@entities/characters';
 
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { AbilityScores } from './ability-scores';
@@ -21,15 +20,11 @@ import { SheetActions } from './sheet-actions';
 
 const { isMobile } = useBreakpoint();
 
-const route = useRoute(RouteName.APP_CHARACTER);
-const id = route.params.id;
-
-const { character } = useCharacter({ id });
-const autosave = useSheetAutosave();
-
-const sheet = computed(() => {
-  return character.value?.sheet;
-});
+const { character, sheet, patchSheet } = useSheetContext();
+/** The event handler; the seam itself is a method, so the component names this. */
+const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  patchSheet(patch, immediate);
+};
 
 const items = computed(() => {
   return character.value?.inventoryItems ?? [];
@@ -37,10 +32,6 @@ const items = computed(() => {
 
 /** The one item scan for this tab; both children read its result. */
 const { rawScores, totals } = useAbilityTotals({ sheet, items });
-
-const handlePatch = (patch: SheetPatch, immediate = false) => {
-  autosave.patchSheet(patch, immediate);
-};
 
 /** The row becomes a column below md, and a rule has to turn with it. */
 const separatorOrientation = computed(() => {

@@ -18,7 +18,7 @@ interface UseItemForm {
   isEditing: ComputedRef<boolean>;
   hasBonuses: ComputedRef<boolean>;
   hasLimitedUses: ComputedRef<boolean>;
-  handleSubmit: (event?: Event) => void;
+  submit: (event?: Event) => void;
 }
 
 const blankValues = (): Record<string, unknown> => {
@@ -89,7 +89,7 @@ export const useItemForm = (options: UseItemFormOptions): UseItemForm => {
     return Boolean(form.values.hasLimitedUses);
   });
 
-  const submit = form.handleSubmit((values) => {
+  const runSubmit = form.handleSubmit((values) => {
     /**
      * `hasBonuses` and `hasLimitedUses` are form-only switches: unticking one
      * clears what it covered rather than leaving an orphaned bonus the player
@@ -124,8 +124,8 @@ export const useItemForm = (options: UseItemFormOptions): UseItemForm => {
     });
   });
 
-  const handleSubmit = (event?: Event): void => {
-    void submit(event);
+  const submit = (event?: Event): void => {
+    void runSubmit(event);
   };
 
   /** Reset on open, not on close: closing mid-edit must not blank the boxes first. */
@@ -139,5 +139,5 @@ export const useItemForm = (options: UseItemFormOptions): UseItemForm => {
     form.resetForm({ values: item ? valuesFromItem(item) : blankValues() });
   });
 
-  return { title, isEditing, hasBonuses, hasLimitedUses, handleSubmit };
+  return { title, isEditing, hasBonuses, hasLimitedUses, submit };
 };

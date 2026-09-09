@@ -1,25 +1,20 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
 
 import { CollectionKey } from '@shared/api/characters';
 import type { Attack } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
+import type { SheetPatch } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
 import { Text } from '@shared/ui/text';
 
-import {
-  proficiencyBonus,
-  useCharacter,
-  useCharacterCollection,
-  useSheetAutosave,
-} from '@entities/characters';
+import { proficiencyBonus, useCharacterCollection } from '@entities/characters';
 
 import type { AttackBody } from '@widgets/character-sheet/config/combat';
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { AttackDetailDialog } from './attack-detail-dialog';
@@ -27,12 +22,13 @@ import { AttackDialog } from './attack-dialog';
 import { AttackRow } from './attack-row';
 import { InitiativePanel } from './initiative-panel';
 
-const route = useRoute(RouteName.APP_CHARACTER);
-const id = route.params.id;
+const { characterId, character, patchSheet } = useSheetContext();
+/** The event handler; the seam itself is a method, so the component names this. */
+const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  patchSheet(patch, immediate);
+};
 
-const { character } = useCharacter({ id });
-const attacks = useCharacterCollection(CollectionKey.ATTACKS, { characterId: id });
-const autosave = useSheetAutosave();
+const attacks = useCharacterCollection(CollectionKey.ATTACKS, { characterId });
 
 const sheet = computed(() => {
   return character.value?.sheet ?? null;
@@ -73,7 +69,7 @@ const isDeleteOpen = ref(false);
 const selected = ref<Attack | null>(null);
 
 const handleInitiativeBonus = (bonus: number): void => {
-  autosave.patchSheet({ initiativeBonus: bonus });
+  handlePatch({ initiativeBonus: bonus });
 };
 
 const handleAddClick = (): void => {

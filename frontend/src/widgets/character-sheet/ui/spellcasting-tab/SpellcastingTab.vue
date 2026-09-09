@@ -125,7 +125,6 @@ const handleAddCustom = async (values: SpellSubmitValues): Promise<void> => {
       :save-dc="saveDc"
       :attack-bonus="attackBonus"
       :progression="progression"
-      @patch="handlePatch"
     />
 
     <SpellSlots

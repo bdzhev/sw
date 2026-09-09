@@ -181,7 +181,27 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   ```
 
 - When a consumer's `class` must land on a specific inner element rather than the root, use `defineOptions({ inheritAttrs: false })` + explicit `v-bind="$attrs"`.
-- **Every event handler is named `handle*`.** `handleClick`, `handleSubmit`, `handleSpendClick`, `handleToggleLanguage`. Not `onInput`, not `onBonusInput`, and not a bare verb like `toggle` / `submitTrait` / `openAdd`. The `handle` prefix is what makes a handler greppable and tells you at the binding site that you are looking at one.
+- **Every event handler in a component is named `handle*`.** `handleClick`, `handleSubmit`, `handleSpendClick`, `handleToggleLanguage`. Not `onInput`, not `onBonusInput`, and not a bare verb. The `handle` prefix is what makes a handler greppable and tells you at the binding site that you are looking at one.
+- **A composable returns methods, not handlers.** `patchSheet`, `submitItem`, `toggleItemPin`, `castAtLevel` — never `handlePatch`, never `handleSubmit`. The `handle*` prefix belongs to the component that binds to an event: it takes the method, names its own handler, and passes that to `@event`.
+
+  ```ts
+  // model/ — the seam publishes a verb
+  return { patchSheet, submitItem, toggleItemPin };
+  ```
+
+  ```ts
+  // ui/ — the component names the handler it binds
+  const { patchSheet } = useSheetContext();
+
+  const handlePatch = (patch: SheetPatch, immediate = false): void => {
+    patchSheet(patch, immediate);
+  };
+  ```
+
+  The bare-verb rule above is about **component** handlers, not about a composable's public surface — there, the bare verb is the point. A composable that returns `handle*` has guessed that its value will be bound to an event, which is the caller's decision, and it reads wrong at every call site doing something else with it: `useEquipment.patchCurrency` calls it from a plain function, `castAtLevel` from a store action.
+
+  `handleSubmit` is the case that tempts you, because `vee-validate`'s own `form.handleSubmit` is named that. That is _its_ naming, not a licence to re-publish it — wrap it and return `submit`.
+
 - **An `@event` is a bare handler reference. Never a call, never an expression.**
 
   ```vue

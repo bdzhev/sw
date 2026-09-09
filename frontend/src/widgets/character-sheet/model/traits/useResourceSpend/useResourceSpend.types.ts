@@ -33,5 +33,5 @@ export interface UseResourceSpend {
   isAbilityDisabled: (ability: ResourceSubAbility) => boolean;
   /** Clamped and floored before it reaches `onSpend`. */
   spend: (cost: number) => void;
-  handleSubmit: (event?: Event) => void;
+  submit: (event?: Event) => void;
 }

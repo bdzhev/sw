@@ -42,7 +42,7 @@ const emit = defineEmits<{
   submit: [values: ItemSubmitValues];
 }>();
 
-const { title, hasBonuses, hasLimitedUses, handleSubmit } = useItemForm({
+const { title, hasBonuses, hasLimitedUses, submit } = useItemForm({
   getItem: () => {
     return props.item;
   },
@@ -53,6 +53,11 @@ const { title, hasBonuses, hasLimitedUses, handleSubmit } = useItemForm({
     emit('submit', values);
   },
 });
+
+/** The form's own submit; the composable publishes a method, not a handler. */
+const handleSubmit = (event?: Event): void => {
+  submit(event);
+};
 </script>
 
 <template>

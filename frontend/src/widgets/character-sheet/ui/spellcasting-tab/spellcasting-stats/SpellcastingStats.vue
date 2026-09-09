@@ -6,6 +6,7 @@ import type { SheetPatch } from '@shared/api/characters';
 import { abilityLabels } from '@entities/characters';
 
 import { formatSigned } from '@widgets/character-sheet/lib/format';
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { ProgressionField } from './progression-field';
@@ -13,10 +14,15 @@ import type { SpellcastingStatsProps } from './SpellcastingStats.types';
 
 const props = defineProps<SpellcastingStatsProps>();
 
-const emit = defineEmits<{ patch: [patch: SheetPatch, immediate?: boolean] }>();
-
+/**
+ * Writes through the sheet context rather than emitting up: this component held
+ * a `handlePatch` whose only job was to re-emit `ProgressionField`'s patch
+ * verbatim, which made the progression write a five-hop path.
+ */
+const { patchSheet } = useSheetContext();
+/** The event handler; the seam itself is a method, so the component names this. */
 const handlePatch = (patch: SheetPatch, immediate = false): void => {
-  emit('patch', patch, immediate);
+  patchSheet(patch, immediate);
 };
 
 const abilityLabel = computed(() => {

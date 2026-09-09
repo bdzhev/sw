@@ -2,9 +2,8 @@
 import { computed } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
+import type { SheetPatch } from '@shared/api/characters';
 import { RouteName } from '@shared/lib/router';
-
-import { useSheetAutosave } from '@entities/characters';
 
 import { useSheetShell } from '@widgets/character-sheet/model/sheet-shell';
 import { SheetTab, useSheetTabs } from '@widgets/character-sheet/model/sheet-tabs';
@@ -19,10 +18,21 @@ import { SpellcastingTab } from './spellcasting-tab';
 import { StatusBar } from './status-bar';
 import { TraitsTab } from './traits-tab';
 
-const { characterId, character, isFetchingCharacter, handlePatch } = useSheetShell();
+const {
+  characterId,
+  character,
+  isFetchingCharacter,
+  patchSheet,
+  saveState,
+  hasUnsavedChanges,
+} = useSheetShell();
+
+/** The event handler; the seam itself is a method, so the component names this. */
+const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  patchSheet(patch, immediate);
+};
 
 const { activeTab, tabs } = useSheetTabs(characterId);
-const autosave = useSheetAutosave();
 
 const TAB_COMPONENTS = {
   [SheetTab.MAIN]: MainTab,
@@ -66,9 +76,6 @@ const settingsLink = computed<RouteLocationRaw>(() => {
       </template>
     </div>
 
-    <StatusBar
-      :save-state="autosave.saveState"
-      :has-unsaved-changes="autosave.hasUnsavedChanges"
-    />
+    <StatusBar :save-state="saveState" :has-unsaved-changes="hasUnsavedChanges" />
   </div>
 </template>

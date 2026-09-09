@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 
+import type { SheetPatch } from '@shared/api/characters';
 import type { Languages, SkillProficiencies } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
 import { DataTable } from '@shared/ui/data-table';
 import { Skeleton } from '@shared/ui/skeleton';
 
@@ -14,8 +13,6 @@ import {
   proficiencyBonus,
   skillModifier,
   SKILLS,
-  useCharacter,
-  useSheetAutosave,
 } from '@entities/characters';
 
 import {
@@ -28,6 +25,7 @@ import type {
   SkillRowView,
 } from '@widgets/character-sheet/config/skills';
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 import { SheetSection } from '@widgets/character-sheet/ui/sheet-section';
 
 import { LanguagePicker } from './language-picker';
@@ -43,15 +41,11 @@ const EMPTY_LANGUAGES: string[] = [];
 /** The modifier column's header follows its numbers to the right. */
 const HEADER_CLASSES = { modifier: 'text-right' };
 
-const route = useRoute(RouteName.APP_CHARACTER);
-const id = route.params.id;
-
-const { character } = useCharacter({ id });
-const autosave = useSheetAutosave();
-
-const sheet = computed(() => {
-  return character.value?.sheet;
-});
+const { character, sheet, patchSheet } = useSheetContext();
+/** The event handler; the seam itself is a method, so the component names this. */
+const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  patchSheet(patch, immediate);
+};
 
 const items = computed(() => {
   return character.value?.inventoryItems ?? [];
@@ -167,11 +161,11 @@ const handleCycleProficiency = (skillKey: string) => {
     delete next[skillKey];
   }
 
-  autosave.patchSheet({ skillProficiencies: next }, true);
+  handlePatch({ skillProficiencies: next }, true);
 };
 
 const handleUpdateLanguages = (value: Languages, immediate = false) => {
-  autosave.patchSheet({ languages: value }, immediate);
+  handlePatch({ languages: value }, immediate);
 };
 </script>
 

@@ -56,12 +56,12 @@ export const useResourceSpend = (options: UseResourceSpendOptions): UseResourceS
     return ability.cost !== null && ability.cost > meta.remaining.value;
   };
 
-  const submit = form.handleSubmit((values) => {
+  const runSubmit = form.handleSubmit((values) => {
     spend(Number(values.amount));
   });
 
-  const handleSubmit = (event?: Event) => {
-    void submit(event);
+  const submit = (event?: Event) => {
+    void runSubmit(event);
   };
 
   watch(isOpen, (open) => {
@@ -85,6 +85,6 @@ export const useResourceSpend = (options: UseResourceSpendOptions): UseResourceS
     selectAbility,
     isAbilityDisabled,
     spend,
-    handleSubmit,
+    submit,
   };
 };

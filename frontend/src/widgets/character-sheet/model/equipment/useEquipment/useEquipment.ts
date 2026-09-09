@@ -1,16 +1,12 @@
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 
 import { CollectionKey, MAX_ITEMS } from '@shared/api/characters';
 import type { InventoryItem, SheetPatch } from '@shared/api/characters';
-import { RouteName } from '@shared/lib/router';
 
-import {
-  useCharacter,
-  useCharacterCollection,
-  useSheetAutosave,
-} from '@entities/characters';
+import { useCharacterCollection } from '@entities/characters';
+
+import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 
 import { useEquipmentUi } from '../useEquipmentUi';
 import type { ItemSubmitValues } from '../useItemForm';
@@ -22,20 +18,11 @@ import type { UseEquipment } from './useEquipment.types';
  * has to be a singleton — see the note there.
  */
 export const useEquipment = (): UseEquipment => {
-  const route = useRoute(RouteName.APP_CHARACTER_ITEMS);
   const ui = useEquipmentUi();
-
-  const characterId = route.params.id;
-
-  const { character } = useCharacter({ id: characterId });
-  const autosave = useSheetAutosave();
+  const { characterId, character, sheet, patchSheet } = useSheetContext();
 
   const items = useCharacterCollection(CollectionKey.INVENTORY_ITEMS, {
-    characterId: characterId,
-  });
-
-  const sheet = computed(() => {
-    return character.value?.sheet;
+    characterId,
   });
 
   const allItems = computed(() => {
@@ -108,7 +95,7 @@ export const useEquipment = (): UseEquipment => {
 
   /** Currency is a `character_sheets` column, so it rides the autosave debounce. */
   const patchCurrency = (patch: SheetPatch): void => {
-    autosave.patchSheet(patch);
+    patchSheet(patch);
   };
 
   const {

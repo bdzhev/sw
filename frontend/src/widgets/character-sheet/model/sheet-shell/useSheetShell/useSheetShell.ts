@@ -1,10 +1,13 @@
-import { computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { computed, onBeforeUnmount, onMounted, provide, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 
 import { CharacterStatus, type SheetPatch } from '@shared/api/characters';
 import { type CharacterRouteName, RouteName } from '@shared/lib/router';
 
 import { useCharacter, useSheetAutosave } from '@entities/characters';
+
+import { SHEET_CTX_KEY } from '@widgets/character-sheet/config/sheet';
 
 import type { UseSheetShell } from './useSheetShell.types';
 
@@ -30,6 +33,8 @@ export const useSheetShell = (): UseSheetShell => {
     id: characterId,
   });
   const autosave = useSheetAutosave();
+  /** A store, so the two read-only flags need unwrapping to stay reactive. */
+  const { saveState, hasUnsavedChanges } = storeToRefs(autosave);
 
   const sheet = computed(() => {
     return character.value?.sheet;
@@ -61,7 +66,7 @@ export const useSheetShell = (): UseSheetShell => {
     }
   });
 
-  const handlePatch = (patch: SheetPatch, immediate = false): void => {
+  const patchSheet = (patch: SheetPatch, immediate = false): void => {
     autosave.patchSheet(patch, immediate);
   };
 
@@ -88,5 +93,28 @@ export const useSheetShell = (): UseSheetShell => {
     autosave.detach();
   });
 
-  return { characterId, character, sheet, isFetchingCharacter, handlePatch };
+  /**
+   * Provided rather than returned-and-threaded: the tabs are five levels of
+   * template away, and a tab that reached for `useSheetAutosave()` itself was
+   * going around this seam. It cannot call `useSheetShell` instead — a second
+   * call would register a second set of teardown listeners.
+   */
+  provide(SHEET_CTX_KEY, {
+    characterId,
+    character,
+    sheet,
+    patchSheet,
+    saveState,
+    hasUnsavedChanges,
+  });
+
+  return {
+    characterId,
+    character,
+    sheet,
+    isFetchingCharacter,
+    patchSheet,
+    saveState,
+    hasUnsavedChanges,
+  };
 };

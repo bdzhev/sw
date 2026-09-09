@@ -16,7 +16,7 @@ export const useSpellForm = (options: UseSpellFormOptions): UseSpellForm => {
     initialValues: { name: '', description: '' },
   });
 
-  const submit = form.handleSubmit((values) => {
+  const runSubmit = form.handleSubmit((values) => {
     onSubmit({
       customName: values.name,
       customLevel: values.level,
@@ -24,8 +24,8 @@ export const useSpellForm = (options: UseSpellFormOptions): UseSpellForm => {
     });
   });
 
-  const handleSubmit = (event?: Event) => {
-    void submit(event);
+  const submit = (event?: Event) => {
+    void runSubmit(event);
   };
 
   /** The dialog stays mounted between openings, so the fields are cleared on open. */
@@ -37,5 +37,5 @@ export const useSpellForm = (options: UseSpellFormOptions): UseSpellForm => {
     form.resetForm({ values: { name: '', description: '' } });
   });
 
-  return { handleSubmit };
+  return { submit };
 };

@@ -16,7 +16,7 @@ export const useTraitForm = (options: UseTraitFormOptions) => {
     return getTrait() ? 'Edit trait' : 'Add a trait';
   });
 
-  const submit = form.handleSubmit((values) => {
+  const runSubmit = form.handleSubmit((values) => {
     onSubmit({
       name: values.name,
       tag: values.tag,
@@ -25,8 +25,8 @@ export const useTraitForm = (options: UseTraitFormOptions) => {
     });
   });
 
-  const handleSubmit = (event?: Event) => {
-    void submit(event);
+  const submit = (event?: Event) => {
+    void runSubmit(event);
   };
 
   /**
@@ -50,5 +50,5 @@ export const useTraitForm = (options: UseTraitFormOptions) => {
     });
   });
 
-  return { title, handleSubmit };
+  return { title, submit };
 };

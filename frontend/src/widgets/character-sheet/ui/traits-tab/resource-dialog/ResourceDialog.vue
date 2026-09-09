@@ -41,7 +41,7 @@ const emit = defineEmits<{
   submit: [values: ResourceSubmitValues];
 }>();
 
-const { title, isEditing, isCustomResource, maxHint, sourcedTriggerHint, handleSubmit } =
+const { title, isEditing, isCustomResource, maxHint, sourcedTriggerHint, submit } =
   useResourceForm({
     getResource: () => {
       return props.resource;
@@ -53,6 +53,11 @@ const { title, isEditing, isCustomResource, maxHint, sourcedTriggerHint, handleS
       emit('submit', values);
     },
   });
+
+/** The form's own submit; the composable publishes a method, not a handler. */
+const handleSubmit = (event?: Event): void => {
+  submit(event);
+};
 </script>
 
 <template>

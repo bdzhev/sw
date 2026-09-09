@@ -75,7 +75,7 @@ const canWidenSearch = computed(() => {
   return mode.value === AddSpellMode.STANDARD;
 });
 
-const { handleSubmit } = useSpellForm({
+const { submit } = useSpellForm({
   isOpen: () => {
     return open.value;
   },
@@ -83,6 +83,11 @@ const { handleSubmit } = useSpellForm({
     emit('addCustom', values);
   },
 });
+
+/** The form's own submit; the composable publishes a method, not a handler. */
+const handleSubmit = (event?: Event): void => {
+  submit(event);
+};
 
 const runSearch = (searchMode: string): void => {
   const trimmed = query.value.trim();

@@ -74,7 +74,7 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
     return `${name} resets on: ${RESET_TRIGGER_LABELS[sourced].toLowerCase()}.`;
   });
 
-  const submit = form.handleSubmit((values) => {
+  const runSubmit = form.handleSubmit((values) => {
     const isCustomName = values.resource === CUSTOM_RESOURCE_VALUE;
     const maxValue = values.maxValue ?? null;
 
@@ -92,8 +92,8 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
     });
   });
 
-  const handleSubmit = (event?: Event) => {
-    void submit(event);
+  const submit = (event?: Event) => {
+    void runSubmit(event);
   };
 
   /**
@@ -136,6 +136,6 @@ export const useResourceForm = (options: UseResourceFormOptions) => {
     isCustomResource,
     maxHint,
     sourcedTriggerHint,
-    handleSubmit,
+    submit,
   };
 };

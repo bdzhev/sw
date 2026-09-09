@@ -45,7 +45,7 @@ export const useSettingsForm = (options: UseSettingsFormOptions): UseSettingsFor
     return form.meta.value.dirty;
   });
 
-  const submit = form.handleSubmit((values) => {
+  const runSubmit = form.handleSubmit((values) => {
     const character = getCharacter();
 
     if (!character) {
@@ -67,8 +67,8 @@ export const useSettingsForm = (options: UseSettingsFormOptions): UseSettingsFor
     form.resetForm({ values: { ...values, lore, appearance } });
   });
 
-  const handleSubmit = (event?: Event): void => {
-    void submit(event);
+  const submit = (event?: Event): void => {
+    void runSubmit(event);
   };
 
   /** Fills the boxes once the query resolves, and again if the row changes under us. */
@@ -84,5 +84,5 @@ export const useSettingsForm = (options: UseSettingsFormOptions): UseSettingsFor
     { immediate: true },
   );
 
-  return { isSaving, isDirty, handleSubmit };
+  return { isSaving, isDirty, submit };
 };
