@@ -1,10 +1,6 @@
 import { CharacterStat } from '@shared/api/characters';
 
-export interface SkillDefinition {
-  key: string;
-  label: string;
-  ability: CharacterStat;
-}
+import type { SkillDefinition } from './types';
 
 /**
  * The 18 skills and their governing ability. Which of them a character is

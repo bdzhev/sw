@@ -4,3 +4,6 @@ export const DESCRIPTION_MAX_LENGTH = 2000;
 
 /** A pool nobody plays with — a ceiling only so a typo cannot store six digits. */
 export const RESOURCE_VALUE_LIMIT = 999;
+
+/** One use, the default a flat resource's primary tap spends. */
+export const RESOURCE_FLAT_SPEND = 1;

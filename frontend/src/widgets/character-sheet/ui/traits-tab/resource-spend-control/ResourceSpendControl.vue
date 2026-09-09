@@ -4,6 +4,8 @@ import { ref } from 'vue';
 
 import { Button } from '@shared/ui/button';
 
+import { RESOURCE_FLAT_SPEND } from '@widgets/character-sheet/config/traits';
+import { spendAmount } from '@widgets/character-sheet/lib/traits';
 import { useResourceMeta } from '@widgets/character-sheet/model/traits';
 
 import type { ResourceSpendControlProps } from './ResourceSpendControl.types';
@@ -12,8 +14,6 @@ import { SpendDialog } from './spend-dialog';
 const props = withDefaults(defineProps<ResourceSpendControlProps>(), { isSaving: false });
 
 const emit = defineEmits<{ spend: [amount: number] }>();
-
-const FLAT_COST = 1;
 
 const isDialogOpen = ref(false);
 
@@ -33,7 +33,13 @@ const handlePrimaryClick = () => {
     return;
   }
 
-  emit('spend', Math.min(FLAT_COST, remaining.value));
+  const amount = spendAmount(RESOURCE_FLAT_SPEND, remaining.value);
+
+  if (amount === null) {
+    return;
+  }
+
+  emit('spend', amount);
 };
 
 const handleMoreClick = () => {

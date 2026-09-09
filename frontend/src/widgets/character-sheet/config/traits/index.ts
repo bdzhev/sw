@@ -3,6 +3,7 @@ export {
   RESOURCE_NAME_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
   RESOURCE_VALUE_LIMIT,
+  RESOURCE_FLAT_SPEND,
 } from './limits';
 
 export {

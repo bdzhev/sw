@@ -2,6 +2,7 @@ import { useForm } from 'vee-validate';
 import { computed, ref, watch } from 'vue';
 
 import type { ResourceSubAbility } from '@widgets/character-sheet/config/traits';
+import { spendAmount } from '@widgets/character-sheet/lib/traits';
 
 import { useResourceMeta } from '../useResourceMeta';
 import { spendAmountSchema } from './spendAmount.schema';
@@ -27,15 +28,14 @@ export const useResourceSpend = (options: UseResourceSpendOptions): UseResourceS
       : 'Custom amount';
   });
 
-  /** The clamp the design asks for: a spend can never take the pool below zero. */
   const spend = (cost: number) => {
-    const clamped = Math.min(Math.max(1, cost), meta.remaining.value);
+    const amount = spendAmount(cost, meta.remaining.value);
 
-    if (clamped <= 0) {
+    if (amount === null) {
       return;
     }
 
-    onSpend(clamped);
+    onSpend(amount);
   };
 
   const selectAbility = (ability: ResourceSubAbility) => {

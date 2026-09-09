@@ -14,6 +14,7 @@ import {
 import { FormInput } from '@shared/ui/form-input';
 import { Text } from '@shared/ui/text';
 
+import { RESOURCE_FLAT_SPEND } from '@widgets/character-sheet/config/traits';
 import type { ResourceSubAbility } from '@widgets/character-sheet/config/traits';
 import { useResourceSpend } from '@widgets/character-sheet/model/traits';
 
@@ -27,8 +28,6 @@ const open = defineModel<boolean>('open', { required: true });
 const emit = defineEmits<{
   spend: [amount: number];
 }>();
-
-const FLAT_COST = 1;
 
 const {
   label,
@@ -61,7 +60,7 @@ const handleSelectAbility = (ability: ResourceSubAbility): void => {
 };
 
 const handleUseOneClick = (): void => {
-  spend(FLAT_COST);
+  spend(RESOURCE_FLAT_SPEND);
 };
 </script>
 

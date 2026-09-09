@@ -1,6 +1,2 @@
-export {
-  SKILLS,
-  PERCEPTION_SKILL_KEY,
-  STANDARD_LANGUAGES,
-  type SkillDefinition,
-} from './skills';
+export { SKILLS, PERCEPTION_SKILL_KEY, STANDARD_LANGUAGES } from './constants';
+export type { SkillDefinition } from './types';

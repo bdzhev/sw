@@ -38,18 +38,33 @@ Imports point **down** that list only. `@shared` imports nothing from the others
 Inside a slice, segment by purpose:
 
 ```
-model/    composables, stores, form state, domain computation
+model/    composables, stores, form state, domain computation, side effects
 ui/       components
-lib/      rules data and pure formatting
-config/   static data — option lists, label maps, limits
+lib/      pure functions, and values derived from config
+config/   constants and configuration — limits, labels, option lists, static tables
 api/      queries, mutations, transport
 ```
 
-`config/` is a fifth segment, for static data — option lists, label maps, limits, and the local `types.ts` that describes them.
+**`config/` is for constants and configurational values, whatever they describe.** Limits (`ITEM_QUANTITY_LIMIT`, `MAX_CONDITIONS`), labels and option lists (`PROGRESSION_LABELS`, `CONDITION_OPTIONS`), rules tables (`SKILLS`, `HIT_DIE_BY_CLASS`), table column defs, view-model types. Split each group into `constants.ts` and `types.ts`, with the group's `index.ts` publishing both. Do not reach for a narrower story about what "belongs" in config: if it is a static value or the type of one, it goes here.
 
-**`lib/` vs `model/`: ask what it operates on, not whether it holds state.** "Pure helpers" reads as "anything without reactivity", which pulls domain logic into `lib/` and leaves `model/` holding only the composables. The line is: `lib/` is rules _data_ and formatting that could belong to any app; `model/` is anything that computes over this app's domain, or touches a side-effecting surface (`localStorage`, the query client) — including plain exported functions.
+**`lib/` is what gets _worked out_.** Pure functions — formatting, arithmetic over values handed to them, lookups into config. Also values computed at module load from config, and those are **camelCase, never SCREAMING_CASE**: uppercase reads as a hand-maintained constant, and mislabelling a derived map as one is how a reader comes to trust it as the source. `config/abilities` holds the literal `ABILITIES`; `lib/abilities` holds `abilityLabels`, `abilityShortLabels`, `abilitySheetFields`, each built from it by a private `byStat`.
 
-`entities/characters` is the worked example. `lib/class-tables`, `lib/skills` and `lib/abilities` are rules data. `model/derived-stats` is the 5e arithmetic over that data; `model/sheet-buffer` owns a `localStorage` key; `model/sheet-cache` owns three `setQueryData` calls. None of the last three is a composable, and all three are `model/`.
+**`model/` is anything that computes over this app's domain, or touches a side-effecting surface** — including plain exported functions. "Pure helpers" reads as "anything without reactivity", which pulls domain logic into `lib/` and leaves `model/` holding only the composables. That is the wrong cut.
+
+`entities/characters` is the worked example of all three:
+
+```
+config/abilities/     ABILITIES                     the literal table
+config/class-tables/  HIT_DIE_BY_CLASS, MAX_SLOT_LEVEL, the slot tables
+config/skills/        SKILLS, STANDARD_LANGUAGES
+lib/abilities/        abilityLabels, abilityShortLabels, abilitySheetFields
+model/class-tables/   proficiencyBonusForLevel, slotMaximaFromProgression
+model/derived-stats/  the 5e arithmetic over all of it
+model/sheet-buffer/   owns a localStorage key
+model/sheet-cache/    owns three setQueryData calls
+```
+
+Note the pair: `config/class-tables` is the data, `model/class-tables` is the reading of it, and the import goes one way only. None of the last four is a composable, and all four are `model/`.
 
 **Segments are siblings. A segment never nests inside another segment.** There is no `ui/some-tab/model/`, no `ui/some-tab/config/`. If a slice is big enough that its composables need grouping, group them _inside_ the segment by area:
 
