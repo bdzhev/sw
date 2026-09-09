@@ -1,5 +1,5 @@
 import { storeToRefs } from 'pinia';
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 
 import { CollectionKey } from '@shared/api/characters';
 import type { ClassResource, Trait } from '@shared/api/characters';
@@ -11,7 +11,7 @@ import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 import type { ResourceSubmitValues } from '../useResourceForm';
 import type { TraitSubmitValues } from '../useTraitForm';
 import { useTraitsUi } from '../useTraitsUi';
-import type { UseTraitsTab } from './useTraitsTab.types';
+import type { UseTraitsTab, UseTraitsTabOptions } from './useTraitsTab.types';
 
 const byPinOrder = <T extends { pinOrder: number }>(rows: T[]): T[] => {
   return [...rows].sort((first, second) => {
@@ -24,8 +24,16 @@ const byPinOrder = <T extends { pinOrder: number }>(rows: T[]): T[] => {
  * writes. Dialog state lives in `useTraitsUi`, which is a store because it has
  * to be a singleton — see the note there.
  */
-export const useTraitsTab = (): UseTraitsTab => {
+export const useTraitsTab = (options: UseTraitsTabOptions = {}): UseTraitsTab => {
+  const { onTraitSubmitted, onResourceSubmitted, onDeleted } = options;
+
   const ui = useTraitsUi();
+
+  /**
+   * The store outlives this tab, so its open flags have to be cleared or the
+   * tab reopens the dialog it was showing when the player navigated away.
+   */
+  onUnmounted(ui.reset);
   const { characterId, character } = useSheetContext();
 
   const traits = useCharacterCollection(CollectionKey.TRAITS, {
@@ -85,7 +93,7 @@ export const useTraitsTab = (): UseTraitsTab => {
       return;
     }
 
-    ui.closeDelete();
+    onDeleted?.();
   };
 
   const submitTrait = async (values: TraitSubmitValues) => {
@@ -101,7 +109,7 @@ export const useTraitsTab = (): UseTraitsTab => {
       return;
     }
 
-    ui.closeTraitDialog();
+    onTraitSubmitted?.();
   };
 
   const submitResource = async (values: ResourceSubmitValues) => {
@@ -117,7 +125,7 @@ export const useTraitsTab = (): UseTraitsTab => {
       return;
     }
 
-    ui.closeResourceDialog();
+    onResourceSubmitted?.();
   };
 
   const toggleTraitPin = (trait: Trait) => {

@@ -2,22 +2,24 @@
 import { Trash2, WandSparkles } from 'lucide-vue-next';
 import { computed } from 'vue';
 
-import type { CharacterSpell } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 
 import { canCast } from '@widgets/character-sheet/lib/spellcasting';
-import { useSpellMeta } from '@widgets/character-sheet/model/spellcasting';
+import {
+  useSpellcastingUi,
+  useSpellMeta,
+} from '@widgets/character-sheet/model/spellcasting';
 
 import type { SpellRowProps } from './SpellRow.types';
 
 const props = withDefaults(defineProps<SpellRowProps>(), { isSaving: false });
 
-/** The row carries which spell was acted on, so nothing above has to work it out. */
-const emit = defineEmits<{
-  open: [spell: CharacterSpell];
-  cast: [spell: CharacterSpell];
-  remove: [spell: CharacterSpell];
-}>();
+/**
+ * Opens dialogs by writing the store rather than emitting: the tab is two levels
+ * up, so every event would have to be re-declared and forwarded by `SpellList`,
+ * which has no use for any of them.
+ */
+const ui = useSpellcastingUi();
 
 const { name, level, metaLine, isCastable } = useSpellMeta(() => {
   return props.spell;
@@ -29,15 +31,15 @@ const hasNoSlots = computed(() => {
 });
 
 const handleCastClick = (): void => {
-  emit('cast', props.spell);
+  ui.openCast(props.spell);
 };
 
 const handleOpenClick = (): void => {
-  emit('open', props.spell);
+  ui.openDetail(props.spell);
 };
 
 const handleRemoveClick = (): void => {
-  emit('remove', props.spell);
+  ui.askDelete(props.spell);
 };
 </script>
 

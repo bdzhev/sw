@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { computed } from 'vue';
 
 import type { CharacterSpell } from '@shared/api/characters';
 import type { SpellReference } from '@shared/api/spells';
@@ -7,7 +8,10 @@ import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
 import { Skeleton } from '@shared/ui/skeleton';
 
-import { useSpellcastingTab } from '@widgets/character-sheet/model/spellcasting';
+import {
+  useSpellcastingTab,
+  useSpellcastingUi,
+} from '@widgets/character-sheet/model/spellcasting';
 import type { SpellSubmitValues } from '@widgets/character-sheet/model/spellcasting';
 
 import { AddSpellDialog } from './add-spell-dialog';
@@ -21,6 +25,31 @@ import { SpellcastingStats } from './spellcasting-stats';
  * Dialog state is local refs rather than a store: every row here emits what it
  * acted on, so there is nothing a singleton would have to hold.
  */
+const ui = useSpellcastingUi();
+
+const {
+  isAddOpen,
+  isDetailOpen,
+  detailSpell,
+  isCastOpen,
+  castSpell,
+  isDeleteOpen,
+  pendingDelete,
+} = storeToRefs(ui);
+
+/**
+ * A library add leaves the dialog open so the player can pick another spell, so
+ * only the custom one closes. That difference is the reason the composable
+ * reports these separately instead of returning one success flag.
+ */
+const handleCustomSpellAdded = (): void => {
+  ui.closeAdd();
+};
+
+const handleSpellDeleted = (): void => {
+  ui.closeDelete();
+};
+
 const {
   sheet,
   characterClass,
@@ -36,18 +65,13 @@ const {
   isSavingSpell,
   patchSheet: handlePatch,
   castAtLevel,
-  addSpell,
+  addReferenceSpell,
+  addCustomSpell,
   deleteSpell,
-} = useSpellcastingTab();
-
-const isAddOpen = ref(false);
-const isDetailOpen = ref(false);
-const isCastOpen = ref(false);
-const isDeleteOpen = ref(false);
-
-const detailSpell = ref<CharacterSpell | null>(null);
-const castSpell = ref<CharacterSpell | null>(null);
-const pendingDelete = ref<CharacterSpell | null>(null);
+} = useSpellcastingTab({
+  onCustomSpellAdded: handleCustomSpellAdded,
+  onSpellDeleted: handleSpellDeleted,
+});
 
 const spellName = (spell: CharacterSpell | null): string => {
   return spell?.spell?.name ?? spell?.customName ?? 'this spell';
@@ -67,26 +91,11 @@ const pendingDeleteName = computed(() => {
 });
 
 const handleAddClick = (): void => {
-  isAddOpen.value = true;
-};
-
-const handleOpenDetail = (spell: CharacterSpell): void => {
-  detailSpell.value = spell;
-  isDetailOpen.value = true;
-};
-
-const handleCast = (spell: CharacterSpell): void => {
-  castSpell.value = spell;
-  isCastOpen.value = true;
+  ui.openAdd();
 };
 
 const handleCastAtLevel = (slotLevel: number): void => {
   castAtLevel(slotLevel);
-};
-
-const handleRemove = (spell: CharacterSpell): void => {
-  pendingDelete.value = spell;
-  isDeleteOpen.value = true;
 };
 
 const handleConfirmDelete = async (): Promise<void> => {
@@ -96,20 +105,15 @@ const handleConfirmDelete = async (): Promise<void> => {
     return;
   }
 
-  if (await deleteSpell(spell.id)) {
-    isDeleteOpen.value = false;
-  }
+  await deleteSpell(spell.id);
 };
 
 const handleAddReference = async (spell: SpellReference): Promise<void> => {
-  await addSpell({ spellId: spell.id });
+  await addReferenceSpell(spell.id);
 };
 
-/** Freeform closes the dialog; a library add leaves it open to pick another. */
 const handleAddCustom = async (values: SpellSubmitValues): Promise<void> => {
-  if (await addSpell(values)) {
-    isAddOpen.value = false;
-  }
+  await addCustomSpell(values);
 };
 </script>
 
@@ -139,9 +143,6 @@ const handleAddCustom = async (values: SpellSubmitValues): Promise<void> => {
       :slots="sheet.spellSlots"
       :is-saving="isSavingSpell"
       @add="handleAddClick"
-      @open="handleOpenDetail"
-      @cast="handleCast"
-      @remove="handleRemove"
     />
 
     <AddSpellDialog

@@ -7,6 +7,15 @@ import type { DetailPayload } from '@widgets/character-sheet/config/detail';
 import type { PendingItemDelete } from '../useEquipmentUi';
 import type { ItemSubmitValues } from '../useItemForm';
 
+/**
+ * The outcomes a caller may want to react to. See `UseTraitsTabOptions` for why
+ * these are callbacks rather than a boolean return.
+ */
+export interface UseEquipmentOptions {
+  onItemSubmitted?: () => void;
+  onDeleted?: () => void;
+}
+
 export interface UseEquipment {
   /** undefined until the character query resolves — the subpage renders a skeleton. */
   sheet: ComputedRef<CharacterSheet | undefined>;

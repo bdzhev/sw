@@ -1,5 +1,5 @@
 import { storeToRefs } from 'pinia';
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 
 import { CollectionKey, MAX_ITEMS } from '@shared/api/characters';
 import type { InventoryItem, SheetPatch } from '@shared/api/characters';
@@ -10,15 +10,23 @@ import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
 
 import { useEquipmentUi } from '../useEquipmentUi';
 import type { ItemSubmitValues } from '../useItemForm';
-import type { UseEquipment } from './useEquipment.types';
+import type { UseEquipment, UseEquipmentOptions } from './useEquipment.types';
 
 /**
  * The data half of the equipment subpage: rows derived from the cached sheet, and
  * the writes. Dialog state lives in useEquipmentUi, which is a store because it
  * has to be a singleton — see the note there.
  */
-export const useEquipment = (): UseEquipment => {
+export const useEquipment = (options: UseEquipmentOptions = {}): UseEquipment => {
+  const { onItemSubmitted, onDeleted } = options;
+
   const ui = useEquipmentUi();
+
+  /**
+   * The store outlives this tab, so its open flags have to be cleared or the
+   * tab reopens the dialog it was showing when the player navigated away.
+   */
+  onUnmounted(ui.reset);
   const { characterId, character, sheet, patchSheet } = useSheetContext();
 
   const items = useCharacterCollection(CollectionKey.INVENTORY_ITEMS, {
@@ -50,7 +58,7 @@ export const useEquipment = (): UseEquipment => {
       return;
     }
 
-    ui.closeItemDialog();
+    onItemSubmitted?.();
   };
 
   const toggleItemPin = (item: InventoryItem): void => {
@@ -90,7 +98,7 @@ export const useEquipment = (): UseEquipment => {
       return;
     }
 
-    ui.closeDelete();
+    onDeleted?.();
   };
 
   /** Currency is a `character_sheets` column, so it rides the autosave debounce. */

@@ -1,2 +1,5 @@
 export { useSpellcastingTab } from './useSpellcastingTab';
-export type { UseSpellcastingTab } from './useSpellcastingTab.types';
+export type {
+  UseSpellcastingTab,
+  UseSpellcastingTabOptions,
+} from './useSpellcastingTab.types';

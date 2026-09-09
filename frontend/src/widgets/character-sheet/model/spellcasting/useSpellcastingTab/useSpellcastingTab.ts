@@ -1,4 +1,4 @@
-import { computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 
 import { CollectionKey, SpellcastingProgression } from '@shared/api/characters';
 
@@ -15,8 +15,12 @@ import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
 import { withSlotSpent } from '@widgets/character-sheet/lib/spellcasting';
 import { useAbilityTotals } from '@widgets/character-sheet/model/abilities';
 import { useSheetContext } from '@widgets/character-sheet/model/sheet-shell';
+import { useSpellcastingUi } from '@widgets/character-sheet/model/spellcasting';
 
-import type { UseSpellcastingTab } from './useSpellcastingTab.types';
+import type {
+  UseSpellcastingTab,
+  UseSpellcastingTabOptions,
+} from './useSpellcastingTab.types';
 
 /**
  * The data half of the spellcasting tab. Dialog state stays in the component as
@@ -26,8 +30,18 @@ import type { UseSpellcastingTab } from './useSpellcastingTab.types';
  * Slot counters and progression are autosaved; adding or deleting a spell is a
  * discrete explicit call. Those are two different channels on purpose.
  */
-export const useSpellcastingTab = (): UseSpellcastingTab => {
+export const useSpellcastingTab = (
+  options: UseSpellcastingTabOptions = {},
+): UseSpellcastingTab => {
+  const { onReferenceSpellAdded, onCustomSpellAdded, onSpellDeleted } = options;
+
   const { characterId, character, sheet, patchSheet } = useSheetContext();
+
+  /**
+   * The store outlives this tab, so its open flags have to be cleared or the
+   * tab reopens the dialog it was showing when the player navigated away.
+   */
+  onUnmounted(useSpellcastingUi().reset);
 
   const spells = useCharacterCollection(CollectionKey.SPELLS, {
     characterId: characterId,
@@ -115,14 +129,29 @@ export const useSpellcastingTab = (): UseSpellcastingTab => {
     return spells.isCreating.value || spells.isDeleting.value;
   });
 
-  const addSpell = async (body: SpellBody): Promise<boolean> => {
+  /**
+   * Two named methods rather than one taking a flag: the difference is which
+   * dialog behaviour follows, and that reads better at the call site than an
+   * argument would.
+   */
+  const addReferenceSpell = async (spellId: string): Promise<void> => {
     try {
-      await spells.createRow(body);
+      await spells.createRow({ spellId });
     } catch {
-      return false;
+      return;
     }
 
-    return true;
+    onReferenceSpellAdded?.();
+  };
+
+  const addCustomSpell = async (values: SpellBody): Promise<void> => {
+    try {
+      await spells.createRow(values);
+    } catch {
+      return;
+    }
+
+    onCustomSpellAdded?.();
   };
 
   /**
@@ -139,14 +168,14 @@ export const useSpellcastingTab = (): UseSpellcastingTab => {
     patchSheet({ spellSlots: withSlotSpent(slots, slotLevel) });
   };
 
-  const deleteSpell = async (rowId: string): Promise<boolean> => {
+  const deleteSpell = async (rowId: string): Promise<void> => {
     try {
       await spells.deleteRow(rowId);
     } catch {
-      return false;
+      return;
     }
 
-    return true;
+    onSpellDeleted?.();
   };
 
   return {
@@ -166,7 +195,8 @@ export const useSpellcastingTab = (): UseSpellcastingTab => {
     isSavingSpell,
     patchSheet,
     castAtLevel,
-    addSpell,
+    addReferenceSpell,
+    addCustomSpell,
     deleteSpell,
   };
 };

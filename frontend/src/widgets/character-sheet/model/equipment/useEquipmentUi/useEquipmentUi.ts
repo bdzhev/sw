@@ -58,6 +58,19 @@ export const useEquipmentUi = defineStore('equipmentUi', () => {
     isDeleteOpen.value = false;
   };
 
+  /**
+   * A store outlives the subpage that reads it, and `v-model:open` binds
+   * straight to these refs — so navigating away with a dialog open meant coming
+   * back to it still open, holding the item edited last time. Cleared on
+   * unmount; see `useEquipment`.
+   */
+  const reset = (): void => {
+    isItemDialogOpen.value = false;
+    editedItem.value = null;
+    isDetailOpen.value = false;
+    isDeleteOpen.value = false;
+  };
+
   return {
     isItemDialogOpen,
     editedItem,
@@ -70,5 +83,6 @@ export const useEquipmentUi = defineStore('equipmentUi', () => {
     openItemDetail,
     askDeleteItem,
     closeDelete,
+    reset,
   };
 });

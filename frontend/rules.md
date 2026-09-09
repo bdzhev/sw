@@ -226,6 +226,38 @@ See `src/shared/ui/radio/` and `src/shared/ui/tooltip/`.
   changed, so its consumer binds a bare handler rather than closing over the
   item in the template.
 
+- **A UI store is for distance. Count the hops first.** The click happens in a row; the dialog is rendered once by the tab, because a modal per row is thirty modals. Something has to carry that across. There are two ways, and the choice is not taste:
+
+  | hops from the emitter to the owner   | use                        |
+  | ------------------------------------ | -------------------------- |
+  | **1** — a direct child               | a local `ref`, and an emit |
+  | **2+** — a list or grid sits between | a UI store the leaf writes |
+
+  At one hop the emit costs a line and dies with the component. At two, every intermediate has to _re-declare and forward_ an event it has no use for, and each new event means editing three files. `SpellList` was forwarding four events it never read; the store deleted three of them.
+
+  Worked out per tab, which is why they differ:
+
+  ```
+  CombatTab      → AttackRow                  1 hop   local refs
+  SpellcastingTab → SpellList  → SpellRow     2 hops  useSpellcastingUi
+  TraitsTab      → TraitsList  → TraitRow     2 hops  useTraitsUi
+  ItemsPage      → InventoryGrid → ItemCard   2 hops  useEquipmentUi
+  ```
+
+  **Do not add a store for uniformity.** A store that only its owner writes is a singleton standing in for a `ref`, and it still costs the reset below.
+
+- **State the showing component owns stays a local `ref`, whatever the depth.** `ItemCard.isMenuOpen` _must_ be local — in a store, opening one card's menu would open every card's.
+
+- **A UI store must be reset on unmount.** It outlives the component that reads it, and `v-model:open` binds straight to its refs — so leaving a dialog open and navigating away brought it back on return, still holding the row edited last time. That was a real bug, not a hypothetical. Every UI store exposes `reset()`, registered by the tab's own model composable:
+
+  ```ts
+  const ui = useTraitsUi();
+
+  onUnmounted(ui.reset);
+  ```
+
+  It goes in the composable rather than the `.vue` so the thing that owns the tab's data owns clearing its UI state, and a new tab has one obvious place to put it.
+
 - **A variant map lives in `<Component>.themes.ts` and is typed against its union.** An untyped map lets a variant be half-added — declared in the union, missing from the classes — and it still compiles:
 
   ```ts

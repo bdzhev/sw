@@ -41,6 +41,17 @@ const handlePatch = (patch: SheetPatch, immediate = false): void => {
   patchSheet(patch, immediate);
 };
 
+const ui = useEquipmentUi();
+
+/** What "it worked" means for each dialog — the composable only reports it. */
+const handleItemSubmitted = (): void => {
+  ui.closeItemDialog();
+};
+
+const handleDeleted = (): void => {
+  ui.closeDelete();
+};
+
 const {
   items,
   isSavingItem,
@@ -56,9 +67,10 @@ const {
   toggleEquipped: handleToggleEquipped,
   spendUse: handleSpend,
   confirmDelete,
-} = useEquipment();
-
-const ui = useEquipmentUi();
+} = useEquipment({
+  onItemSubmitted: handleItemSubmitted,
+  onDeleted: handleDeleted,
+});
 
 const sheetLink = computed<RouteLocationRaw>(() => {
   return { name: RouteName.APP_CHARACTER, params: { id: characterId, tab: 'main' } };

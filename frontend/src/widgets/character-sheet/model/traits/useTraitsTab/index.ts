@@ -1,2 +1,2 @@
 export { useTraitsTab } from './useTraitsTab';
-export type { UseTraitsTab } from './useTraitsTab.types';
+export type { UseTraitsTab, UseTraitsTabOptions } from './useTraitsTab.types';

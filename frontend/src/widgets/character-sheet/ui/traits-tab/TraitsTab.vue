@@ -6,7 +6,7 @@ import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
 import { Separator } from '@shared/ui/separator';
 
-import { useTraitsTab } from '@widgets/character-sheet/model/traits';
+import { useTraitsTab, useTraitsUi } from '@widgets/character-sheet/model/traits';
 import { DetailDialog } from '@widgets/character-sheet/ui/detail-dialog';
 
 import { QuickReference } from './quick-reference';
@@ -19,6 +19,21 @@ import { TraitsList } from './traits-list';
  * Only writes are wired from here. Which dialog is open — and about what — is
  * the rows' business with `useTraitsUi`, so those events do not travel.
  */
+const { closeTraitDialog, closeResourceDialog, closeDelete } = useTraitsUi();
+
+/** What "it worked" means for each dialog — the composable only reports it. */
+const handleTraitSubmitted = (): void => {
+  closeTraitDialog();
+};
+
+const handleResourceSubmitted = (): void => {
+  closeResourceDialog();
+};
+
+const handleDeleted = (): void => {
+  closeDelete();
+};
+
 const {
   pinnedTraits,
   pinnedResources,
@@ -40,7 +55,11 @@ const {
   toggleTraitPin: handleTraitTogglePin,
   toggleResourcePin: handleResourceTogglePin,
   spendResource: handleSpend,
-} = useTraitsTab();
+} = useTraitsTab({
+  onTraitSubmitted: handleTraitSubmitted,
+  onResourceSubmitted: handleResourceSubmitted,
+  onDeleted: handleDeleted,
+});
 
 const { isDesktop } = useBreakpoint();
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Plus } from 'lucide-vue-next';
 
-import type { CharacterSpell } from '@shared/api/characters';
 import { Button } from '@shared/ui/button';
 import { Separator } from '@shared/ui/separator';
 import { Text } from '@shared/ui/text';
@@ -13,27 +12,11 @@ import type { SpellListProps } from './SpellList.types';
 
 const props = withDefaults(defineProps<SpellListProps>(), { isSaving: false });
 
-const emit = defineEmits<{
-  add: [];
-  open: [spell: CharacterSpell];
-  cast: [spell: CharacterSpell];
-  remove: [spell: CharacterSpell];
-}>();
+/** Only `add` — the row dialogs go straight to the store, so nothing forwards. */
+const emit = defineEmits<{ add: [] }>();
 
 const handleAddClick = (): void => {
   emit('add');
-};
-
-const handleOpen = (spell: CharacterSpell): void => {
-  emit('open', spell);
-};
-
-const handleCast = (spell: CharacterSpell): void => {
-  emit('cast', spell);
-};
-
-const handleRemove = (spell: CharacterSpell): void => {
-  emit('remove', spell);
 };
 </script>
 
@@ -63,9 +46,6 @@ const handleRemove = (spell: CharacterSpell): void => {
         :spell="spell"
         :slots="props.slots"
         :is-saving="props.isSaving"
-        @open="handleOpen"
-        @cast="handleCast"
-        @remove="handleRemove"
       />
     </ul>
   </SheetSection>

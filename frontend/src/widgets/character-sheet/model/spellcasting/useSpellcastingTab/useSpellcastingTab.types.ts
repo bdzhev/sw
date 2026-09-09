@@ -15,6 +15,21 @@ import type { SlotTableMaxima } from '@entities/characters';
 import type { SpellBody } from '@widgets/character-sheet/config/spellcasting';
 
 /**
+ * The outcomes a caller may want to react to.
+ *
+ * Callbacks rather than a boolean return: the error toast already fires in
+ * `useCharacterCollection`, so the only thing left to report is success, and a
+ * named callback says at the call site what happens on it. Split per method
+ * because the two add paths differ — a library add leaves its dialog open to
+ * pick another spell, a custom one closes it.
+ */
+export interface UseSpellcastingTabOptions {
+  onReferenceSpellAdded?: () => void;
+  onCustomSpellAdded?: () => void;
+  onSpellDeleted?: () => void;
+}
+
+/**
  * Written down rather than inferred, because the width is the point: eighteen
  * members is what "the data half of a tab" costs, and typing it out is the only
  * way to notice. Grouped by what each half is for.
@@ -50,6 +65,7 @@ export interface UseSpellcastingTab {
    */
   patchSheet: (patch: SheetPatch, immediate?: boolean) => void;
   castAtLevel: (slotLevel: number) => void;
-  addSpell: (body: SpellBody) => Promise<boolean>;
-  deleteSpell: (rowId: string) => Promise<boolean>;
+  addReferenceSpell: (spellId: string) => Promise<void>;
+  addCustomSpell: (values: SpellBody) => Promise<void>;
+  deleteSpell: (rowId: string) => Promise<void>;
 }

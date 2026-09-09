@@ -9,6 +9,18 @@ import type { TraitSubmitValues } from '../useTraitForm';
 import type { PendingDelete } from '../useTraitsUi';
 
 /**
+ * The outcomes a caller may want to react to. Callbacks rather than a boolean
+ * return: the error toast already fires in `useCharacterCollection`, so success
+ * is the only thing left to report, and the caller is what knows whether that
+ * means closing a dialog.
+ */
+export interface UseTraitsTabOptions {
+  onTraitSubmitted?: () => void;
+  onResourceSubmitted?: () => void;
+  onDeleted?: () => void;
+}
+
+/**
  * Written down rather than inferred, because the width is the point: twenty-one
  * members is what "the data half of a tab" costs, and the only way to notice
  * that is to have to type it out. Grouped by what each half is for.

@@ -1,2 +1,2 @@
 export { useEquipment } from './useEquipment';
-export type { UseEquipment } from './useEquipment.types';
+export type { UseEquipment, UseEquipmentOptions } from './useEquipment.types';

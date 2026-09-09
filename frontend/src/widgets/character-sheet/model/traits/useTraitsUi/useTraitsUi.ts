@@ -103,6 +103,21 @@ export const useTraitsUi = defineStore('traitsUi', () => {
     isDeleteOpen.value = false;
   };
 
+  /**
+   * A store outlives the component that reads it, and `v-model:open` binds
+   * straight to these refs — so leaving a dialog open and navigating away meant
+   * coming back to it still open, holding the row edited last time. The tab
+   * clears this on unmount; see `useTraitsTab`.
+   */
+  const reset = () => {
+    isTraitDialogOpen.value = false;
+    editedTrait.value = null;
+    isResourceDialogOpen.value = false;
+    editedResource.value = null;
+    isDetailOpen.value = false;
+    isDeleteOpen.value = false;
+  };
+
   return {
     isTraitDialogOpen,
     editedTrait,
@@ -123,5 +138,6 @@ export const useTraitsUi = defineStore('traitsUi', () => {
     askDeleteTrait,
     askDeleteResource,
     closeDelete,
+    reset,
   };
 });

@@ -63,9 +63,16 @@ const isWriting = computed(() => {
   return attacks.isCreating.value || attacks.isUpdating.value;
 });
 
+/**
+ * Local refs, not a store: `AttackRow` is a direct child, so the one event that
+ * opens a dialog travels a single hop. A store here would be a singleton that
+ * outlives the tab, needing a manual reset, to save an emit that costs nothing.
+ */
 const isFormOpen = ref(false);
 const isDetailOpen = ref(false);
 const isDeleteOpen = ref(false);
+
+/** `null` means "add", a row means "edit" — the form reads which from this. */
 const selected = ref<Attack | null>(null);
 
 const handleInitiativeBonus = (bonus: number): void => {
@@ -82,6 +89,7 @@ const handleDetail = (attack: Attack): void => {
   isDetailOpen.value = true;
 };
 
+/** Both hand off from the detail dialog, so it closes as the next one opens. */
 const handleEdit = (): void => {
   isDetailOpen.value = false;
   isFormOpen.value = true;
@@ -90,6 +98,17 @@ const handleEdit = (): void => {
 const handleRemove = (): void => {
   isDetailOpen.value = false;
   isDeleteOpen.value = true;
+};
+
+/** Clearing `selected` with the flag, so a reopened form never shows a stale row. */
+const closeForm = (): void => {
+  isFormOpen.value = false;
+  selected.value = null;
+};
+
+const closeDelete = (): void => {
+  isDeleteOpen.value = false;
+  selected.value = null;
 };
 
 const handleSubmitAttack = async (body: AttackBody): Promise<void> => {
@@ -105,8 +124,7 @@ const handleSubmitAttack = async (body: AttackBody): Promise<void> => {
     return;
   }
 
-  isFormOpen.value = false;
-  selected.value = null;
+  closeForm();
 };
 
 const handleConfirmDelete = async (): Promise<void> => {
@@ -122,8 +140,7 @@ const handleConfirmDelete = async (): Promise<void> => {
     return;
   }
 
-  isDeleteOpen.value = false;
-  selected.value = null;
+  closeDelete();
 };
 
 /**
