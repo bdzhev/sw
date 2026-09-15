@@ -148,8 +148,26 @@ The shared choreography for the three atomic actions — rest, level-up, setup: 
 pending, freeze so autosave cannot race the write, POST, adopt the full state that
 comes back, clear the dirty slot and the buffer.
 
-**It has never executed.** Nothing calls it and no action endpoint exists yet. `rest`
-is the first thing that will run it, and should verify it rather than trust it.
+**`POST /character/:id/rest` is its first and so far only caller**, reached through
+`SheetContext.runAction` rather than by a tab calling this store directly.
+
+**It drains before it writes, and draining means waiting.** `flush()` is a no-op while
+a request is in flight — that is single-flight doing its job — so "flush, then POST"
+was not enough: the older PATCH could reach the server _after_ the action's
+transaction and undo it, with nothing in the response to show it happened.
+`drainBeforeAction` therefore awaits the in-flight request (`inFlightRequest`, the
+only reason that variable exists), then flushes whatever is still pending, and repeats
+up to `MAX_DRAIN_PASSES` because an ack can chain a follow-up flush of its own. The
+bound is deliberate: an edit made _during_ the round trip is discarded by the action,
+which is what an intentional hard reset means.
+
+It adopts the **whole** response, not just its sheet. A rest also returns the
+`classResources` and `inventoryItems` rows it reset, and those have to land in the
+same cache write as the sheet — writing the sheet alone leaves the traits tab showing
+pre-rest counters until the invalidate's refetch arrives, which reads as the reset
+having half happened. `writeCachedDetail` in `../sheet-cache` merges whichever keys a
+response carried; the `invalidateQueries` after it stays as a backstop for rows an
+action touched but did not return.
 
 ## Neighbours
 

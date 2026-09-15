@@ -15,6 +15,7 @@ import {
 import type { AuthVariables } from '@shared/middleware';
 import { errorHook } from '@shared/validation';
 
+import { restRoutes } from './actions';
 import { updateCharacterSchema, updateSheetSchema } from './character.schemas';
 import {
   attacksRoutes,
@@ -189,3 +190,9 @@ characterRoutes.route('/:id/traits', traitsRoutes);
 characterRoutes.route('/:id/resources', resourcesRoutes);
 characterRoutes.route('/:id/items', itemsRoutes);
 characterRoutes.route('/:id/spells', characterSpellsRoutes);
+
+// The atomic actions mount the same way, and for the same reason: they are
+// operations on one character and share its ownership check. `applyRest` runs
+// that check inside its own transaction rather than as middleware, because the
+// check and the writes have to see the same snapshot.
+characterRoutes.route('/:id/rest', restRoutes);

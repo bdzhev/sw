@@ -12,6 +12,16 @@ export interface UseSheetShell {
   isFetchingCharacter: Ref<boolean>;
   /** A method, not a handler — components name their own `handle*` and bind that. */
   patchSheet: (patch: SheetPatch, immediate?: boolean) => void;
+  /**
+   * The atomic-action door: flush, freeze, POST, adopt what comes back. Rest is
+   * the first caller; level-up and start-up are the other two. It lives on the
+   * context for the same reason `patchSheet` does — a tab reaching for
+   * `useSheetAutosave()` itself goes around the seam the shell owns.
+   */
+  runAction: <T extends Partial<CharacterDetail> & { sheet: CharacterSheet }>(
+    endpoint: string,
+    body: unknown,
+  ) => Promise<T>;
   saveState: Ref<SaveState>;
   hasUnsavedChanges: Ref<boolean>;
 }

@@ -2,7 +2,12 @@ import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, provide, watch } from 'vue';
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 
-import { CharacterStatus, type SheetPatch } from '@shared/api/characters';
+import {
+  CharacterStatus,
+  type CharacterDetail,
+  type CharacterSheet,
+  type SheetPatch,
+} from '@shared/api/characters';
 import { type CharacterRouteName, RouteName } from '@shared/lib/router';
 
 import { useCharacter, useSheetAutosave } from '@entities/characters';
@@ -70,6 +75,13 @@ export const useSheetShell = (): UseSheetShell => {
     autosave.patchSheet(patch, immediate);
   };
 
+  const runAction = <T extends Partial<CharacterDetail> & { sheet: CharacterSheet }>(
+    endpoint: string,
+    body: unknown,
+  ): Promise<T> => {
+    return autosave.runServerAction<T>(endpoint, body);
+  };
+
   const handleVisibilityChange = (): void => {
     // visibilitychange is the only teardown signal iOS reliably fires, and this
     // app is explicitly for phones at a table.
@@ -104,6 +116,7 @@ export const useSheetShell = (): UseSheetShell => {
     character,
     sheet,
     patchSheet,
+    runAction,
     saveState,
     hasUnsavedChanges,
   });
@@ -114,6 +127,7 @@ export const useSheetShell = (): UseSheetShell => {
     sheet,
     isFetchingCharacter,
     patchSheet,
+    runAction,
     saveState,
     hasUnsavedChanges,
   };

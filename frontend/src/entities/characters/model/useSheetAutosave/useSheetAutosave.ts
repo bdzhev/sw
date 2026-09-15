@@ -6,12 +6,18 @@ import {
   characterQueries,
   runCharacterAction,
   sendSheetPatchOnTeardown,
+  type CharacterDetail,
   type CharacterSheet,
   type SheetPatch,
 } from '@shared/api/characters';
 
 import { clearBuffer, takeBufferFor, writeBuffer } from '../sheet-buffer';
-import { mergeCachedSheet, readCachedDetail, writeCachedSheet } from '../sheet-cache';
+import {
+  mergeCachedSheet,
+  readCachedDetail,
+  writeCachedDetail,
+  writeCachedSheet,
+} from '../sheet-cache';
 import { useUpdateSheet } from '../useUpdateSheet';
 import type { SaveState } from './useSheetAutosave.types';
 
@@ -21,6 +27,8 @@ const MAX_WAIT_MS = 12000;
 const MAX_RETRIES = 4;
 const RETRY_BASE_MS = 500;
 const SAVED_BADGE_MS = 1500;
+/** How many flush/ack rounds an atomic action waits out before it writes. */
+const MAX_DRAIN_PASSES = 4;
 
 /**
  * Trailing window on the localStorage mirror. `setItem` is synchronous and a held
@@ -70,6 +78,12 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
    */
   let pendingPatch: SheetPatch | undefined;
   let inFlightPatch: SheetPatch | undefined;
+  /**
+   * The in-flight request as a promise that settles rather than rejects. Only
+   * `runServerAction` reads it, and only to *wait* for a PATCH that is already
+   * out - see the note there for why skipping it is not enough.
+   */
+  let inFlightRequest: Promise<void> | null = null;
   let isFrozen = false;
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -178,6 +192,7 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
     retryTimer = null;
     bufferTimer = null;
     inFlightPatch = undefined;
+    inFlightRequest = null;
     isFrozen = false;
     saveState.value = 'idle';
     setPending(undefined);
@@ -241,8 +256,21 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
     setPending(undefined);
     saveState.value = 'saving';
 
+    const request = updateSheet({ id, patch });
+    /** Settles either way: a waiter wants "it is over", not the outcome. */
+    const settled = request.then(
+      () => {
+        return undefined;
+      },
+      () => {
+        return undefined;
+      },
+    );
+
+    inFlightRequest = settled;
+
     try {
-      const sheet = await updateSheet({ id, patch });
+      const sheet = await request;
 
       /**
        * The attached character can change while a request is out. The ack still
@@ -304,6 +332,11 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
       }
 
       throw error;
+    } finally {
+      /** Identity-checked: a follow-up flush inside the `try` owns the slot now. */
+      if (inFlightRequest === settled) {
+        inFlightRequest = null;
+      }
     }
   };
 
@@ -401,15 +434,50 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
   };
 
   /**
+   * Empty the pipe before an atomic action writes the same row.
+   *
+   * A request already out has to be **awaited**, not just skipped: single-flight
+   * makes `flush()` a no-op while one is in flight, so a bare `flush()` here
+   * would let that older PATCH reach the server *after* the action's transaction
+   * and silently undo it. Hp snapping back to its pre-rest value is the visible
+   * form of that, and nothing in the action's response would show it.
+   *
+   * It loops because an ack can chain a follow-up flush for whatever was queued
+   * while it was out. Bounded rather than `while (true)`: a player still editing
+   * during the round trip must not hold the action open forever, and anything
+   * queued past the last pass is discarded by the action anyway - that is what
+   * an intentional hard reset means.
+   */
+  const drainBeforeAction = async (): Promise<void> => {
+    for (let pass = 0; pass < MAX_DRAIN_PASSES; pass += 1) {
+      if (inFlightRequest) {
+        await inFlightRequest;
+      }
+
+      if (!pendingPatch) {
+        return;
+      }
+
+      await flush().catch(() => {
+        /* a failed pre-flush is already queued for retry; the action owns the row */
+      });
+    }
+  };
+
+  /**
    * The shared choreography for the three atomic actions (rest, level-up, setup):
    * flush pending, freeze so autosave cannot race the write, POST, adopt the state
    * that comes back, then clear the dirty slot and the buffer. None of the three
    * re-implements it, and autosave never fights the reset.
    *
-   * **This has never executed.** Nothing calls it and no action endpoint exists yet;
-   * `rest` is the first thing that will, and should verify it rather than trust it.
+   * The whole response is adopted, not just its sheet: a rest also returns the
+   * resource and item rows it reset, and they have to land in the same cache
+   * write as the sheet or the tabs show half a rest until the invalidate's
+   * refetch arrives.
    */
-  const runServerAction = async <T extends { sheet: CharacterSheet }>(
+  const runServerAction = async <
+    T extends Partial<CharacterDetail> & { sheet: CharacterSheet },
+  >(
     endpoint: string,
     body: unknown,
   ): Promise<T> => {
@@ -419,9 +487,7 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
       throw new Error('No character attached');
     }
 
-    await flush().catch(() => {
-      /* a failed pre-flush is already queued for retry; the action still owns the row */
-    });
+    await drainBeforeAction();
 
     isFrozen = true;
 
@@ -430,7 +496,8 @@ export const useSheetAutosave = defineStore('sheetAutosave', () => {
 
       setPending(undefined);
       clearBuffer(id);
-      writeCachedSheet(qc, id, adopted.sheet);
+      writeCachedDetail(qc, id, adopted);
+      /** Backstop: the action may have touched rows it did not return. */
       void qc.invalidateQueries({ queryKey: characterQueries.character(id) });
 
       return adopted;

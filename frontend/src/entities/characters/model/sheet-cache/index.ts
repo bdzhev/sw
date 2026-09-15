@@ -1,1 +1,6 @@
-export { readCachedDetail, writeCachedSheet, mergeCachedSheet } from './sheet-cache';
+export {
+  readCachedDetail,
+  writeCachedDetail,
+  writeCachedSheet,
+  mergeCachedSheet,
+} from './sheet-cache';

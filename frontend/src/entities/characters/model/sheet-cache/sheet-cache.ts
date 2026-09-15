@@ -22,6 +22,25 @@ export const readCachedDetail = (
   return qc.getQueryData<CharacterDetail>(characterQueries.character(id));
 };
 
+/**
+ * Adopts whatever an atomic action returned. A rest rewrites three of the
+ * detail's keys at once, and they have to land together: writing the sheet
+ * alone leaves the resource rows showing pre-rest counters until a refetch,
+ * which reads as the reset having half happened.
+ *
+ * Keys the response did not carry are left as they are, so the same call
+ * serves an action that touches one collection and one that touches three.
+ */
+export const writeCachedDetail = (
+  qc: QueryClient,
+  id: string,
+  partial: Partial<CharacterDetail>,
+): void => {
+  qc.setQueryData(characterQueries.character(id), (old: CharacterDetail | undefined) => {
+    return old ? { ...old, ...partial } : old;
+  });
+};
+
 /** Replaces the sheet wholesale. For a row that came back from the server. */
 export const writeCachedSheet = (
   qc: QueryClient,

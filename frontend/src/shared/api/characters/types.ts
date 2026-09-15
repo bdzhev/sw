@@ -242,6 +242,28 @@ export interface CharacterSpell {
 }
 
 /** Everything `GET /character/:id` returns. */
+export enum RestType {
+  SHORT = 'short',
+  LONG = 'long',
+}
+
+/**
+ * A short rest carries the two numbers the player owns — dice spent and the
+ * healing they rolled on them. A long rest carries nothing at all: every other
+ * value a rest restores is already stored (`maxValue`, `spellSlots.max`), so
+ * the endpoint reads its own rows rather than trusting maxima from here.
+ */
+export type RestPayload =
+  | { type: RestType.SHORT; diceSpent: number; healingRolled: number }
+  | { type: RestType.LONG };
+
+/** The three collections a rest rewrites, under their `CharacterDetail` names. */
+export interface RestResult {
+  sheet: CharacterSheet;
+  classResources: ClassResource[];
+  inventoryItems: InventoryItem[];
+}
+
 export interface CharacterDetail {
   character: CharacterIdentity;
   sheet: CharacterSheet;
