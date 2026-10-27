@@ -1,0 +1,18 @@
+# Builds the app images from source instead of pulling them from ghcr.
+#
+# The published `sw-backend`/`sw-frontend` tags are amd64-only, so `docker
+# compose up` fails on an arm64 machine with "no matching manifest for
+# linux/arm64/v8". Building locally produces images for whatever this host is.
+#
+# The image names are local tags on purpose: overwriting the ghcr tag would make
+# a later `docker compose pull` look like a no-op.
+services:
+  backend:
+    build:
+      context: ./backend
+    image: sw-backend:local
+
+  frontend:
+    build:
+      context: ./frontend
+    image: sw-frontend:local

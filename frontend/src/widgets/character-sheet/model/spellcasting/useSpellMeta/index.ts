@@ -1,0 +1,1 @@
+export { useSpellMeta } from './useSpellMeta';

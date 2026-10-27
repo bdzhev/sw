@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 import { RouteName } from '@shared/lib/router';
+import { Button } from '@shared/ui/button';
 import { Carousel } from '@shared/ui/carousel';
 import { ConfirmDialog } from '@shared/ui/confirm-dialog';
 import { DialogRoot } from '@shared/ui/dialog';
@@ -14,8 +15,8 @@ import { clearQuizDraft, readQuizDraft, writeQuizDraft } from '../../../lib/quiz
 import { useBuilderProvider } from '../../../model/useBuilderProvider';
 import { useCreateCharacter } from '../../../model/useCreateCharacter';
 import { useQuizForm } from '../../../model/useQuizForm';
+import { QuizHeader } from '../quiz-header';
 import { QuizCard } from './quiz-card';
-import { QuizHeader } from './quiz-header';
 
 const { t } = useI18n();
 
@@ -29,9 +30,11 @@ if (!quizItems.value || !character.value) {
   throw new Error('QuizData not loaded');
 }
 
+const questions = quizItems.value.questions;
+
 const form = useQuizForm({
   initialValues: readQuizDraft(characterId),
-  items: quizItems.value.questions,
+  items: questions,
 });
 
 watch(
@@ -59,6 +62,15 @@ const isFormValid = computed(() => {
   return form.meta.value.valid;
 });
 
+/** Same predicate the cards use for their picked tint, counted instead. */
+const progress = computed(() => {
+  const answered = questions.filter((item) => {
+    return Boolean(form.values[item.id]);
+  }).length;
+
+  return { answered, total: questions.length };
+});
+
 const { createCharacter, isCreating } = useCreateCharacter({
   onError: handleCreateCharacterError,
   onSuccess: handleCreateCharacterSuccess,
@@ -70,22 +82,23 @@ const handleCreate = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <!-- No `h-full` below md: `main` has no definite height there, so it resolves
-       to auto and collapses the carousel's height chain. -->
-  <div
-    class="flex min-h-[calc(100svh-var(--spacing-mobile-bar))] flex-col md:h-full md:min-h-0 md:overflow-hidden"
-  >
-    <QuizHeader
-      class="shrink-0 md:mb-4"
-      :is-valid="isFormValid"
-      :is-creating="isCreating"
-      @create="handleCreate"
-    />
+  <div class="flex min-h-0 flex-1 flex-col">
+    <QuizHeader class="md:mb-4" :progress="progress">
+      <Button
+        type="button"
+        class="min-h-11 md:min-h-0"
+        :is-disabled="!isFormValid || isCreating"
+        :is-loading="isCreating"
+        @click="handleCreate"
+      >
+        {{ t('Create character') }}
+      </Button>
+    </QuizHeader>
 
     <div class="min-h-0 flex-1">
       <Carousel>
         <QuizCard
-          v-for="item in quizItems.questions"
+          v-for="item in questions"
           :key="item.id"
           :quiz-item="item"
           :is-picked="Boolean(form.values[item.id])"

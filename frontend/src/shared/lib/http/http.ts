@@ -1,7 +1,36 @@
 import { ApiError } from './ApiError';
 
-export const BASE_URL =
-  (window as Window & { __API_URL__?: string }).__API_URL__ ?? 'http://localhost:3000';
+const API_PORT = 3000;
+
+/**
+ * The API is assumed to answer on the same host as the page. It must be derived
+ * rather than hardcoded: a phone that joined over the LAN would send every
+ * request to its own loopback instead.
+ */
+const sameHostApiUrl = (): string => {
+  const { protocol, hostname } = window.location;
+
+  return `${protocol}//${hostname}:${API_PORT}`;
+};
+
+/**
+ * `__API_URL__` comes from `/config.js`, which the prod image renders from the
+ * `API_URL` env var. A loopback value there is treated as "not configured":
+ * it ships as `http://localhost:3000` in every checkout, and honouring that
+ * would break every device except the one running the server. Point `API_URL`
+ * at a real hostname only when the API lives somewhere else entirely.
+ */
+const configuredApiUrl = (): string | null => {
+  const injected = (window as Window & { __API_URL__?: string }).__API_URL__;
+
+  if (!injected || /^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?$/.test(injected)) {
+    return null;
+  }
+
+  return injected;
+};
+
+export const BASE_URL = configuredApiUrl() ?? sameHostApiUrl();
 
 /**
  * A 401 from these means "wrong credentials", not "session expired", so they must
@@ -70,12 +99,18 @@ const request = async <T>(path: string, init: RequestInit = {}): Promise<T> => {
   return res.json() as Promise<T>;
 };
 
+/**
+ * `init` on `post`/`patch` exists for one flag: `keepalive`, which is what lets a
+ * request outlive the document during page teardown. Spread first, so a caller
+ * cannot reach in and change the method or the body.
+ */
 export const http = {
   get: <T>(path: string) => {
     return request<T>(path);
   },
-  post: <T>(path: string, body?: unknown) => {
+  post: <T>(path: string, body?: unknown, init?: RequestInit) => {
     return request<T>(path, {
+      ...init,
       method: 'POST',
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
@@ -86,8 +121,9 @@ export const http = {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   },
-  patch: <T>(path: string, body?: unknown) => {
+  patch: <T>(path: string, body?: unknown, init?: RequestInit) => {
     return request<T>(path, {
+      ...init,
       method: 'PATCH',
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });

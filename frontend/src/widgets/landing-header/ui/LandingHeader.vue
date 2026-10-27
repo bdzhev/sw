@@ -41,7 +41,7 @@ onUnmounted(() => {
       :class="[
         {
           'flex flex-row items-center justify-between rounded-full p-2 transition-all duration-300': true,
-          'bg-primary-bg/80 backdrop-blur-sm': uiStore.hasScrolled,
+          'bg-bg-primary/80 backdrop-blur-sm': uiStore.hasScrolled,
         },
         uiStore.hasScrolled
           ? `w-[calc(100%-2rem)] pl-4 sm:w-[80%] sm:pl-8 lg:w-[30%]`

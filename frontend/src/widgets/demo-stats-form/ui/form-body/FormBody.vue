@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
 import { Slider } from '@shared/ui/slider';
 import { Text } from '@shared/ui/text';
 
@@ -11,7 +11,7 @@ import { demoStatInputDemoItems } from '../../config/stats/stats';
     <div>
       <Text>Character's name</Text>
 
-      <Input name="characterName" placeholder="Jimbo" class="mt-2" />
+      <FormInput name="characterName" placeholder="Jimbo" class="mt-2" />
     </div>
 
     <div v-for="item in demoStatInputDemoItems" :key="item.id">

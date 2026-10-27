@@ -6,6 +6,8 @@ import {
   DefaultLayout,
   ResultLayout,
   AuthLayout,
+  SheetLayout,
+  BuilderLayout,
 } from '@shared/ui/layouts';
 
 export const routes: RouteRecordRaw[] = [
@@ -51,27 +53,62 @@ export const routes: RouteRecordRaw[] = [
         component: () => {
           return import('@pages/builder');
         },
-        meta: { layout: DefaultLayout },
+        meta: { layout: BuilderLayout },
+        /** `to.name` is a literal in the typed route map, so it narrows `params`. */
         beforeEnter: (to, _from, next) => {
-          const rawId = to.params.id;
-          const id = Array.isArray(rawId) ? rawId[0] : rawId;
-
-          if (!id) {
-            next({ name: RouteName.APP_HOME });
+          if (to.name === RouteName.APP_BUILDER && to.params.id) {
+            next();
 
             return;
           }
 
-          next();
+          next({ name: RouteName.APP_HOME });
         },
       },
       {
-        path: 'character/:id',
+        // The tab is a route param so a tab is deep-linkable, the back button
+        // works, and the sheet survives the mid-combat refresh the save
+        // strategy is designed for. Missing tab redirects to main.
+        path: 'character/:id/:tab?',
         name: RouteName.APP_CHARACTER,
         component: () => {
           return import('@pages/character');
         },
-        meta: { layout: DefaultLayout },
+        meta: { layout: SheetLayout },
+        beforeEnter: (to, _from, next) => {
+          if (to.name !== RouteName.APP_CHARACTER || to.params.tab) {
+            next();
+
+            return;
+          }
+
+          next({
+            name: RouteName.APP_CHARACTER,
+            params: { id: to.params.id, tab: 'main' },
+          });
+        },
+      },
+      {
+        // A page rather than a sixth tab: it carries its own header and shows
+        // none of the sheet's chrome. `items` would also match the `:tab?` route
+        // above, but router ranking scores a static segment over a param, so
+        // this wins regardless of declaration order.
+        path: 'character/:id/items',
+        name: RouteName.APP_CHARACTER_ITEMS,
+        component: () => {
+          return import('@pages/character-items');
+        },
+        meta: { layout: SheetLayout },
+      },
+      {
+        // Same ranking as the items page above: a static segment outranks the
+        // `:tab?` param, so this wins regardless of declaration order.
+        path: 'character/:id/settings',
+        name: RouteName.APP_CHARACTER_SETTINGS,
+        component: () => {
+          return import('@pages/character-settings');
+        },
+        meta: { layout: SheetLayout },
       },
       {
         path: 'settings',

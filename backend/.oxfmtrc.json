@@ -6,9 +6,28 @@
   "trailingComma": "es5",
   "arrowParens": "always",
   "bracketSpacing": true,
-  "ignorePatterns": ["**/dist/**", "**/src/drizzle/**"],
+  "ignorePatterns": ["**/dist/**", "**/src/shared/db/migrations/**"],
   "sortImports": {
+    "groups": [
+      "builtin",
+      "external",
+      "shared",
+      "modules",
+      ["parent", "sibling", "index"],
+      "unknown"
+    ],
+    "customGroups": [
+      {
+        "groupName": "shared",
+        "elementNamePattern": ["@shared/**", "@shared"]
+      },
+      {
+        "groupName": "modules",
+        "elementNamePattern": ["@modules/**", "@modules"]
+      }
+    ],
     "newlinesBetween": true,
-    "ignoreCase": true
+    "ignoreCase": true,
+    "order": "asc"
   }
 }

@@ -3,9 +3,31 @@
   "js/ts.tsdk.promptToUseWorkspaceVersion": true,
 
   "editor.formatOnSave": true,
+  // oxfmt formats whole files, not just modified ranges — it owns import order,
+  // so a partial format would produce inconsistent results.
   "editor.formatOnSaveMode": "file",
   "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.codeActionsOnSave": {
     "source.fixAll.oxc": "always"
+  },
+
+  // These per-language blocks are load-bearing, not redundant with the generic
+  // `editor.defaultFormatter` above. A language-specific setting always beats a
+  // generic one, even a generic one declared closer to the file — so a
+  // `"[typescript]"` formatter in the user's own settings.json silently wins here
+  // unless this folder claims the language too. Symptom when it does: files come
+  // back double-quoted with trailing commas everywhere (Prettier's defaults),
+  // while `bun run format` puts them back, so every commit churns.
+  "[typescript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   }
 }

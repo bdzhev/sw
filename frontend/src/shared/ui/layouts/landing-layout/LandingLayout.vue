@@ -1,5 +1,5 @@
 <template>
-  <div id="layout" class="relative z-10 flex flex-col bg-radial">
+  <div id="layout" class="relative z-10 flex flex-col">
     <slot name="header" />
 
     <div class="flex flex-1 flex-col" id="content">

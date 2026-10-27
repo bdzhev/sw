@@ -1,4 +1,10 @@
-import type { ButtonProps } from './BaseButton.types';
-import Button from './BaseButton.vue';
+import Button from './Button.vue';
 
-export { Button, type ButtonProps };
+export { Button };
+export type {
+  ButtonAlign,
+  ButtonProps,
+  ButtonSize,
+  ButtonVariant,
+  ButtonWidth,
+} from './Button.types';

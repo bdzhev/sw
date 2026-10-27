@@ -1,14 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { Toaster } from '@shared/ui/toast';
 import { TooltipProvider } from '@shared/ui/tooltip';
 
 import { LandingFooter } from '@widgets/landing-footer';
-import { LandingHeader } from '@widgets/landing-header';
-import { SidebarNavigation } from '@widgets/sidebar-navigation';
 
 const route = useRoute();
+
+const LandingHeader = defineAsyncComponent({
+  loader: async () => {
+    const { LandingHeader } = await import('@widgets/landing-header');
+
+    return LandingHeader;
+  },
+  timeout: 1000,
+});
+
+const SidebarNavigation = defineAsyncComponent({
+  loader: async () => {
+    const { SidebarNavigation } = await import('@widgets/sidebar-navigation');
+
+    return SidebarNavigation;
+  },
+  timeout: 1000,
+});
 
 /** reka defaults to 700ms, which reads as "the tooltip is broken". */
 const TOOLTIP_DELAY_MS = 200;
@@ -37,6 +54,8 @@ const layout = computed(() => {
         <LandingFooter />
       </template>
     </component>
+
+    <Toaster />
   </TooltipProvider>
 </template>
 

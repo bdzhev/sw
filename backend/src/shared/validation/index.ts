@@ -1,0 +1,1 @@
+export { errorHook } from './validate';

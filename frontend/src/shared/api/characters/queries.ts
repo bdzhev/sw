@@ -7,7 +7,7 @@ export const characterQueries = {
   character: (id?: string) => {
     return [BASE_QUERY_PART, id];
   },
-  addCharacter: () => {
-    return [BASE_QUERY_PART, 'addCharacter'];
+  createCharacter: () => {
+    return [BASE_QUERY_PART, 'createCharacter'];
   },
 };

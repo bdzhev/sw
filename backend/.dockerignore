@@ -1,0 +1,12 @@
+# Installed inside the image — copying the host's would defeat the install layer
+# and drop macOS binaries into a linux image.
+node_modules
+
+# The live Postgres data directory, bind-mounted by compose. Without this line
+# `COPY . .` bakes the database into the image, and every write to it
+# invalidates that layer and everything after it.
+postgres
+
+.git
+.env*
+*.log

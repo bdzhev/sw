@@ -36,7 +36,7 @@ const props = defineProps<BaseConfirmDialogProps>();
       </DialogBody>
 
       <DialogFooter>
-        <div class="flex flex-row items-center justify-end gap-4">
+        <div class="flex flex-row flex-wrap items-center justify-end gap-4">
           <DialogClose as-child>
             <Button variant="secondary" :is-disabled="props.isLoading">
               {{ 'Cancel' }}

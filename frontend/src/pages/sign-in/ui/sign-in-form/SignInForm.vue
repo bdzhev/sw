@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { getApiErrorMessage } from '@shared/lib/http';
 import { RouteName } from '@shared/lib/router';
 import { Button } from '@shared/ui/button';
-import { Input } from '@shared/ui/input';
+import { FormInput } from '@shared/ui/form-input';
 import { SensitiveInput } from '@shared/ui/sensitive-input';
 import { Text } from '@shared/ui/text';
 
@@ -50,7 +50,7 @@ const errorMessage = computed(() => {
 
 <template>
   <form @submit.prevent="handleSubmit">
-    <Input name="username" placeholder="Username" autocomplete="username" />
+    <FormInput name="username" placeholder="Username" autocomplete="username" />
 
     <SensitiveInput
       name="password"

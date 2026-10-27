@@ -19,6 +19,28 @@
    */
   --spacing-mobile-bar: 3.5rem;
 
+  /**
+   * The widest a single form control gets before it stops reading as a control.
+   * A select or an input stretched across a desktop card looks like a banner,
+   * not a field. Tailwind's `--container-*` namespace, so this is `max-w-field`
+   * (and `w-field` / `min-w-field`) at every breakpoint.
+   *
+   * Deliberately not applied inside `shared/ui/select` itself: a dialog's fields
+   * are meant to fill their column and match the inputs beside them. This is for
+   * a lone control on a wide sheet surface.
+   */
+  --container-field: 20rem;
+
+  /**
+   * How wide a toast gets. Narrow on purpose: it is an interruption in the
+   * corner, not a banner, and the viewport is `w-full max-w-toast` so a phone
+   * keeps a visible gutter beside it rather than a full-bleed bar.
+   */
+  --container-toast: 20rem;
+
+  /* Below Tailwind's `xs`, for status chrome that must not compete with content. */
+  --text-xxs: 0.6875rem;
+
   --font-alegreya: 'Alegreya', sans-serif;
 
   /**
@@ -35,17 +57,16 @@
   --animate-drawer-out-left: drawer-out-left 150ms ease-in;
   --animate-drawer-in-right: drawer-in-right 200ms ease-out;
   --animate-drawer-out-right: drawer-out-right 150ms ease-in;
+  --animate-toast-in: toast-in 200ms ease-out;
+  --animate-toast-out: toast-out 150ms ease-in;
+  --animate-menu-in: menu-in 120ms ease-out;
+  --animate-menu-out: menu-out 100ms ease-in;
+  --animate-accordion-down: accordion-down 180ms ease-out;
+  --animate-accordion-up: accordion-up 150ms ease-in;
 
   /**
    * Values come from the shadcn preset `b1Lhw7mSAq`, `.dark` block only — the app
-   * has no light theme. The preset's own variable names are deliberately not
-   * introduced: these semantic names stay, so nothing downstream changes and
-   * there is no second vocabulary to collide with (rules §4).
-   *
-   * shadcn's `--primary` is a fill paired with `--primary-foreground`, while our
-   * `--color-accent-primary` is the outline/text colour of a transparent button.
-   * So the bright `--sidebar-primary` takes that slot and the darker `--primary`
-   * becomes the hover fill, which keeps the existing light-on-dark relationship.
+   * has no light theme.
    */
   --color-bg-primary: oklch(0.147 0.004 49.25); /* --background */
   --color-bg-secondary: oklch(0.216 0.006 56.043); /* --card */
@@ -66,35 +87,35 @@
   --color-danger: oklch(0.704 0.191 22.216); /* --destructive */
   --color-warning: oklch(0.837 0.128 66.29); /* --chart-1 */
 
-  /* remove the colors below in next iterations */
-  --color-primary-bg: oklch(0.147 0.004 49.25); /* --background */
-  --color-primary-fg: oklch(0.216 0.006 56.043); /* --popover */
-
-  --color-secondary-bg: oklch(0.274 0.006 286.033); /* --secondary */
-  --color-secondary-fg: oklch(0.268 0.007 34.298); /* --muted */
-
-  /* Was referenced by the loading-animation shimmer and never defined, so that
-     gradient ran transparent-to-transparent. */
-  --color-primary-muted: oklch(0.268 0.007 34.298); /* --muted */
-
-  --color-primary-button: oklch(0.216 0.006 56.043); /* --card */
-  --color-primary-button-bg: oklch(0.696 0.17 162.48); /* --sidebar-primary */
-  --color-primary-button-hover-bg: oklch(0.432 0.095 166.913); /* --primary */
-
-  --color-secondary-button: oklch(0.274 0.006 286.033); /* --secondary */
+  /* Raised neutral surface: the secondary button fill, a switch's off track,
+     the card overlay. Distinct from --color-bg-secondary, which is flatter. */
+  --color-bg-raised: oklch(0.274 0.006 286.033); /* --secondary */
   /* The preset has no adjacent neutral step, so the hover is derived. */
-  --color-secondary-button-hover: color-mix(
+  --color-bg-raised-hover: color-mix(
     in oklab,
     oklch(0.274 0.006 286.033),
     oklch(0.985 0.001 106.423) 12%
   );
 
-  --color-button-disabled: oklch(0.268 0.007 34.298); /* --muted */
+  /* Muted: disabled fills, the loading shimmer, dim-until-hover icons. */
+  --color-muted: oklch(0.268 0.007 34.298); /* --muted */
 
-  --color-accent: oklch(0.705 0.213 47.604); /* --chart-2 */
-  --color-accent-muted: oklch(0.646 0.222 41.116); /* --chart-3 */
+  /**
+   * Surfaces that float above the page: dialog, drawer, toast. Lighter than
+   * --color-bg-secondary on purpose — the overlay behind them is the page colour
+   * at 80%, so a card-coloured panel over it reads as flat.
+   */
+  --color-bg-elevated: oklch(0.3 0.006 286.033);
 
-  --color-error: oklch(0.704 0.191 22.216); /* --destructive */
+  /**
+   * Coin colours, for the currency captions only. Not in the semantic ramp
+   * above — these name a material, not a role, so they must never be reached for
+   * as "the warm one" or "the muted one". All three are light enough to read on
+   * --color-bg-secondary.
+   */
+  --color-coin-gold: oklch(0.83 0.14 88);
+  --color-coin-silver: oklch(0.8 0.02 250);
+  --color-coin-copper: oklch(0.68 0.13 45);
 }
 
 @utility loading-animation {
@@ -109,12 +130,7 @@
 
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-primary-muted),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, var(--color-muted), transparent);
     animation: loading-shimmer 1.25s infinite;
   }
 }
@@ -133,12 +149,7 @@
     left: -200%;
     height: 100%;
     width: 200%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      var(--color-secondary-bg),
-      transparent
-    );
+    background: linear-gradient(90deg, transparent, var(--color-bg-raised), transparent);
     transform: translateX(0);
   }
 }
@@ -182,6 +193,31 @@
   to {
     opacity: 0;
     transform: scale(0.97);
+  }
+}
+
+/**
+ * Height, not max-height: reka measures the panel and publishes the number as
+ * `--reka-accordion-content-height`, so the open state animates to a real value
+ * instead of an arbitrary ceiling that would make short panels look slow.
+ */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--reka-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--reka-accordion-content-height);
+  }
+
+  to {
+    height: 0;
   }
 }
 
@@ -245,6 +281,66 @@
   }
 }
 
+/**
+ * `transform`, not the `translate` utilities: the toast root carries
+ * `data-[swipe=move]:translate-x-*` for the drag, and the two must not compound.
+ *
+ * X only, in both directions. The viewport is pinned to the right edge, so the
+ * toast slides in leftwards off that edge and leaves back out through it — the
+ * same axis the swipe-to-dismiss gesture uses.
+ */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+/**
+ * Scale only, no translate: reka positions the popper by writing `transform` on
+ * the content's wrapper, and a translating keyframe here would compound with it.
+ */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes menu-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
 @utility fade-bottom {
   mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
 }
@@ -275,12 +371,29 @@
   @apply px-5 md:px-10 lg:px-22;
 }
 
+/**
+ * Cancel an inherited `page-x`, for a full-bleed bar or strip inside a guttered
+ * container. The element must not also be `w-full` — a fixed width ignores the
+ * negative margins and shifts left instead of widening.
+ */
+@utility page-x-escape {
+  @apply -mx-5 md:-mx-10 lg:-mx-22;
+}
+
+/**
+ * Escape the gutter and re-apply it inside, for a strip that scrolls edge to
+ * edge while its content still starts on the gutter.
+ */
+@utility page-x-bleed {
+  @apply page-x-escape page-x;
+}
+
 @utility bg-radial {
   background-image: radial-gradient(
     circle at center,
-    var(--accent) 0%,
-    var(--secondary) 40%,
-    var(--primary-bg) 100%
+    var(--color-branding) 0%,
+    var(--color-secondary) 40%,
+    var(--color-bg-primary) 100%
   );
   background-size: 300% 300%;
   background-position: center;
@@ -292,6 +405,10 @@
   -webkit-overflow-scrolling: touch;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 html,
 body {
   margin: 0;
@@ -301,7 +418,7 @@ body {
   font-style: normal;
   color: var(--color-primary);
 
-  background-color: var(--color-primary-bg);
+  background-color: var(--color-bg-primary);
 
   ::-webkit-scrollbar {
     display: none;
@@ -309,7 +426,7 @@ body {
 }
 
 #app {
-  background-color: var(--color-primary-bg);
+  background-color: var(--color-bg-primary);
   height: 100%;
 }
 
@@ -321,19 +438,25 @@ body {
 /**
  * Headings scale with the viewport here, once, so a section only overrides the
  * scale when its type is genuinely special (the landing hero, for instance).
+ *
+ * `@layer base` is load-bearing: unlayered rules beat every `@layer`, so
+ * without it these win over the utilities layer and a `text-sm` on an `<h2>` is
+ * silently ignored.
  */
-h1 {
-  @apply text-2xl font-extrabold md:text-3xl lg:text-4xl;
-}
+@layer base {
+  h1 {
+    @apply text-2xl font-extrabold md:text-3xl lg:text-4xl;
+  }
 
-h2 {
-  @apply text-xl font-bold md:text-2xl lg:text-3xl;
-}
+  h2 {
+    @apply text-xl font-bold md:text-2xl lg:text-3xl;
+  }
 
-h3 {
-  @apply text-lg font-extrabold md:text-xl lg:text-2xl;
-}
+  h3 {
+    @apply text-lg font-extrabold md:text-xl lg:text-2xl;
+  }
 
-h4 {
-  @apply text-base font-bold md:text-lg lg:text-xl;
+  h4 {
+    @apply text-base font-bold md:text-lg lg:text-xl;
+  }
 }

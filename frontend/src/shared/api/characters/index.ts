@@ -1,12 +1,28 @@
 export { characterQueries } from './queries';
 
 export {
-  getCharactersInfo,
+  COLLECTION_SEGMENTS,
+  createCollectionRow,
+  updateCollectionRow,
+  deleteCollectionRow,
+  CollectionKey,
+  type CollectionRow,
+  type CollectionCreate,
+  type CollectionPatch,
+} from './collections';
+
+export {
+  getCharacterSummaries,
   getCharacter,
   updateCharacter,
+  updateCharacterSheet,
+  sendSheetPatchOnTeardown,
+  runCharacterAction,
   deleteCharacter,
-  addCharacter,
+  createCharacter,
   PAGE_SIZE,
+  MAX_CHARACTERS,
+  MAX_ITEMS,
 } from './characters';
 
 export {
@@ -14,8 +30,29 @@ export {
   CharacterStatus,
   CharacterStat,
   CharacterRace,
-  type BaseCharacterData,
-  type CharacterData,
-  type AddCharacterPayload,
+  SpellcastingProgression,
+  AttackAbility,
+  AttackDelivery,
+  TraitTag,
+  ResetTrigger,
+  RestType,
+  type CharacterSummary,
+  type CharacterIdentity,
+  type CharacterSheet,
+  type CharacterDetail,
+  type CharactersPage,
+  type CreateCharacterPayload,
   type UpdateCharacterPayload,
+  type SheetPatch,
+  type RestPayload,
+  type RestResult,
+  type SpellSlots,
+  type Languages,
+  type SkillProficiencies,
+  type Attack,
+  type Trait,
+  type ClassResource,
+  type InventoryItem,
+  type SpellReference,
+  type CharacterSpell,
 } from './types';

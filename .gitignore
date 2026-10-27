@@ -11,5 +11,12 @@ build/
 # postgres data
 backend/postgres/
 
+# Architecture decision records — local notes, not shared. The skills that read
+# them (/improve-codebase-architecture, /domain-modeling) work off the working
+# tree, so ignoring these costs nothing. Matches both contexts: docs/adr/ at the
+# root for system-wide decisions, and frontend|backend/docs/adr/ for scoped ones.
+# docs/agents/ is deliberately NOT ignored — that is shared repo config.
+**/docs/adr/
+
 # OS
 .DS_Store

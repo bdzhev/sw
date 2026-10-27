@@ -1,11 +1,15 @@
 import { useRoute } from 'vue-router';
 
+import { RouteName } from '@shared/lib/router';
+
 export const useRouteParam = () => {
-  const route = useRoute();
+  /**
+   * Naming the route is what types `params`: `:id?` normalizes to `''` when it
+   * is missing, and the route's own `beforeEnter` redirects in that case.
+   */
+  const route = useRoute(RouteName.APP_BUILDER);
 
-  const rawId = route.params.id;
-
-  const characterId = Array.isArray(rawId) ? rawId[0] : rawId;
+  const characterId = route.params.id;
 
   return { characterId };
 };

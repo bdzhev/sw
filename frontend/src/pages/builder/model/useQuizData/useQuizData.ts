@@ -40,7 +40,7 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
   watch(
     character,
     (value) => {
-      if (value?.status === CharacterStatus.ACTIVE) {
+      if (value?.character.status === CharacterStatus.ACTIVE) {
         router.replace({
           name: RouteName.APP_CHARACTER,
           params: { id: ctx.characterId },
@@ -50,7 +50,7 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     { immediate: true },
   );
 
-  const handleTryAgainClick = () => {
+  const refetchQuizData = () => {
     if (characterError) {
       refetchCharacter();
     }
@@ -78,6 +78,6 @@ export const useQuizData = (options?: UseQuizDataOptions) => {
     character,
     quizItems,
     hasError,
-    onTryAgainClick: handleTryAgainClick,
+    refetchQuizData,
   };
 };

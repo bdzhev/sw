@@ -3,25 +3,27 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { nextTick, onBeforeUnmount } from 'vue';
 
 import { mediaFrom } from '../../ui/breakpoints';
+import { createStickyEase } from './stickyEase';
 import type { UseHorizontalScrollAnimationOptions } from './types';
 
 /**
- * How much page scroll one panel-width of horizontal travel costs. 1 is the 1:1
- * mapping — the row moves exactly as fast as the wheel — which reads right with
- * a pointer. Touch gets a shorter distance: a flick covers far less than a wheel
- * spin, and at 1:1 a phone needs several swipes per panel.
+ * How much page scroll one panel-width of horizontal travel costs. Not the wheel
+ * cost: ScrollSmoother runs on the same md-and-up range as the pin and its
+ * `speed` below 1 multiplies whatever is set here, so 0.5 reads as roughly 1:1.
  */
 const TOUCH_END_MULTIPLIER = 0.5;
-const DESKTOP_END_MULTIPLIER = 1;
+const DESKTOP_END_MULTIPLIER = 0.5;
+
+const DEFAULT_STICKINESS = 0.75;
 
 export const useHorizontalScrollAnimation = (
   options: UseHorizontalScrollAnimationOptions,
 ) => {
   const {
     wrapperSelector,
-    rowSelector,
     childrenSelector,
     mediaQuery = mediaFrom('md'),
+    stickiness = DEFAULT_STICKINESS,
   } = options;
 
   gsap.registerPlugin(ScrollTrigger);
@@ -46,15 +48,18 @@ export const useHorizontalScrollAnimation = (
 
       const sections = gsap.utils.toArray<HTMLElement>(childrenSelector);
       const wrapper = document.querySelector<HTMLElement>(wrapperSelector);
-      const row = document.querySelector(rowSelector);
 
-      if (!wrapper || !sections.length || !row) {
+      /**
+       * Two is the real minimum: a single panel leaves the sticky ease with no
+       * gap to divide by.
+       */
+      if (!wrapper || sections.length < 2) {
         return;
       }
 
       const scrollTween = gsap.to(sections, {
         xPercent: -100 * (sections.length - 1),
-        ease: 'none',
+        ease: createStickyEase(sections.length - 1, stickiness),
         scrollTrigger: {
           trigger: wrapper,
           start: 'top top',
@@ -70,7 +75,12 @@ export const useHorizontalScrollAnimation = (
           },
           pin: true,
           anticipatePin: 1,
-          scrub: isDesktop ? 0.5 : true,
+          /**
+           * Locked to scroll position, not eased into it: the smoother already
+           * eases, and a scrub duration on top of that is what made the row
+           * visibly trail the wheel.
+           */
+          scrub: true,
           /**
            * Snapping competes with touch momentum, so it stays a
            * pointer-device affordance.
@@ -78,8 +88,15 @@ export const useHorizontalScrollAnimation = (
           snap: isDesktop
             ? {
                 snapTo: 1 / (sections.length - 1),
-                duration: { min: 0.2, max: 0.5 },
-                ease: 'power1.inOut',
+                duration: { min: 0.1, max: 0.25 },
+                ease: 'power2.out',
+                /**
+                 * Both default to on, and together they are what made a nudge
+                 * forward get pulled to the next panel rather than back to the
+                 * nearest one. Off, snap only finishes what the ease started.
+                 */
+                directional: false,
+                inertia: false,
               }
             : undefined,
           invalidateOnRefresh: true,
